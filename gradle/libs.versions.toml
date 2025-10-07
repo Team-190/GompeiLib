@@ -3,7 +3,6 @@ wpilib = "2025.3.1"
 advantagekit = "4.1.2"
 phoenix6 = "25.4.0"
 
-
 [libraries]
 # WPILib Core
 wpilib-wpilibj = { group = "edu.wpi.first.wpilibj", name = "wpilibj-java", version.ref = "wpilib" }
@@ -12,6 +11,8 @@ wpilib-ntcore = { group = "edu.wpi.first.ntcore", name = "ntcore-java", version.
 wpilib-cscore = { group = "edu.wpi.first.cscore", name = "cscore-java", version.ref = "wpilib" }
 wpilib-cameraserver = { group = "edu.wpi.first.cameraserver", name = "cameraserver-java", version.ref = "wpilib" }
 wpilib-wpiutil = { group = "edu.wpi.first.wpiutil", name = "wpiutil-java", version.ref = "wpilib" }
+wpilib-wpiunits = { group = "edu.wpi.first.wpiunits", name = "wpiunits-java", version.ref = "wpilib" }
+wpilib-commands = { group = "edu.wpi.first.wpilibNewCommands", name = "wpilibNewCommands-java", version.ref = "wpilib" }
 
 # AdvantageKit
 advantagekit-java = { group = "org.littletonrobotics.akit", name = "akit-java", version.ref = "advantagekit" }
@@ -26,5 +27,7 @@ wpilib = [
     "wpilib-ntcore",
     "wpilib-cscore",
     "wpilib-cameraserver",
-    "wpilib-wpiutil"
+    "wpilib-wpiutil",
+    "wpilib-wpiunits",
+    "wpilib-commands"
 ]
