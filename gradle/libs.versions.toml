@@ -1,7 +1,10 @@
 [versions]
 wpilib = "2025.3.1"
 advantagekit = "4.1.2"
+quickbuf = "1.4"
+jackson = "2.17.2"
 phoenix6 = "25.4.0"
+choreo = "2025.0.3"
 
 [libraries]
 # WPILib Core
@@ -16,9 +19,19 @@ wpilib-commands = { group = "edu.wpi.first.wpilibNewCommands", name = "wpilibNew
 
 # AdvantageKit
 advantagekit-java = { group = "org.littletonrobotics.akit", name = "akit-java", version.ref = "advantagekit" }
+advantagekit-autolog = { group = "org.littletonrobotics.akit", name = "akit-autolog", version.ref = "advantagekit" }
 
-# Vendor Libraries
+# QuickBuf / Jackson (runtime dependencies needed for generated code)
+quickbuf = { group = "us.hebi.quickbuf", name = "quickbuf-runtime", version.ref = "quickbuf" }
+jackson-annotations = { group = "com.fasterxml.jackson.core", name = "jackson-annotations", version.ref = "jackson" }
+jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-core", version.ref = "jackson" }
+jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
+
+# CTRE Phoenix 6/Pro
 phoenix6 = { group = "com.ctre.phoenix6", name = "wpiapi-java", version.ref = "phoenix6" }
+
+# Choreo
+choreo = { group = "choreo", name = "ChoreoLib-java", version.ref = "choreo" }
 
 [bundles]
 wpilib = [
@@ -30,4 +43,13 @@ wpilib = [
     "wpilib-wpiutil",
     "wpilib-wpiunits",
     "wpilib-commands"
+]
+
+advantagekit = [
+    "advantagekit-java",
+    "advantagekit-autolog",
+    "quickbuf",
+    "jackson-annotations",
+    "jackson-core",
+    "jackson-databind"
 ]
