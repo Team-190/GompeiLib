@@ -10,9 +10,9 @@ import edu.wpi.team190.gompeilib.core.logging.Trace;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
-public class Module {
-    private final DriveConstants driveConstants;
-  private final ModuleIO io;
+public class SwerveModule {
+    private final SwerveDriveConstants driveConstants;
+  private final SwerveModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
   private final int index;
 
@@ -22,7 +22,7 @@ public class Module {
     @Getter
     private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
 
-  public Module(DriveConstants driveConstants, ModuleIO io, int index) {
+  public SwerveModule(SwerveDriveConstants driveConstants, SwerveModuleIO io, int index) {
       this.driveConstants = driveConstants;
     this.io = io;
     this.index = index;

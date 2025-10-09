@@ -19,20 +19,26 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.List;
+import java.util.Optional;
+import java.util.Queue;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import edu.wpi.team190.gompeilib.core.GompeiLib;
+import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIO;
+import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOInputsAutoLogged;
+import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOPigeon2;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
+import edu.wpi.team190.gompeilib.core.utility.PhoenixOdometryThread;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Drive extends SubsystemBase {
-    private final DriveConstants driveConstants;
+public class SwerveDrive extends SubsystemBase {
+    private final SwerveDriveConstants driveConstants;
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs;
-  private final Module[] modules;
+  private final SwerveModule[] modules;
 
   private final LinearFilter xFilter;
   private final LinearFilter yFilter;
@@ -52,24 +58,29 @@ public class Drive extends SubsystemBase {
   private final PIDController autoYController;
   private final PIDController autoHeadingController;
 
-  public Drive(
-          DriveConstants driveConstants,
+  private final boolean isGryoHighFrequency;
+
+  private final Optional<Queue<Double>> yawTimestampQueue;
+  private final Optional<Queue<Double>> yawPositionQueue;
+
+  public SwerveDrive(
+          SwerveDriveConstants driveConstants,
           GyroIO gyroIO,
-          ModuleIO flModuleIO,
-          ModuleIO frModuleIO,
-          ModuleIO blModuleIO,
-          ModuleIO brModuleIO,
+          SwerveModuleIO flModuleIO,
+          SwerveModuleIO frModuleIO,
+          SwerveModuleIO blModuleIO,
+          SwerveModuleIO brModuleIO,
           Supplier<Pose2d> robotPoseSupplier,
           Consumer<Pose2d> resetPoseConsumer,
-          DriveConstants.AutoAlignGains autoFeedbackConstants) {
+          SwerveDriveConstants.AutoAlignGains autoFeedbackConstants) {
       this.driveConstants = driveConstants;
     this.gyroIO = gyroIO;
     gyroInputs = new GyroIOInputsAutoLogged();
-    modules = new Module[4]; // FL, FR, BL, BR
-    modules[0] = new Module(driveConstants, flModuleIO, 0);
-    modules[1] = new Module(driveConstants, frModuleIO, 1);
-    modules[2] = new Module(driveConstants, blModuleIO, 2);
-    modules[3] = new Module(driveConstants, brModuleIO, 3);
+    modules = new SwerveModule[4]; // FL, FR, BL, BR
+    modules[0] = new SwerveModule(driveConstants, flModuleIO, 0);
+    modules[1] = new SwerveModule(driveConstants, frModuleIO, 1);
+    modules[2] = new SwerveModule(driveConstants, blModuleIO, 2);
+    modules[3] = new SwerveModule(driveConstants, brModuleIO, 3);
 
     // Start threads (no-op if no signals have been created)
     PhoenixOdometryThread.getInstance(driveConstants).start();
@@ -102,13 +113,27 @@ public class Drive extends SubsystemBase {
     this.autoXController = new PIDController(autoFeedbackConstants.translation_Kp().get(), 0, autoFeedbackConstants.translation_Kd().get());
     this.autoYController = new PIDController(autoFeedbackConstants.translation_Kp().get(), 0, autoFeedbackConstants.translation_Kd().get());
     this.autoHeadingController = new PIDController(autoFeedbackConstants.rotation_Kp().get(), 0, autoFeedbackConstants.rotation_Kd().get());
+
+    this.isGryoHighFrequency = gyroIO instanceof GyroIOPigeon2;
+
+    if (isGryoHighFrequency) {
+        this.yawTimestampQueue = Optional.of(PhoenixOdometryThread.getInstance(driveConstants).makeTimestampQueue());
+        this.yawPositionQueue = Optional.of(PhoenixOdometryThread.getInstance(driveConstants).registerSignal(gyroIO.getYaw()));
+    } else {
+        this.yawTimestampQueue = Optional.empty();
+        this.yawPositionQueue = Optional.empty();
+    }
   }
 
   @Trace
   public void periodic() {
     driveConstants.lock.lock();
 
-    gyroIO.updateInputs(gyroInputs);
+    if (yawTimestampQueue.isPresent() && yawPositionQueue.isPresent()) {
+        gyroIO.updateInputs(gyroInputs, yawTimestampQueue.get(), yawPositionQueue.get());
+        yawTimestampQueue.get().clear();
+        yawPositionQueue.get().clear();
+    }
 
     for (int i = 0; i < 4; i++) {
       modules[i].updateInputs();

@@ -9,7 +9,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class DriveConstants {
+public class SwerveDriveConstants {
   public final ReentrantLock lock;
 
   public final SwerveModuleConstants<
@@ -35,7 +35,7 @@ public class DriveConstants {
   public final double DRIVER_DEADBAND;
   public final double OPERATOR_DEADBAND;
 
-  public DriveConstants(
+  public SwerveDriveConstants(
       DriveConfig driveConfig,
       Gains gains,
       AutoAlignGains autoAlignGains,

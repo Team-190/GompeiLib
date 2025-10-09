@@ -11,12 +11,14 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
+package edu.wpi.team190.gompeilib.core.utility;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive.SwerveDriveConstants;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -34,7 +36,7 @@ import java.util.function.DoubleSupplier;
  * time synchronization.
  */
 public class PhoenixOdometryThread extends Thread {
-  private final DriveConstants driveConstants;
+  private final SwerveDriveConstants driveConstants;
   private final Lock signalsLock =
       new ReentrantLock(); // Prevents conflicts when registering signals
   private BaseStatusSignal[] phoenixSignals = new BaseStatusSignal[0];
@@ -46,14 +48,14 @@ public class PhoenixOdometryThread extends Thread {
   private static boolean isCANFD;
   private static PhoenixOdometryThread instance = null;
 
-  public static PhoenixOdometryThread getInstance(DriveConstants driveConstants) {
+  public static PhoenixOdometryThread getInstance(SwerveDriveConstants driveConstants) {
     if (instance == null) {
       instance = new PhoenixOdometryThread(driveConstants);
     }
     return instance;
   }
 
-  private PhoenixOdometryThread(DriveConstants driveConstants) {
+  private PhoenixOdometryThread(SwerveDriveConstants driveConstants) {
       this.driveConstants = driveConstants;
     setName("PhoenixOdometryThread");
     setDaemon(true);

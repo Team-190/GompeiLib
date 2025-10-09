@@ -1,4 +1,4 @@
-package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
+package edu.wpi.team190.gompeilib.core.io.components.inertial;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -10,19 +10,18 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
+import edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive.SwerveDriveConstants;
+import lombok.Getter;
 
 import java.util.Queue;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
-
+    @Getter
     private final StatusSignal<Angle> yaw;
     private final StatusSignal<AngularVelocity> yawVelocity;
 
-    private final Queue<Double> yawPositionQueue;
-  private final Queue<Double> yawTimestampQueue;
-
-  public GyroIOPigeon2(DriveConstants driveConstants) {
+  public GyroIOPigeon2(SwerveDriveConstants driveConstants) {
       Pigeon2 pigeon = new Pigeon2(driveConstants.DRIVE_CONFIG.pigeon2Id(), driveConstants.DRIVE_CONFIG.canBus());
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
     pigeon.getConfigurator().setYaw(0.0);
@@ -35,15 +34,12 @@ public class GyroIOPigeon2 implements GyroIO {
 
     pigeon.optimizeBusUtilization();
 
-    yawTimestampQueue = PhoenixOdometryThread.getInstance(driveConstants).makeTimestampQueue();
-    yawPositionQueue = PhoenixOdometryThread.getInstance(driveConstants).registerSignal(pigeon.getYaw());
-
     PhoenixUtil.registerSignals(true, yaw, yawVelocity);
   }
 
   @Trace
   @Override
-  public void updateInputs(GyroIOInputs inputs) {
+  public void updateInputs(GyroIOInputs inputs, Queue<Double> yawTimestampQueue, Queue<Double> yawPositionQueue) {
     inputs.connected = BaseStatusSignal.isAllGood(yaw, yawVelocity);
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
@@ -54,8 +50,5 @@ public class GyroIOPigeon2 implements GyroIO {
         yawPositionQueue.stream()
             .map(Rotation2d::fromDegrees)
             .toArray(Rotation2d[]::new);
-
-    yawTimestampQueue.clear();
-    yawPositionQueue.clear();
   }
 }

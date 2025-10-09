@@ -3,7 +3,7 @@ package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface ModuleIO {
+public interface SwerveModuleIO {
   @AutoLog
   public static class ModuleIOInputs {
     public double drivePositionRadians = 0.0;

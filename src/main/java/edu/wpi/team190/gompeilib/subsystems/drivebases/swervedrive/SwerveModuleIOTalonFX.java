@@ -23,6 +23,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
+import edu.wpi.team190.gompeilib.core.utility.PhoenixOdometryThread;
 
 import java.util.Queue;
 
@@ -34,7 +35,7 @@ import static edu.wpi.team190.gompeilib.core.utility.PhoenixUtil.tryUntilOk;
  *
  * <p>Device configuration and other behaviors not exposed by TunerConstants can be customized here.
  */
-public class ModuleIOTalonFX implements ModuleIO {
+public class SwerveModuleIOTalonFX implements SwerveModuleIO {
   private final TalonFX driveTalonFX;
   private final TalonFX turnTalonFX;
   private final CANcoder cancoder;
@@ -71,8 +72,8 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final VelocityTorqueCurrentFOC velocityTorqueCurrentRequest;
   private final MotionMagicTorqueCurrentFOC positionTorqueCurrentRequest;
 
-  public ModuleIOTalonFX(
-          DriveConstants driveConstants,
+  public SwerveModuleIOTalonFX(
+          SwerveDriveConstants driveConstants,
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
     driveTalonFX = new TalonFX(constants.DriveMotorId, driveConstants.DRIVE_CONFIG.canBus());

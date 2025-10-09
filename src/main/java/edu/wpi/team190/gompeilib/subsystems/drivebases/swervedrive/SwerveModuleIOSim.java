@@ -18,7 +18,7 @@ import edu.wpi.team190.gompeilib.core.GompeiLib;
  *
  * <p>Simulation is always based on voltage control.
  */
-public class ModuleIOSim implements ModuleIO {
+public class SwerveModuleIOSim implements SwerveModuleIO {
   private static final double DRIVE_KP = 0.05;
   private static final double DRIVE_KD = 0.0;
   private static final double DRIVE_KS = 0.0;
@@ -41,8 +41,8 @@ public class ModuleIOSim implements ModuleIO {
   private double driveAppliedVolts;
   private double turnAppliedVolts;
 
-  public ModuleIOSim(DriveConstants driveConstants,
-      SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+  public SwerveModuleIOSim(SwerveDriveConstants driveConstants,
+                           SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
     // Create drive and turn sim models
     driveSim =
