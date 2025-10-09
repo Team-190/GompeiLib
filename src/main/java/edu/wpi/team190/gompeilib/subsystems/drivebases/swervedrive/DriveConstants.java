@@ -6,7 +6,7 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.team190.gompeilib.core.util.LoggedTunableNumber;
+import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DriveConstants {

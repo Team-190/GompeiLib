@@ -1,4 +1,4 @@
-package edu.wpi.team190.gompeilib.core.util;
+package edu.wpi.team190.gompeilib.core.utility;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;

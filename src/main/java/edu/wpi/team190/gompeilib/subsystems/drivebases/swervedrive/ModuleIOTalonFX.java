@@ -22,11 +22,11 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
-import edu.wpi.team190.gompeilib.core.util.PhoenixUtil;
+import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 
 import java.util.Queue;
 
-import static edu.wpi.team190.gompeilib.core.util.PhoenixUtil.tryUntilOk;
+import static edu.wpi.team190.gompeilib.core.utility.PhoenixUtil.tryUntilOk;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
