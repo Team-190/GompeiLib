@@ -73,7 +73,6 @@ public class ModuleIOTalonFX implements ModuleIO {
 
   public ModuleIOTalonFX(
           DriveConstants driveConstants,
-      int id,
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
     driveTalonFX = new TalonFX(constants.DriveMotorId, driveConstants.DRIVE_CONFIG.canBus());
