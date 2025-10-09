@@ -1,4 +1,4 @@
-package edu.wpi.team190.gompeilib.subsystems.swervedrive;
+package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;

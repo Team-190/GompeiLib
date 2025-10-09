@@ -1,10 +1,11 @@
 [versions]
 wpilib = "2025.3.1"
+phoenix6 = "25.4.0"
+choreo = "2025.0.3"
+aspectj = "1.9.21"
 advantagekit = "4.1.2"
 quickbuf = "1.4"
 jackson = "2.17.2"
-phoenix6 = "25.4.0"
-choreo = "2025.0.3"
 
 [libraries]
 # WPILib Core
@@ -17,6 +18,16 @@ wpilib-wpiutil = { group = "edu.wpi.first.wpiutil", name = "wpiutil-java", versi
 wpilib-wpiunits = { group = "edu.wpi.first.wpiunits", name = "wpiunits-java", version.ref = "wpilib" }
 wpilib-commands = { group = "edu.wpi.first.wpilibNewCommands", name = "wpilibNewCommands-java", version.ref = "wpilib" }
 
+# CTRE Phoenix 6/Pro
+phoenix6 = { group = "com.ctre.phoenix6", name = "wpiapi-java", version.ref = "phoenix6" }
+
+# Choreo
+choreo = { group = "choreo", name = "ChoreoLib-java", version.ref = "choreo" }
+
+# AspectJ
+aspectj-rt = { group = "org.aspectj", name = "aspectjrt", version.ref = "aspectj" }
+aspectj-tools = { group = "org.aspectj", name = "aspectjtools", version.ref = "aspectj" }
+
 # AdvantageKit
 advantagekit-java = { group = "org.littletonrobotics.akit", name = "akit-java", version.ref = "advantagekit" }
 advantagekit-autolog = { group = "org.littletonrobotics.akit", name = "akit-autolog", version.ref = "advantagekit" }
@@ -26,12 +37,6 @@ quickbuf = { group = "us.hebi.quickbuf", name = "quickbuf-runtime", version.ref 
 jackson-annotations = { group = "com.fasterxml.jackson.core", name = "jackson-annotations", version.ref = "jackson" }
 jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-core", version.ref = "jackson" }
 jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
-
-# CTRE Phoenix 6/Pro
-phoenix6 = { group = "com.ctre.phoenix6", name = "wpiapi-java", version.ref = "phoenix6" }
-
-# Choreo
-choreo = { group = "choreo", name = "ChoreoLib-java", version.ref = "choreo" }
 
 [bundles]
 wpilib = [
@@ -43,6 +48,11 @@ wpilib = [
     "wpilib-wpiutil",
     "wpilib-wpiunits",
     "wpilib-commands"
+]
+
+aspectj =  [
+    "aspectj-rt",
+    "aspectj-tools"
 ]
 
 advantagekit = [

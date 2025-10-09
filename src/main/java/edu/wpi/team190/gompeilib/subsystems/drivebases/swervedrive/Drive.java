@@ -1,5 +1,5 @@
 // Copyright 2021-2024 FRC 6328
-package edu.wpi.team190.gompeilib.subsystems.swervedrive;
+package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
@@ -19,12 +19,11 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import edu.wpi.team190.gompeilib.GompeiLib;
+import edu.wpi.team190.gompeilib.core.GompeiLib;
+import edu.wpi.team190.gompeilib.core.logging.Trace;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -105,6 +104,7 @@ public class Drive extends SubsystemBase {
     this.autoHeadingController = new PIDController(autoFeedbackConstants.rotation_Kp().get(), 0, autoFeedbackConstants.rotation_Kd().get());
   }
 
+  @Trace
   public void periodic() {
     driveConstants.lock.lock();
 
@@ -176,6 +176,7 @@ public class Drive extends SubsystemBase {
    *
    * @param speeds Speeds in meters/sec
    */
+  @Trace
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
     ChassisSpeeds optimizedSpeeds = ChassisSpeeds.discretize(speeds, GompeiLib.getLoopPeriod());
@@ -201,6 +202,7 @@ public class Drive extends SubsystemBase {
    *
    * @param speeds Speeds in meters/sec
    */
+  @Trace
   public void runVelocityTorque(ChassisSpeeds speeds, List<Vector<N2>> forces) {
     if (forces.size() != 4) {
       throw new IllegalArgumentException("Forces array must have 4 elements");
@@ -233,6 +235,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Runs the drive in a straight line with the specified drive current. */
+  @Trace
   public void runCharacterization(double amps) {
     for (int i = 0; i < 4; i++) {
       modules[i].runCharacterization(amps);
@@ -240,6 +243,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Stops the drive. */
+  @Trace
   public void stop() {
     runVelocity(new ChassisSpeeds());
   }
@@ -248,6 +252,7 @@ public class Drive extends SubsystemBase {
    * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
    * return to their normal orientations the next time a nonzero velocity is requested.
    */
+  @Trace
   public void stopWithX() {
     Rotation2d[] headings = new Rotation2d[4];
     for (int i = 0; i < 4; i++) {
@@ -258,6 +263,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the module states (turn angles and drive velocities) for all of the modules. */
+  @Trace
   @AutoLogOutput(key = "SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
@@ -268,6 +274,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the module positions (turn angles and drive positions) for all of the modules. */
+  @Trace
   public SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] states = new SwerveModulePosition[4];
     for (int i = 0; i < 4; i++) {
@@ -277,12 +284,14 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the measured chassis speeds of the robot. */
+  @Trace
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
   private ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 
   /** Returns the position of each module in radians. */
+  @Trace
   public double[] getWheelRadiusCharacterizationPositions() {
     double[] values = new double[4];
     for (int i = 0; i < 4; i++) {
@@ -292,6 +301,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the average velocity of the modules in rotations/sec (Phoenix native units). */
+  @Trace
   public double getFFCharacterizationVelocity() {
     double output = 0.0;
     for (int i = 0; i < 4; i++) {
@@ -301,26 +311,31 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the maximum linear speed in meters per sec. */
+  @Trace
   public double getMaxLinearSpeedMetersPerSec() {
     return driveConstants.DRIVE_CONFIG.maxLinearVelocityMetersPerSecond();
   }
 
   /** Returns the maximum angular speed in radians per sec. */
+  @Trace
   public double getMaxAngularSpeedRadPerSec() {
     return getMaxLinearSpeedMetersPerSec() / driveConstants.DRIVE_CONFIG.driveBaseRadius();
   }
 
   /** Returns the field relative velocity in X and Y. */
+  @Trace
   public Translation2d getFieldRelativeVelocity() {
     return new Translation2d(filteredX, filteredY);
   }
 
   /** Returns the current yaw velocity */
+  @Trace
   public double getYawVelocity() {
     return gyroInputs.yawVelocityRadPerSec;
   }
 
   /** Sets PID gains for modules */
+  @Trace
   public void setPIDGains(double drive_Kp, double drive_Kd, double turn_Kp, double turn_Kd) {
     for (var module : modules) {
       module.setPID(drive_Kp, drive_Kd, turn_Kp, turn_Kd);
@@ -328,6 +343,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Sets FF gains for modules */
+  @Trace
   public void setFFGains(double kS, double kV) {
     for (var module : modules) {
       module.setFF(kS, kV);
@@ -335,6 +351,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Runs a choreo path from swerve samples */
+  @Trace
   public void choreoDrive(SwerveSample sample) {
     double xFF = sample.vx;
     double yFF = sample.vy;

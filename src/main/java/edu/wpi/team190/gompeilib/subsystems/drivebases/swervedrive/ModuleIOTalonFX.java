@@ -1,4 +1,4 @@
-package edu.wpi.team190.gompeilib.subsystems.swervedrive;
+package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -20,7 +20,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.team190.gompeilib.GompeiLib;
+import edu.wpi.team190.gompeilib.core.GompeiLib;
+import edu.wpi.team190.gompeilib.core.logging.Trace;
 import edu.wpi.team190.gompeilib.core.util.PhoenixUtil;
 
 import java.util.Queue;
@@ -208,6 +209,7 @@ public class ModuleIOTalonFX implements ModuleIO {
   }
 
   @Override
+  @Trace
   public void updateInputs(ModuleIOInputs inputs) {
     inputs.drivePositionRadians =
         Units.rotationsToRadians(drivePositionRotations.getValueAsDouble());
@@ -252,16 +254,19 @@ public class ModuleIOTalonFX implements ModuleIO {
   }
 
   @Override
+  @Trace
   public void setDriveAmps(double currentAmps) {
     driveTalonFX.setControl(torqueCurrentRequest.withOutput(currentAmps));
   }
 
   @Override
+  @Trace
   public void setTurnAmps(double currentAmps) {
     turnTalonFX.setControl(torqueCurrentRequest.withOutput(currentAmps));
   }
 
   @Override
+  @Trace
   public void setDriveVelocity(double velocityRadiansPerSecond, double currentFeedforward) {
     driveTalonFX.setControl(
         velocityTorqueCurrentRequest
@@ -270,12 +275,14 @@ public class ModuleIOTalonFX implements ModuleIO {
   }
 
   @Override
+  @Trace
   public void setTurnPosition(Rotation2d rotation) {
       turnPositionGoal = rotation;
     turnTalonFX.setControl(positionTorqueCurrentRequest.withPosition(rotation.getRotations()));
   }
 
   @Override
+  @Trace
   public void setPID(double drive_Kp, double drive_Kd, double turn_Kp, double turn_Kd) {
     driveConfig.Slot0.kP = drive_Kp;
     driveConfig.Slot0.kD = drive_Kd;
@@ -286,6 +293,7 @@ public class ModuleIOTalonFX implements ModuleIO {
   }
 
   @Override
+  @Trace
   public void setFeedforward(double drive_Ks, double drive_Kv) {
     driveConfig.Slot0.kS = drive_Ks;
     driveConfig.Slot0.kV = drive_Kv;

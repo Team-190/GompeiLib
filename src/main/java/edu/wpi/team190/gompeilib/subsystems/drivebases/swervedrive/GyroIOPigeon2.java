@@ -1,4 +1,4 @@
-package edu.wpi.team190.gompeilib.subsystems.swervedrive;
+package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.team190.gompeilib.core.logging.Trace;
 import edu.wpi.team190.gompeilib.core.util.PhoenixUtil;
 
 import java.util.Queue;
@@ -40,6 +41,7 @@ public class GyroIOPigeon2 implements GyroIO {
     PhoenixUtil.registerSignals(true, yaw, yawVelocity);
   }
 
+  @Trace
   @Override
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected = BaseStatusSignal.isAllGood(yaw, yawVelocity);

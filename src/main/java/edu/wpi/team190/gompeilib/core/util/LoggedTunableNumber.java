@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.team190.gompeilib.GompeiLib;
+import edu.wpi.team190.gompeilib.core.GompeiLib;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**

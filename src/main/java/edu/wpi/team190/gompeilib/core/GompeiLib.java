@@ -1,4 +1,4 @@
-package edu.wpi.team190.gompeilib;
+package edu.wpi.team190.gompeilib.core;
 
 /**
  * Main class for the GompeiLib library. Must be initialized by calling init() in robotInit().

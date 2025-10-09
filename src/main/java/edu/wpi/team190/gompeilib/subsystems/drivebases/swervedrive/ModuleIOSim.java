@@ -1,4 +1,4 @@
-package edu.wpi.team190.gompeilib.subsystems.swervedrive;
+package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -10,7 +10,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.team190.gompeilib.GompeiLib;
+import edu.wpi.team190.gompeilib.core.GompeiLib;
 
 /**
  * Physics sim implementation of module IO. Simulation is not vendor-specific, but the sim models
