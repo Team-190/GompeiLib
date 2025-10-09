@@ -39,6 +39,24 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+repositories {
+    // This block defines the destination for your library.
+    maven {
+        name = "GitHubPackages"
+        // This is the URL for your GitHub Packages repository.
+        // Make sure to replace the placeholders with your actual details.
+        url = uri("https://maven.pkg.github.com/YOUR_ORGANIZATION_NAME/YOUR_REPOSITORY_NAME")
+        credentials {
+            // This code securely reads your credentials. It first checks for
+            // environment variables (used by GitHub Actions) and then falls back
+            // to the gradle.properties file (for local builds).
+            username = System.getenv("GPR_USER") ?: gpr.user
+            password = System.getenv("GPR_KEY") ?: gpr.key
+        }
+    }
+}
+
+
 test {
     useJUnitPlatform()
 }
