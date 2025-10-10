@@ -49,7 +49,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/YOUR_ORGANIZATION_NAME/YOUR_REPOSITORY_NAME")
+            url = uri("https://maven.pkg.github.com/Team-190/GompeiLib")
             credentials {
                 // --- THIS IS THE FIX ---
                 // This logic now checks if the 'gpr.user' property exists before trying to use it.
