@@ -70,8 +70,7 @@ public class SwerveDrive extends SubsystemBase {
       SwerveModuleIO blModuleIO,
       SwerveModuleIO brModuleIO,
       Supplier<Pose2d> robotPoseSupplier,
-      Consumer<Pose2d> resetPoseConsumer,
-      SwerveDriveConstants.AutoGains autoFeedbackConstants) {
+      Consumer<Pose2d> resetPoseConsumer) {
     this.driveConstants = driveConstants;
     this.gyroIO = gyroIO;
     gyroInputs = new GyroIOInputsAutoLogged();
@@ -103,19 +102,19 @@ public class SwerveDrive extends SubsystemBase {
 
     this.autoXController =
         new PIDController(
-            autoFeedbackConstants.translation_Kp().get(),
+            driveConstants.AUTO_GAINS.translation_Kp().get(),
             0,
-            autoFeedbackConstants.translation_Kd().get());
+            driveConstants.AUTO_GAINS.translation_Kd().get());
     this.autoYController =
         new PIDController(
-            autoFeedbackConstants.translation_Kp().get(),
+            driveConstants.AUTO_GAINS.translation_Kp().get(),
             0,
-            autoFeedbackConstants.translation_Kd().get());
+            driveConstants.AUTO_GAINS.translation_Kd().get());
     this.autoHeadingController =
         new PIDController(
-            autoFeedbackConstants.rotation_Kp().get(),
+            driveConstants.AUTO_GAINS.rotation_Kp().get(),
             0,
-            autoFeedbackConstants.rotation_Kd().get());
+            driveConstants.AUTO_GAINS.rotation_Kd().get());
 
     this.isGryoHighFrequency = gyroIO instanceof GyroIOPigeon2;
 

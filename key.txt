@@ -1,0 +1,22 @@
+to use GompeiLib, put this in your robot project gradle file under the deploy block:
+
+repositories {
+    // This tells Gradle that the following repository should ONLY be used
+    // for dependencies that match the filter.
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "GompeiLibGitHubPackages"
+                url = uri("https://maven.pkg.github.com/Team-190/GompeiLib")
+                credentials {
+                    username = "GompeiLibReader"
+                    password = "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"
+                }
+            }
+        }
+        // The filter tells Gradle to only look for dependencies in the "edu.wpi.team190" group.
+        filter {
+            includeGroup "edu.wpi.team190"
+        }
+    }
+}
