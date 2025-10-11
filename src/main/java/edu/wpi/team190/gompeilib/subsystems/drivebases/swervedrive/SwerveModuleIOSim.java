@@ -41,8 +41,9 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
   private double driveAppliedVolts;
   private double turnAppliedVolts;
 
-  public SwerveModuleIOSim(SwerveDriveConstants driveConstants,
-                           SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+  public SwerveModuleIOSim(
+      SwerveDriveConstants driveConstants,
+      SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
     // Create drive and turn sim models
     driveSim =

@@ -11,7 +11,7 @@ import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public class SwerveModule {
-    private final SwerveDriveConstants driveConstants;
+  private final SwerveDriveConstants driveConstants;
   private final SwerveModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
   private final int index;
@@ -19,11 +19,10 @@ public class SwerveModule {
   private final Alert driveDisconnectedAlert;
   private final Alert turnDisconnectedAlert;
   private final Alert turnEncoderDisconnectedAlert;
-    @Getter
-    private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
+  @Getter private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
 
   public SwerveModule(SwerveDriveConstants driveConstants, SwerveModuleIO io, int index) {
-      this.driveConstants = driveConstants;
+    this.driveConstants = driveConstants;
     this.io = io;
     this.index = index;
     driveDisconnectedAlert =
@@ -75,7 +74,8 @@ public class SwerveModule {
     // Apply setpoints
     io.setDriveVelocity(
         state.speedMetersPerSecond / driveConstants.DRIVE_CONFIG.wheelRadiusMeters(),
-        driveConstants.DRIVE_CONFIG
+        driveConstants
+            .DRIVE_CONFIG
             .driveModel()
             .getCurrent(wheelTorqueNewtonMeters / driveConstants.FRONT_LEFT.DriveMotorGearRatio));
     io.setTurnPosition(state.angle);
@@ -125,8 +125,8 @@ public class SwerveModule {
     return new SwerveModuleState(getVelocityMetersPerSec(), getAngle());
   }
 
-    /** Returns the timestamps of the samples received this cycle. */
-    @Trace
+  /** Returns the timestamps of the samples received this cycle. */
+  @Trace
   public double[] getOdometryTimestamps() {
     return inputs.odometryTimestamps;
   }

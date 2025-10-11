@@ -1,5 +1,7 @@
 package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
+import static edu.wpi.team190.gompeilib.core.utility.PhoenixUtil.tryUntilOk;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -22,12 +24,9 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
-import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixOdometryThread;
-
+import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.Queue;
-
-import static edu.wpi.team190.gompeilib.core.utility.PhoenixUtil.tryUntilOk;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
@@ -73,7 +72,7 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
   private final MotionMagicTorqueCurrentFOC positionTorqueCurrentRequest;
 
   public SwerveModuleIOTalonFX(
-          SwerveDriveConstants driveConstants,
+      SwerveDriveConstants driveConstants,
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
     driveTalonFX = new TalonFX(constants.DriveMotorId, driveConstants.DRIVE_CONFIG.canBus());
@@ -152,7 +151,8 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 
     timestampQueue = PhoenixOdometryThread.getInstance(driveConstants).makeTimestampQueue();
     drivePositionQueue =
-        PhoenixOdometryThread.getInstance(driveConstants).registerSignal(driveTalonFX.getPosition());
+        PhoenixOdometryThread.getInstance(driveConstants)
+            .registerSignal(driveTalonFX.getPosition());
     turnPositionQueue =
         PhoenixOdometryThread.getInstance(driveConstants).registerSignal(turnTalonFX.getPosition());
 
@@ -244,9 +244,7 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
     inputs.odometryDrivePositionsRadians =
         drivePositionQueue.stream().mapToDouble(Units::rotationsToRadians).toArray();
     inputs.odometryTurnPositions =
-        turnPositionQueue.stream()
-            .map(Rotation2d::fromRotations)
-            .toArray(Rotation2d[]::new);
+        turnPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[]::new);
 
     timestampQueue.clear();
     drivePositionQueue.clear();
@@ -277,7 +275,7 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
   @Override
   @Trace
   public void setTurnPosition(Rotation2d rotation) {
-      turnPositionGoal = rotation;
+    turnPositionGoal = rotation;
     turnTalonFX.setControl(positionTorqueCurrentRequest.withPosition(rotation.getRotations()));
   }
 

@@ -18,24 +18,23 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.List;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIO;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOInputsAutoLogged;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOPigeon2;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixOdometryThread;
+import java.util.List;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class SwerveDrive extends SubsystemBase {
-    private final SwerveDriveConstants driveConstants;
+  private final SwerveDriveConstants driveConstants;
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs;
   private final SwerveModule[] modules;
@@ -64,16 +63,16 @@ public class SwerveDrive extends SubsystemBase {
   private final Optional<Queue<Double>> yawPositionQueue;
 
   public SwerveDrive(
-          SwerveDriveConstants driveConstants,
-          GyroIO gyroIO,
-          SwerveModuleIO flModuleIO,
-          SwerveModuleIO frModuleIO,
-          SwerveModuleIO blModuleIO,
-          SwerveModuleIO brModuleIO,
-          Supplier<Pose2d> robotPoseSupplier,
-          Consumer<Pose2d> resetPoseConsumer,
-          SwerveDriveConstants.AutoAlignGains autoFeedbackConstants) {
-      this.driveConstants = driveConstants;
+      SwerveDriveConstants driveConstants,
+      GyroIO gyroIO,
+      SwerveModuleIO flModuleIO,
+      SwerveModuleIO frModuleIO,
+      SwerveModuleIO blModuleIO,
+      SwerveModuleIO brModuleIO,
+      Supplier<Pose2d> robotPoseSupplier,
+      Consumer<Pose2d> resetPoseConsumer,
+      SwerveDriveConstants.AutoGains autoFeedbackConstants) {
+    this.driveConstants = driveConstants;
     this.gyroIO = gyroIO;
     gyroInputs = new GyroIOInputsAutoLogged();
     modules = new SwerveModule[4]; // FL, FR, BL, BR
@@ -81,9 +80,6 @@ public class SwerveDrive extends SubsystemBase {
     modules[1] = new SwerveModule(driveConstants, frModuleIO, 1);
     modules[2] = new SwerveModule(driveConstants, blModuleIO, 2);
     modules[3] = new SwerveModule(driveConstants, brModuleIO, 3);
-
-    // Start threads (no-op if no signals have been created)
-    PhoenixOdometryThread.getInstance(driveConstants).start();
 
     xFilter = LinearFilter.movingAverage(10);
     yFilter = LinearFilter.movingAverage(10);
@@ -101,27 +97,39 @@ public class SwerveDrive extends SubsystemBase {
         };
 
     autoFactory =
-        new AutoFactory(
-            robotPoseSupplier,
-            resetPoseConsumer,
-            this::choreoDrive,
-            true,
-            this);
+        new AutoFactory(robotPoseSupplier, resetPoseConsumer, this::choreoDrive, true, this);
 
     this.robotPoseSupplier = robotPoseSupplier;
 
-    this.autoXController = new PIDController(autoFeedbackConstants.translation_Kp().get(), 0, autoFeedbackConstants.translation_Kd().get());
-    this.autoYController = new PIDController(autoFeedbackConstants.translation_Kp().get(), 0, autoFeedbackConstants.translation_Kd().get());
-    this.autoHeadingController = new PIDController(autoFeedbackConstants.rotation_Kp().get(), 0, autoFeedbackConstants.rotation_Kd().get());
+    this.autoXController =
+        new PIDController(
+            autoFeedbackConstants.translation_Kp().get(),
+            0,
+            autoFeedbackConstants.translation_Kd().get());
+    this.autoYController =
+        new PIDController(
+            autoFeedbackConstants.translation_Kp().get(),
+            0,
+            autoFeedbackConstants.translation_Kd().get());
+    this.autoHeadingController =
+        new PIDController(
+            autoFeedbackConstants.rotation_Kp().get(),
+            0,
+            autoFeedbackConstants.rotation_Kd().get());
 
     this.isGryoHighFrequency = gyroIO instanceof GyroIOPigeon2;
 
     if (isGryoHighFrequency) {
-        this.yawTimestampQueue = Optional.of(PhoenixOdometryThread.getInstance(driveConstants).makeTimestampQueue());
-        this.yawPositionQueue = Optional.of(PhoenixOdometryThread.getInstance(driveConstants).registerSignal(gyroIO.getYaw()));
+      // Start threads (no-op if no signals have been created)
+      PhoenixOdometryThread.getInstance(driveConstants).start();
+      this.yawTimestampQueue =
+          Optional.of(PhoenixOdometryThread.getInstance(driveConstants).makeTimestampQueue());
+      this.yawPositionQueue =
+          Optional.of(
+              PhoenixOdometryThread.getInstance(driveConstants).registerSignal(gyroIO.getYaw()));
     } else {
-        this.yawTimestampQueue = Optional.empty();
-        this.yawPositionQueue = Optional.empty();
+      this.yawTimestampQueue = Optional.empty();
+      this.yawPositionQueue = Optional.empty();
     }
   }
 
@@ -130,9 +138,9 @@ public class SwerveDrive extends SubsystemBase {
     driveConstants.lock.lock();
 
     if (yawTimestampQueue.isPresent() && yawPositionQueue.isPresent()) {
-        gyroIO.updateInputs(gyroInputs, yawTimestampQueue.get(), yawPositionQueue.get());
-        yawTimestampQueue.get().clear();
-        yawPositionQueue.get().clear();
+      gyroIO.updateInputs(gyroInputs, yawTimestampQueue.get(), yawPositionQueue.get());
+      yawTimestampQueue.get().clear();
+      yawPositionQueue.get().clear();
     }
 
     for (int i = 0; i < 4; i++) {
@@ -385,7 +393,8 @@ public class SwerveDrive extends SubsystemBase {
     double xFeedback = autoXController.calculate(robotPoseSupplier.get().getX(), sample.x);
     double yFeedback = autoYController.calculate(robotPoseSupplier.get().getY(), sample.y);
     double rotationFeedback =
-        autoHeadingController.calculate(robotPoseSupplier.get().getRotation().getRadians(), sample.heading);
+        autoHeadingController.calculate(
+            robotPoseSupplier.get().getRotation().getRadians(), sample.heading);
 
     ChassisSpeeds velocity =
         ChassisSpeeds.fromFieldRelativeSpeeds(

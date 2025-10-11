@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id "com.diffplug.spotless" version "6.12.0"
     id "io.freefair.lombok" version "8.4"
     id "io.freefair.aspectj.post-compile-weaving" version "8.4"
 }
@@ -50,13 +51,6 @@ publishing {
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/Team-190/GompeiLib")
-            credentials {
-                // --- THIS IS THE FIX ---
-                // This logic now checks if the 'gpr.user' property exists before trying to use it.
-                // This prevents the build from failing during the 'build' job, which has no credentials.
-                username = System.getenv("GPR_USER") ?: (project.hasProperty("gpr.user") ? gpr.user : null)
-                password = System.getenv("GPR_KEY") ?: (project.hasProperty("gpr.key") ? gpr.key : null)
-            }
         }
     }
 }
@@ -66,3 +60,44 @@ test {
     useJUnitPlatform()
 }
 
+// Spotless formatting
+project.compileJava.dependsOn(spotlessApply)
+spotless {
+    java {
+        target fileTree(".") {
+            include "**/*.java"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        toggleOffOn()
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    groovyGradle {
+        target fileTree(".") {
+            include "**/*.gradle"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        greclipse()
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    json {
+        target fileTree(".") {
+            include "**/*.json"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        gson().indentWithSpaces(2)
+    }
+    format "misc", {
+        target fileTree(".") {
+            include "**/*.md", "**/.gitignore"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+}

@@ -28,8 +28,8 @@ public class SwerveDriveConstants {
   public final DriveConfig DRIVE_CONFIG;
 
   public final Gains GAINS;
-  public final AutoAlignGains AUTO_ALIGN_GAINS;
-  public final AutoAlignGains AUTO_GAINS;
+  public final AutoGains AUTO_GAINS;
+  public final AutoAlignNearConstants AUTO_ALIGN_NEAR_CONSTANTS;
 
   public final double ODOMETRY_FREQUENCY;
   public final double DRIVER_DEADBAND;
@@ -38,20 +38,20 @@ public class SwerveDriveConstants {
   public SwerveDriveConstants(
       DriveConfig driveConfig,
       Gains gains,
-      AutoAlignGains autoAlignGains,
-      AutoAlignGains autoGains,
+      AutoGains autoGains,
+      AutoAlignNearConstants autoAlignNearConstants,
       double odometryFrequency,
       double driverDeadband,
       double operatorDeadband) {
-      this.lock = new ReentrantLock();
+    this.lock = new ReentrantLock();
     this.FRONT_LEFT = driveConfig.frontLeft();
     this.FRONT_RIGHT = driveConfig.frontRight();
     this.BACK_LEFT = driveConfig.backLeft();
     this.BACK_RIGHT = driveConfig.backRight();
     this.DRIVE_CONFIG = driveConfig;
     this.GAINS = gains;
-    this.AUTO_ALIGN_GAINS = autoAlignGains;
     this.AUTO_GAINS = autoGains;
+    this.AUTO_ALIGN_NEAR_CONSTANTS = autoAlignNearConstants;
     this.ODOMETRY_FREQUENCY = odometryFrequency;
     this.DRIVER_DEADBAND = driverDeadband;
     this.OPERATOR_DEADBAND = operatorDeadband;
@@ -106,7 +106,7 @@ public class SwerveDriveConstants {
       LoggedTunableNumber turn_Kp,
       LoggedTunableNumber turn_Kd) {}
 
-  public record AutoAlignGains(
+  public record AutoGains(
       LoggedTunableNumber translation_Kp,
       LoggedTunableNumber translation_Kd,
       LoggedTunableNumber rotation_Kp,
@@ -118,7 +118,7 @@ public class SwerveDriveConstants {
       LoggedTunableNumber tolerance,
       LoggedTunableNumber maxVelocity) {}
 
-  public static record AlignRobotToAprilTagConstants(
+  public record AutoAlignNearConstants(
       PIDControllerConstants xPIDConstants,
       PIDControllerConstants yPIDConstants,
       PIDControllerConstants omegaPIDConstants,
