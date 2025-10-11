@@ -51,6 +51,14 @@ publishing {
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/Team-190/GompeiLib")
+            credentials {
+                // --- THIS IS THE FIX ---
+                // This logic now checks if the 'gpr.user' property exists before trying to use it.
+                // This prevents the build from failing during the 'build' job, which has no credentials.
+                username = System.getenv("GPR_USER") ?: (project.hasProperty("gpr.user") ? gpr.user : null)
+                password = System.getenv("GPR_KEY") ?: (project.hasProperty("gpr.key") ? gpr.key : null)
+            }
+
         }
     }
 }
