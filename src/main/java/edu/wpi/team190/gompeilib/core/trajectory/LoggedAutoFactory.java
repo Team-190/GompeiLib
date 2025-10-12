@@ -11,6 +11,8 @@ import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import choreo.trajectory.TrajectorySample;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -25,8 +27,6 @@ import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 
 /**
  * A factory used to create {@link AutoRoutine}s and {@link AutoTrajectory}s.
@@ -154,8 +154,7 @@ public class LoggedAutoFactory {
   /**
    * Create a factory that can be used to create {@link AutoRoutine} and {@link AutoTrajectory}.
    *
-   * @param <ST> {@link choreo.trajectory.DifferentialSample} or {@link
-   *     SwerveSample}
+   * @param <ST> {@link choreo.trajectory.DifferentialSample} or {@link SwerveSample}
    * @param poseSupplier A function that returns the current field-relative {@link Pose2d} of the
    *     robot.
    * @param resetOdometry A function that receives a field-relative {@link Pose2d} to reset the
@@ -306,8 +305,7 @@ public class LoggedAutoFactory {
    * does not invoke bindings added via calling {@link #bind} or {@link AutoBindings} passed into
    * the factory constructor.
    *
-   * @param <ST> {@link choreo.trajectory.DifferentialSample} or {@link
-   *     SwerveSample}
+   * @param <ST> {@link choreo.trajectory.DifferentialSample} or {@link SwerveSample}
    * @param trajectory The trajectory to use.
    * @return A new {@link AutoTrajectory}.
    */
@@ -342,8 +340,7 @@ public class LoggedAutoFactory {
   /**
    * Creates a command that resets the robot's odometry to the start of a trajectory.
    *
-   * @param <ST> {@link choreo.trajectory.DifferentialSample} or {@link
-   *     SwerveSample}
+   * @param <ST> {@link choreo.trajectory.DifferentialSample} or {@link SwerveSample}
    * @param trajectory The trajectory to use.
    * @return A command that resets the robot's odometry.
    */
@@ -365,8 +362,8 @@ public class LoggedAutoFactory {
   }
 
   /**
-   * The {@link AutoFactory} caches trajectories with a {@link Choreo.TrajectoryCache} to avoid reloading
-   * the same trajectory multiple times.
+   * The {@link AutoFactory} caches trajectories with a {@link Choreo.TrajectoryCache} to avoid
+   * reloading the same trajectory multiple times.
    *
    * @return The trajectory cache.
    */

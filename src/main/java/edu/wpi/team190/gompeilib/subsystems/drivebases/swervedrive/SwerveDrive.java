@@ -1,7 +1,6 @@
 // Copyright 2021-2024 FRC 6328
 package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
-import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -30,9 +29,9 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import lombok.Getter;
 
 public class SwerveDrive extends SubsystemBase {
   private final SwerveDriveConstants driveConstants;
@@ -386,24 +385,24 @@ public class SwerveDrive extends SubsystemBase {
   /** Runs a choreo path from swerve samples */
   @Trace
   public void choreoDrive(SwerveSample sample) {
-      Pose2d pose = robotPoseSupplier.get();
-      double xFF = sample.vx;
-      double yFF = sample.vy;
-      double rotationFF = sample.omega;
+    Pose2d pose = robotPoseSupplier.get();
+    double xFF = sample.vx;
+    double yFF = sample.vy;
+    double rotationFF = sample.omega;
 
-      double xFeedback = autoXController.calculate(pose.getX(), sample.x);
-      double yFeedback = autoYController.calculate(pose.getY(), sample.y);
-      double rotationFeedback = autoHeadingController
-                      .calculate(pose.getRotation().getRadians(), sample.heading);
+    double xFeedback = autoXController.calculate(pose.getX(), sample.x);
+    double yFeedback = autoYController.calculate(pose.getY(), sample.y);
+    double rotationFeedback =
+        autoHeadingController.calculate(pose.getRotation().getRadians(), sample.heading);
 
-      ChassisSpeeds velocity =
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                      xFF + xFeedback,
-                      yFF + yFeedback,
-                      rotationFF + rotationFeedback,
-                      Rotation2d.fromRadians(sample.heading));
+    ChassisSpeeds velocity =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            xFF + xFeedback,
+            yFF + yFeedback,
+            rotationFF + rotationFeedback,
+            Rotation2d.fromRadians(sample.heading));
 
-      runVelocity(velocity);
-      Logger.recordOutput("Auto/Setpoint", sample.getPose());
+    runVelocity(velocity);
+    Logger.recordOutput("Auto/Setpoint", sample.getPose());
   }
 }

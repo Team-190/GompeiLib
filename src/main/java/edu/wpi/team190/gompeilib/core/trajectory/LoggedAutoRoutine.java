@@ -70,7 +70,8 @@ public class LoggedAutoRoutine {
    * @param allianceHelper The alliance helper that is used to determine flipping logic
    * @see AutoFactory#newRoutine Creating a loop from a AutoFactory
    */
-  LoggedAutoRoutine(LoggedAutoFactory factory, String name, LoggedAutoFactory.AllianceContext allianceHelper) {
+  LoggedAutoRoutine(
+      LoggedAutoFactory factory, String name, LoggedAutoFactory.AllianceContext allianceHelper) {
     this.factory = (LoggedAutoFactory) factory;
     this.name = name;
     this.allianceCtx = allianceHelper;
