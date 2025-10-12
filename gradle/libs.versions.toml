@@ -17,6 +17,7 @@ wpilib-cameraserver = { group = "edu.wpi.first.cameraserver", name = "cameraserv
 wpilib-wpiutil = { group = "edu.wpi.first.wpiutil", name = "wpiutil-java", version.ref = "wpilib" }
 wpilib-wpiunits = { group = "edu.wpi.first.wpiunits", name = "wpiunits-java", version.ref = "wpilib" }
 wpilib-commands = { group = "edu.wpi.first.wpilibNewCommands", name = "wpilibNewCommands-java", version.ref = "wpilib" }
+wpilib-hal = { group = "edu.wpi.first.hal", name = "hal-java", version.ref = "wpilib" }
 
 # CTRE Phoenix 6/Pro
 phoenix6 = { group = "com.ctre.phoenix6", name = "wpiapi-java", version.ref = "phoenix6" }
@@ -47,7 +48,8 @@ wpilib = [
     "wpilib-cameraserver",
     "wpilib-wpiutil",
     "wpilib-wpiunits",
-    "wpilib-commands"
+    "wpilib-commands",
+    "wpilib-hal"
 ]
 
 aspectj =  [
