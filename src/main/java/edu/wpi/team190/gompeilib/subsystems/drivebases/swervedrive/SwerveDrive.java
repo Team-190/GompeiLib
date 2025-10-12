@@ -46,7 +46,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private final SwerveDriveKinematics kinematics;
   @Getter private Rotation2d rawGyroRotation;
-  private SwerveModulePosition[] lastModulePositions;
+  private final SwerveModulePosition[] lastModulePositions;
   @Getter private ChassisSpeeds measuredChassisSpeeds;
 
   @Getter private final LoggedAutoFactory autoFactory;
@@ -57,9 +57,7 @@ public class SwerveDrive extends SubsystemBase {
   private final PIDController autoYController;
   private final PIDController autoHeadingController;
 
-  private final boolean isGryoHighFrequency;
-
-  private final Optional<Queue<Double>> yawTimestampQueue;
+    private final Optional<Queue<Double>> yawTimestampQueue;
   private final Optional<Queue<Double>> yawPositionQueue;
 
   public SwerveDrive(
@@ -116,7 +114,7 @@ public class SwerveDrive extends SubsystemBase {
             0,
             driveConstants.AUTO_GAINS.rotation_Kd().get());
 
-    this.isGryoHighFrequency = gyroIO instanceof GyroIOPigeon2;
+      boolean isGryoHighFrequency = gyroIO instanceof GyroIOPigeon2;
 
     if (isGryoHighFrequency) {
       // Start threads (no-op if no signals have been created)
@@ -140,6 +138,8 @@ public class SwerveDrive extends SubsystemBase {
       gyroIO.updateInputs(gyroInputs, yawTimestampQueue.get(), yawPositionQueue.get());
       yawTimestampQueue.get().clear();
       yawPositionQueue.get().clear();
+    } else {
+        gyroIO.updateInputs(gyroInputs);
     }
 
     for (int i = 0; i < 4; i++) {
