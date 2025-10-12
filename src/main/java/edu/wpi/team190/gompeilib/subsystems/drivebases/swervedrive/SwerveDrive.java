@@ -23,6 +23,7 @@ import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIO;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOInputsAutoLogged;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOPigeon2;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
+import edu.wpi.team190.gompeilib.core.trajectory.LoggedAutoFactory;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixOdometryThread;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +50,7 @@ public class SwerveDrive extends SubsystemBase {
   private SwerveModulePosition[] lastModulePositions;
   @Getter private ChassisSpeeds measuredChassisSpeeds;
 
-  @Getter private final AutoFactory autoFactory;
+  @Getter private final LoggedAutoFactory autoFactory;
 
   private final Supplier<Pose2d> robotPoseSupplier;
 
@@ -96,7 +97,7 @@ public class SwerveDrive extends SubsystemBase {
         };
 
     autoFactory =
-        new AutoFactory(robotPoseSupplier, resetPoseConsumer, this::choreoDrive, true, this);
+        new LoggedAutoFactory(robotPoseSupplier, resetPoseConsumer, this::choreoDrive, true, this);
 
     this.robotPoseSupplier = robotPoseSupplier;
 
