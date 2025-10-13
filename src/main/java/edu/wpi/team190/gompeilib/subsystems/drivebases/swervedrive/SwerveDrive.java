@@ -114,6 +114,8 @@ public class SwerveDrive extends SubsystemBase {
             0,
             driveConstants.AUTO_GAINS.rotation_Kd().get());
 
+      autoHeadingController.enableContinuousInput(-Math.PI, Math.PI);
+
       boolean isGryoHighFrequency = gyroIO instanceof GyroIOPigeon2;
 
     if (isGryoHighFrequency) {
