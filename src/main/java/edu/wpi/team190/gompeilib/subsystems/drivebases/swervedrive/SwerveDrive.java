@@ -57,7 +57,7 @@ public class SwerveDrive extends SubsystemBase {
   private final PIDController autoYController;
   private final PIDController autoHeadingController;
 
-    private final Optional<Queue<Double>> yawTimestampQueue;
+  private final Optional<Queue<Double>> yawTimestampQueue;
   private final Optional<Queue<Double>> yawPositionQueue;
 
   public SwerveDrive(
@@ -68,7 +68,7 @@ public class SwerveDrive extends SubsystemBase {
       SwerveModuleIO blModuleIO,
       SwerveModuleIO brModuleIO,
       Supplier<Pose2d> robotPoseSupplier,
-      Consumer<Pose2d> resetPoseConsumer) {
+      Consumer<Pose2d> resetPoseConsumer, PIDController autoXController, PIDController autoYController, PIDController autoHeadingController) {
     this.driveConstants = driveConstants;
     this.gyroIO = gyroIO;
     gyroInputs = new GyroIOInputsAutoLogged();
@@ -98,25 +98,7 @@ public class SwerveDrive extends SubsystemBase {
 
     this.robotPoseSupplier = robotPoseSupplier;
 
-    this.autoXController =
-        new PIDController(
-            driveConstants.AUTO_GAINS.translation_Kp().get(),
-            0,
-            driveConstants.AUTO_GAINS.translation_Kd().get());
-    this.autoYController =
-        new PIDController(
-            driveConstants.AUTO_GAINS.translation_Kp().get(),
-            0,
-            driveConstants.AUTO_GAINS.translation_Kd().get());
-    this.autoHeadingController =
-        new PIDController(
-            driveConstants.AUTO_GAINS.rotation_Kp().get(),
-            0,
-            driveConstants.AUTO_GAINS.rotation_Kd().get());
-
-      autoHeadingController.enableContinuousInput(-Math.PI, Math.PI);
-
-      boolean isGryoHighFrequency = gyroIO instanceof GyroIOPigeon2;
+    boolean isGryoHighFrequency = gyroIO instanceof GyroIOPigeon2;
 
     if (isGryoHighFrequency) {
       // Start threads (no-op if no signals have been created)
@@ -130,6 +112,10 @@ public class SwerveDrive extends SubsystemBase {
       this.yawTimestampQueue = Optional.empty();
       this.yawPositionQueue = Optional.empty();
     }
+
+    this.autoXController = autoXController;
+    this.autoYController = autoYController;
+    this.autoHeadingController = autoHeadingController;
   }
 
   @Trace
@@ -141,7 +127,7 @@ public class SwerveDrive extends SubsystemBase {
       yawTimestampQueue.get().clear();
       yawPositionQueue.get().clear();
     } else {
-        gyroIO.updateInputs(gyroInputs);
+      gyroIO.updateInputs(gyroInputs);
     }
 
     for (int i = 0; i < 4; i++) {
