@@ -1,6 +1,7 @@
 // Copyright 2021-2024 FRC 6328
 package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
+import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -22,7 +23,6 @@ import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIO;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOInputsAutoLogged;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOPigeon2;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
-import edu.wpi.team190.gompeilib.core.trajectory.LoggedAutoFactory;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixOdometryThread;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public class SwerveDrive extends SubsystemBase {
   private final SwerveModulePosition[] lastModulePositions;
   @Getter private ChassisSpeeds measuredChassisSpeeds;
 
-  @Getter private final LoggedAutoFactory autoFactory;
+  @Getter private final AutoFactory autoFactory;
 
   private final Supplier<Pose2d> robotPoseSupplier;
 
@@ -68,7 +68,10 @@ public class SwerveDrive extends SubsystemBase {
       SwerveModuleIO blModuleIO,
       SwerveModuleIO brModuleIO,
       Supplier<Pose2d> robotPoseSupplier,
-      Consumer<Pose2d> resetPoseConsumer, PIDController autoXController, PIDController autoYController, PIDController autoHeadingController) {
+      Consumer<Pose2d> resetPoseConsumer,
+      PIDController autoXController,
+      PIDController autoYController,
+      PIDController autoHeadingController) {
     this.driveConstants = driveConstants;
     this.gyroIO = gyroIO;
     gyroInputs = new GyroIOInputsAutoLogged();
@@ -94,7 +97,7 @@ public class SwerveDrive extends SubsystemBase {
         };
 
     autoFactory =
-        new LoggedAutoFactory(robotPoseSupplier, resetPoseConsumer, this::choreoDrive, true, this);
+        new AutoFactory(robotPoseSupplier, resetPoseConsumer, this::choreoDrive, true, this);
 
     this.robotPoseSupplier = robotPoseSupplier;
 
