@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
@@ -68,10 +69,7 @@ public class SwerveDrive extends SubsystemBase {
       SwerveModuleIO blModuleIO,
       SwerveModuleIO brModuleIO,
       Supplier<Pose2d> robotPoseSupplier,
-      Consumer<Pose2d> resetPoseConsumer,
-      PIDController autoXController,
-      PIDController autoYController,
-      PIDController autoHeadingController) {
+      Consumer<Pose2d> resetPoseConsumer) {
     this.driveConstants = driveConstants;
     this.gyroIO = gyroIO;
     gyroInputs = new GyroIOInputsAutoLogged();
@@ -116,9 +114,27 @@ public class SwerveDrive extends SubsystemBase {
       this.yawPositionQueue = Optional.empty();
     }
 
-    this.autoXController = autoXController;
-    this.autoYController = autoYController;
-    this.autoHeadingController = autoHeadingController;
+    autoHeadingController =
+        new PIDController(
+            driveConstants.AUTO_GAINS.rotation_Kp().get(),
+            0.0,
+            driveConstants.AUTO_GAINS.rotation_Kd().get(),
+            GompeiLib.getLoopPeriod());
+    autoXController =
+        new PIDController(
+            driveConstants.AUTO_GAINS.translation_Kp().get(),
+            0.0,
+            driveConstants.AUTO_GAINS.translation_Kd().get(),
+            GompeiLib.getLoopPeriod());
+    autoYController =
+        new PIDController(
+            driveConstants.AUTO_GAINS.translation_Kp().get(),
+            0.0,
+            driveConstants.AUTO_GAINS.translation_Kd().get(),
+            GompeiLib.getLoopPeriod());
+
+    autoHeadingController.enableContinuousInput(-Math.PI, Math.PI);
+    autoHeadingController.setTolerance(Units.degreesToRadians(1.0));
   }
 
   @Trace
