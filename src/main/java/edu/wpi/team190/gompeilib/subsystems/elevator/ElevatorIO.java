@@ -59,7 +59,7 @@ public interface ElevatorIO {
      * @param kA the acceleration gain.
      * @param kG the gravity gain.
      */
-    public void updateGames(double kP, double kI, double kD, double kS, double kV, double kA, double kG);
+    public void updateGains(double kP, double kI, double kD, double kS, double kV, double kA, double kG);
     /**
      * Sets the constraints for the elevator.
      *
