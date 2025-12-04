@@ -1,37 +1,67 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
-import lombok.getter;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.team190.gompeilib.core.logging.Trace;
+import lombok.Getter;
+import lombok.Setter;
+import org.littletonrobotics.junction.Logger;
+import edu.wpi.team190.gompeilib.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
 
 public class Elevator extends SubsystemBase {
-    public final ElevatorIO io;
-    public final ElevatorIOInputAutoLogged inputs;
+  public final ElevatorIO io;
+  public final ElevatorConstants elevatorConstants;
+  public final ElevatorIOInputsAutoLogged inputs;
 
-    @Getter private ElevatorPositions position;
-    private boolean isClosedLoop;
+  @Getter @Setter
+  private boolean isClosedLoop;
+  private double position;
+  private double positionGoalMeters;
 
-    public Elevator(ElevatorConstants elevatorConstants, ElevatorIO io) {
-        this.elevatorConstants = elevatorConstants;
-        this.io = io;
+  public Elevator(ElevatorConstants elevatorConstants, ElevatorIO io) {
+    this.io = io;
+    this.elevatorConstants = elevatorConstants;
+    this.inputs = new ElevatorIOInputsAutoLogged();
+  }
+
+  @Trace
+  public void periodic() {
+    elevatorConstants.lock.lock();
+    io.updateInputs(inputs);
+    elevatorConstants.lock.unlock();
+
+    Logger.processInputs("Elevator", inputs);
+
+    Logger.recordOutput("Elevator/Position", position);
+
+    if (isClosedLoop) {
+        io.setPositionGoal(positionGoalMeters);
     }
+  }
 
-    @Trace
-    public void periodic() {
-        elevatorConstants.lock.lock();
-        io.updateInputs(inputs);
-        InternalLoggedTracer.record("Update Inputs", "Elevator/Periodic")
-        elevatorConstants.lock.unlock();
+  public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG) {
+    io.updateGains(kP, kD, kS, kV, kA, kG);
+  }
 
-        Logger.processInputs("Elevator", inputs);
+  public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
+    io.updateConstraints(maxAcceleration, cruisingVelocity);
+  }
 
-        Logger.recordOutput("Elevator/Position", position.name());
-        if (isClosedLoop) {
-            io.setPositionGoal(position.getPosition);
-        }
-        Logger.record("Set Position Goal", "Elevator/Periodic");
-    }
+  public void updateInputs(ElevatorIOInputs inputs) {
+      io.updateInputs(inputs);
+      Logger.processInputs("Elevator", this.inputs);
+  }
 
-    private void setGains(double kP, double kD, double kS, double kV, doubla kA, double kG) {
-        io.updateGains(kP, kD, kS, kV, kA, kG);
-    }
+ public void setPosition(double positionMeters) {
+      inputs.positionMeters = positionMeters;
+ }
 
+ public void setPositionGoal(double positionMeters) {
+      inputs.positionMeters = positionMeters;
+  }
 
+ public void setVoltage(double volts) {
+      for (int i = 0; i < inputs.appliedVolts.length; i++) {
+          inputs.appliedVolts[i] = volts;
+      }
+ }
 }
