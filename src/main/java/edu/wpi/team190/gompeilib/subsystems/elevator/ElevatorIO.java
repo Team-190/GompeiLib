@@ -3,10 +3,8 @@ package edu.wpi.team190.gompeilib.subsystems.elevator;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
-
     @AutoLog
-    public static class ElevatorInputs {
-
+    public static class ElevatorIOInputs {
         public double positionMeters = 0.0;
         public double velocityMetersPerSecond = 0.0;
 
@@ -52,14 +50,14 @@ public interface ElevatorIO {
      * Sets the gains for the elevator.
      *
      * @param kP the proportional gain.
-     * @param kI the integral gain.
      * @param kD the derivative gain.
      * @param kS the static gain.
      * @param kV the velocity gain.
      * @param kA the acceleration gain.
      * @param kG the gravity gain.
      */
-    public void updateGains(double kP, double kI, double kD, double kS, double kV, double kA, double kG);
+    public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG);
+
     /**
      * Sets the constraints for the elevator.
      *
