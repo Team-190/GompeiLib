@@ -3,10 +3,12 @@ package edu.wpi.team190.gompeilib.subsystems.elevator;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
-  @AutoLog
-  public static class ElevatorIOInputs {
-    public double positionMeters = 0.0;
-    public double velocityMetersPerSecond = 0.0;
+
+    @AutoLog
+    public static class ElevatorIOInputs {
+        public double positionMeters = 0.0;
+        public double velocityMetersPerSecond = 0.0;
+        public double accelerationMetersPerSecondSquared = 0.0;
 
     public double[] appliedVolts = new double[] {};
     public double[] supplyCurrentAmps = new double[] {};
