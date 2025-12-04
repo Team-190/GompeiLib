@@ -17,7 +17,7 @@ public class ElevatorConstants {
   public final ElevatorParameters ELEVATOR_PARAMETERS;
   public final Gains SLOT0_GAINS;
   public final Gains SLOT1_GAINS;
-  public final Gains SLOT3_GAINS;
+  public final Gains SLOT2_GAINS;
   public final Constraints CONSTRAINTS;
 
   public ElevatorConstants(

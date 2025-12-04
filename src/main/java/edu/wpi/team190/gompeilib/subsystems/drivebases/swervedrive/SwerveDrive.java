@@ -60,6 +60,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private final Optional<Queue<Double>> yawTimestampQueue;
   private final Optional<Queue<Double>> yawPositionQueue;
+
   public SwerveDrive(
       SwerveDriveConstants driveConstants,
       GyroIO gyroIO,
