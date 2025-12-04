@@ -5,32 +5,45 @@ import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ElevatorConstants {
-  public final ReentrantLock lock;
+    public final ReentrantLock lock;
+    public final int ELEVATOR_CAN_ID;
+    public final double ELEVATOR_GEAR_RATIO;
+    public final double DRUM_RADIUS;
 
-  public final int ELEVATOR_CAN_ID;
-  public final double ELEVATOR_GEAR_RATIO;
-  public final double DRUM_RADIUS;
+    public final double ELEVATOR_SUPPLY_CURRENT_LIMIT;
+    public final double ELEVATOR_STATOR_CURRENT_LIMIT;
 
-  public final double ELEVATOR_SUPPLY_CURRENT_LIMIT;
-  public final double ELEVATOR_STATOR_CURRENT_LIMIT;
+    public final ElevatorParameters ELEVATOR_PARAMETERS;
+    public final Gains SLOT0_GAINS;
+    public final Gains SLOT1_GAINS;
+    public final Gains SLOT2_GAINS;
+    public final Constraints CONSTRAINTS;
 
-  public final ElevatorParameters ELEVATOR_PARAMETERS;
-  public final Gains SLOT0_GAINS;
-  public final Gains SLOT1_GAINS;
-  public final Gains SLOT2_GAINS;
-  public final Constraints CONSTRAINTS;
+    public ElevatorConstants(int ELEVATOR_CAN_ID,
+                             double ELEVATOR_GEAR_RATIO,
+                             double DRUM_RADIUS,
+                             double ELEVATOR_SUPPLY_CURRENT_LIMIT,
+                             double ELEVATOR_STATOR_CURRENT_LIMIT,
+                             ElevatorParameters ELEVATOR_PARAMETERS,
+                             Gains SLOT0_GAINS,
+                             Gains SLOT1_GAINS,
+                             Gains SLOT2_GAINS,
+                             Constraints CONSTRAINTS) {
+        this.lock = new ReentrantLock();
 
-  public ElevatorConstants(
-      int ELEVATOR_CAN_ID,
-      double ELEVATOR_GEAR_RATIO,
-      double DRUM_RADIUS,
-      double ELEVATOR_SUPPLY_CURRENT_LIMIT,
-      double ELEVATOR_STATOR_CURRENT_LIMIT,
-      ElevatorParameters ELEVATOR_PARAMETERS,
-      Gains SLOT0_GAINS,
-      Gains SLOT1_GAINS,
-      Gains SLOT2_GAINS,
-      Constraints CONSTRAINTS) {}
+        this.ELEVATOR_CAN_ID = ELEVATOR_CAN_ID;
+        this.ELEVATOR_GEAR_RATIO = ELEVATOR_GEAR_RATIO;
+        this.DRUM_RADIUS = DRUM_RADIUS;
+
+        this.ELEVATOR_SUPPLY_CURRENT_LIMIT = ELEVATOR_SUPPLY_CURRENT_LIMIT;
+        this.ELEVATOR_STATOR_CURRENT_LIMIT = ELEVATOR_STATOR_CURRENT_LIMIT;
+
+        this.ELEVATOR_PARAMETERS = ELEVATOR_PARAMETERS;
+        this.SLOT0_GAINS = SLOT0_GAINS;
+        this.SLOT1_GAINS = SLOT1_GAINS;
+        this.SLOT2_GAINS = SLOT2_GAINS;
+        this.CONSTRAINTS = CONSTRAINTS;
+    }
 
   public record Gains(
       LoggedTunableNumber kP,

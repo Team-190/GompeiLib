@@ -64,6 +64,9 @@ public class ElevatorIOSim implements ElevatorIO {
 
         inputs.positionSetpointMeters = sim.getPositionMeters();
         inputs.velocityMetersPerSecond = sim.getVelocityMetersPerSecond();
+        inputs.accelerationMetersPerSecondSquared = -1; //TODO: Replace with calculation based on velocity
+
+        for (int i = 0; i<)
 
     }
 
