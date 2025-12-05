@@ -16,6 +16,8 @@ public class ElevatorIOSim implements ElevatorIO {
     private double appliedVolts;
     private boolean isClosedLoop;
 
+    private final int numMotors;
+
     public ElevatorIOSim(ElevatorConstants constants) {
         sim = new ElevatorSim(
                 LinearSystemId.createElevatorSystem(
@@ -47,6 +49,8 @@ public class ElevatorIOSim implements ElevatorIO {
 
         appliedVolts = 0;
         isClosedLoop = true;
+
+        numMotors = constants.ELEVATOR_PARAMETERS.NUM_MOTORS();
     }
 
 
@@ -66,8 +70,16 @@ public class ElevatorIOSim implements ElevatorIO {
         inputs.velocityMetersPerSecond = sim.getVelocityMetersPerSecond();
         inputs.accelerationMetersPerSecondSquared = -1; //TODO: Replace with calculation based on velocity
 
-        for (int i = 0; i<)
+        for (int i = 0; i < numMotors; i++) {
+            inputs.appliedVolts[i] = appliedVolts;
+            inputs.supplyCurrentAmps[i] = sim.getCurrentDrawAmps();
+            inputs.torqueCurrentAmps[i] = sim.getCurrentDrawAmps();
+            inputs.temperatureCelsius[i] = 0;
+        }
 
+        inputs.positionGoalMeters = feedback.getGoal().position;
+        inputs.positionSetpointMeters = feedback.getSetpoint().position;
+        inputs.positionErrorMeters = feedback.getPositionError();
     }
 
     @Override
