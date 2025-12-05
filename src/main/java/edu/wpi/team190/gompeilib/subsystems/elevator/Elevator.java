@@ -2,17 +2,15 @@ package edu.wpi.team190.gompeilib.subsystems.elevator;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
-import lombok.Getter;
-import lombok.Setter;
-import org.littletonrobotics.junction.Logger;
 import edu.wpi.team190.gompeilib.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
+import java.util.Arrays;
+import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
   public final ElevatorIO io;
   public final ElevatorConstants elevatorConstants;
   public final ElevatorIOInputsAutoLogged inputs;
 
-  @Getter @Setter
   private boolean isClosedLoop;
   private double position;
   private double positionGoalMeters;
@@ -30,11 +28,10 @@ public class Elevator extends SubsystemBase {
     elevatorConstants.lock.unlock();
 
     Logger.processInputs("Elevator", inputs);
-
     Logger.recordOutput("Elevator/Position", position);
 
     if (isClosedLoop) {
-        io.setPositionGoal(positionGoalMeters);
+      io.setPositionGoal(positionGoalMeters);
     }
   }
 
@@ -47,21 +44,21 @@ public class Elevator extends SubsystemBase {
   }
 
   public void updateInputs(ElevatorIOInputs inputs) {
-      io.updateInputs(inputs);
-      Logger.processInputs("Elevator", this.inputs);
+    io.updateInputs(inputs);
+    Logger.processInputs("Elevator", this.inputs);
   }
 
- public void setPosition(double positionMeters) {
-      inputs.positionMeters = positionMeters;
- }
-
- public void setPositionGoal(double positionMeters) {
-      inputs.positionMeters = positionMeters;
+  public void setPosition(double positionMeters) {
+    inputs.positionMeters = positionMeters;
   }
 
- public void setVoltage(double volts) {
-      for (int i = 0; i < inputs.appliedVolts.length; i++) {
-          inputs.appliedVolts[i] = volts;
-      }
- }
+  public void setPositionGoal(double positionMeters) {
+    inputs.positionMeters = positionMeters;
+    isClosedLoop = true;
+  }
+
+  public void setVoltage(double volts) {
+    Arrays.fill(inputs.appliedVolts, volts);
+    isClosedLoop = false;
+  }
 }

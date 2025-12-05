@@ -1,14 +1,14 @@
-package edu.wpi.team190.gompeilib.subsystems.elevator;
+ package edu.wpi.team190.gompeilib.subsystems.elevator;
 
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.units.measure.*;
-import java.util.ArrayList;
+ import com.ctre.phoenix6.StatusSignal;
+ import com.ctre.phoenix6.configs.TalonFXConfiguration;
+ import com.ctre.phoenix6.controls.MotionMagicVoltage;
+ import com.ctre.phoenix6.controls.VoltageOut;
+ import com.ctre.phoenix6.hardware.TalonFX;
+ import edu.wpi.first.units.measure.*;
+ import java.util.ArrayList;
 
-public class ElevatorIOTalonFX implements ElevatorIO {
+ public class ElevatorIOTalonFX implements ElevatorIO {
 
   // Core hardware components
   public final TalonFX talonFX;
@@ -69,4 +69,4 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   @Override
   public void updateConstraints(double maxAcceleration, double cruisingVelocity) {}
-}
+ }
