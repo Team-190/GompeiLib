@@ -1,14 +1,15 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import edu.wpi.first.units.measure.*;
-import edu.wpi.team190.gompeilib.core.logging.Trace;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
-
 import java.util.ArrayList;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
@@ -55,6 +56,113 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     }
 
     config = new TalonFXConfiguration();
+    config.Slot0.withKP(constants.SLOT0_GAINS.kP().get())
+        .withKD(constants.SLOT0_GAINS.kD().get())
+        .withKS(constants.SLOT0_GAINS.kS().get())
+        .withKV(constants.SLOT0_GAINS.kV().get())
+        .withKA(constants.SLOT0_GAINS.kA().get())
+        .withKG(constants.SLOT0_GAINS.kG().get())
+        .withGravityType(GravityTypeValue.Elevator_Static);
+
+    config.Slot1.withKP(constants.SLOT1_GAINS.kP().get())
+        .withKD(constants.SLOT1_GAINS.kD().get())
+        .withKS(constants.SLOT1_GAINS.kS().get())
+        .withKV(constants.SLOT1_GAINS.kV().get())
+        .withKA(constants.SLOT1_GAINS.kA().get())
+        .withKG(constants.SLOT1_GAINS.kG().get())
+        .withGravityType(GravityTypeValue.Elevator_Static);
+
+    config.Slot2.withKP(constants.SLOT2_GAINS.kP().get())
+        .withKD(constants.SLOT2_GAINS.kD().get())
+        .withKS(constants.SLOT2_GAINS.kS().get())
+        .withKV(constants.SLOT2_GAINS.kV().get())
+        .withKA(constants.SLOT2_GAINS.kA().get())
+        .withKG(constants.SLOT2_GAINS.kG().get())
+        .withGravityType(GravityTypeValue.Elevator_Static);
+
+    config.CurrentLimits.withSupplyCurrentLimit(constants.ELEVATOR_SUPPLY_CURRENT_LIMIT)
+        .withSupplyCurrentLimitEnable(true)
+        .withStatorCurrentLimit(constants.ELEVATOR_STATOR_CURRENT_LIMIT)
+        .withStatorCurrentLimitEnable(true);
+
+    config.SoftwareLimitSwitch.withForwardSoftLimitThreshold(
+            constants.ELEVATOR_PARAMETERS.MAX_HEIGHT_METERS()
+                * constants.ELEVATOR_GEAR_RATIO
+                / (2 * Math.PI * constants.DRUM_RADIUS))
+        .withForwardSoftLimitEnable(true)
+        .withReverseSoftLimitThreshold(
+            constants.ELEVATOR_PARAMETERS.MIN_HEIGHT_METERS()
+                * constants.ELEVATOR_GEAR_RATIO
+                / (2 * Math.PI * constants.DRUM_RADIUS))
+        .withReverseSoftLimitEnable(true);
+
+    config.MotionMagic.withMotionMagicAcceleration(
+            constants.CONSTRAINTS.maxAccelerationMetersPerSecondSquared().getAsDouble()
+                * constants.ELEVATOR_GEAR_RATIO
+                / (2 * Math.PI * constants.DRUM_RADIUS))
+        .withMotionMagicCruiseVelocity(
+            constants.CONSTRAINTS.cruisingVelocityMetersPerSecond().getAsDouble()
+                * constants.ELEVATOR_GEAR_RATIO
+                / (2 * Math.PI * constants.DRUM_RADIUS));
+
+    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config));
+
+    for (TalonFX follower : followTalonFX) {
+      PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config));
+      follower.setControl(new Follower(talonFX.getDeviceID(), !(follower.getDeviceID() % 2 == 0)));
+    }
+
+    appliedVolts = new ArrayList<>();
+    supplyCurrentAmps = new ArrayList<>();
+    torqueCurrentAmps = new ArrayList<>();
+    temperatureCelsius = new ArrayList<>();
+
+    positionRotations = talonFX.getPosition();
+    velocityRotationsPerSecond = talonFX.getVelocity();
+    appliedVolts.add(talonFX.getMotorVoltage());
+    supplyCurrentAmps.add(talonFX.getSupplyCurrent());
+    torqueCurrentAmps.add(talonFX.getTorqueCurrent());
+    temperatureCelsius.add(talonFX.getDeviceTemp());
+    positionGoalMeters = 0.0;
+    positionSetpointRotations = talonFX.getClosedLoopReference();
+    positionErrorRotations = talonFX.getClosedLoopError();
+
+    for (int i = 0; i < constants.ELEVATOR_PARAMETERS.NUM_MOTORS() - 1; i++) {
+      appliedVolts.add(followTalonFX[i].getMotorVoltage());
+      supplyCurrentAmps.add(followTalonFX[i].getSupplyCurrent());
+      torqueCurrentAmps.add(followTalonFX[i].getTorqueCurrent());
+      temperatureCelsius.add(followTalonFX[i].getDeviceTemp());
+    }
+
+    var signalsList = new ArrayList<StatusSignal<?>>();
+
+    signalsList.add(positionRotations);
+    signalsList.add(velocityRotationsPerSecond);
+    signalsList.add(positionSetpointRotations);
+    signalsList.add(positionErrorRotations);
+    signalsList.addAll(appliedVolts);
+    signalsList.addAll(supplyCurrentAmps);
+    signalsList.addAll(torqueCurrentAmps);
+    signalsList.addAll(temperatureCelsius);
+
+    statusSignals = new StatusSignal[signalsList.size()];
+
+    for (int i = 0; i < signalsList.size(); i++) {
+      statusSignals[i] = signalsList.get(i);
+    }
+
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        50, statusSignals); // TODO: make the frequency a variable
+
+    talonFX.optimizeBusUtilization();
+    for (TalonFX follower : followTalonFX) {
+      follower.optimizeBusUtilization();
+    }
+
+    positionVoltageRequest = new MotionMagicVoltage(0.0);
+    voltageRequest = new VoltageOut(0.0);
+
+    PhoenixUtil.registerSignals(constants.ON_CANIVORE, statusSignals);
   }
 
   @Override
@@ -74,7 +182,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
             / constants.ELEVATOR_GEAR_RATIO;
     inputs.accelerationMetersPerSecondSquared = -1; // TODO: Replace with an actual value
 
-    for (int i = 0; i <= constants.ELEVATOR_PARAMETERS.NUM_MOTORS(); i++) {
+    for (int i = 0; i < constants.ELEVATOR_PARAMETERS.NUM_MOTORS(); i++) {
       inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
       inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
       inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValueAsDouble();
@@ -99,7 +207,16 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   public void setPosition(double positionMeters) {}
 
   @Override
-  public void setPositionGoal(double positionMeters) {}
+  public void setPositionGoal(double positionMeters) {
+    positionGoalMeters = positionMeters;
+    talonFX.setControl(
+        positionVoltageRequest
+            .withPosition(
+                positionMeters
+                    / (2 * Math.PI * constants.DRUM_RADIUS)
+                    * constants.ELEVATOR_GEAR_RATIO)
+            .withSlot(0));
+  }
 
   @Override
   public void setVoltage(double volts) {
