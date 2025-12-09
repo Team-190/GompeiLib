@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ElevatorConstants {
   public final ReentrantLock lock;
   public final int ELEVATOR_CAN_ID;
+  public final boolean ON_CANIVORE;
   public final double ELEVATOR_GEAR_RATIO;
   public final double DRUM_RADIUS;
 
@@ -21,6 +22,7 @@ public class ElevatorConstants {
 
   public ElevatorConstants(
       int ELEVATOR_CAN_ID,
+      boolean ON_CANIVORE,
       double ELEVATOR_GEAR_RATIO,
       double DRUM_RADIUS,
       double ELEVATOR_SUPPLY_CURRENT_LIMIT,
@@ -33,6 +35,7 @@ public class ElevatorConstants {
     this.lock = new ReentrantLock();
 
     this.ELEVATOR_CAN_ID = ELEVATOR_CAN_ID;
+    this.ON_CANIVORE = ON_CANIVORE;
     this.ELEVATOR_GEAR_RATIO = ELEVATOR_GEAR_RATIO;
     this.DRUM_RADIUS = DRUM_RADIUS;
 
