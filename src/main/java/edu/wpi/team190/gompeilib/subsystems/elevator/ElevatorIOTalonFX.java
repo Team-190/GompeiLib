@@ -8,6 +8,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import edu.wpi.team190.gompeilib.core.utility.GainSlot;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
@@ -229,6 +230,24 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   @Override
   public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG) {
     config.Slot0.withKP(kP).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
+    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config));
+  }
+
+  @Override
+  public void updateGains(
+          double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
+      switch (slot) {
+          case ZERO:
+              config.Slot0.withKP(kP).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
+              break;
+          case ONE:
+              config.Slot1.withKP(kP).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
+              break;
+          case TWO:
+          default:
+              config.Slot2.withKP(kP).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
+              break;
+      }
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config));
   }
 

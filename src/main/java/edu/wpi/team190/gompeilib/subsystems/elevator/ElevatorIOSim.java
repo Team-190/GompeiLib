@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.team190.gompeilib.core.utility.GainSlot;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import java.util.Arrays;
@@ -102,6 +103,13 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG) {
+    feedback.setPID(kP, 0, kD);
+    feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
+  }
+
+  @Override
+  public void updateGains(
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
     feedback.setPID(kP, 0, kD);
     feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
   }
