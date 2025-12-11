@@ -61,4 +61,9 @@ public class Elevator extends SubsystemBase {
     Arrays.fill(inputs.appliedVolts, volts);
     isClosedLoop = false;
   }
+
+  public double getPositionMeters() {
+      return inputs.positionMeters;
+  }
+
 }
