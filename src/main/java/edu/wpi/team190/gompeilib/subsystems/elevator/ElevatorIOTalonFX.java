@@ -204,7 +204,9 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   }
 
   @Override
-  public void setPosition(double positionMeters) {}
+  public void setPosition(double positionMeters) {
+    talonFX.setPosition(positionMeters / (2 * Math.PI * constants.DRUM_RADIUS) * constants.ELEVATOR_GEAR_RATIO);
+  }
 
   @Override
   public void setPositionGoal(double positionMeters) {
