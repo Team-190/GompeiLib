@@ -96,6 +96,11 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
+  public void setPositionGoal(double positionMeters, int slot) {
+      setPositionGoal(positionMeters);
+  }
+
+  @Override
   public void setVoltage(double volts) {
     isClosedLoop = false;
     appliedVolts = volts;
