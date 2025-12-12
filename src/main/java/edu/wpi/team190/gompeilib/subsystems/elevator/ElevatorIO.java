@@ -39,7 +39,6 @@ public interface ElevatorIO {
    * Sets the position goal of the elevator.
    *
    * @param positionMeters The position goal of the elevator in meters.
-   *
    */
   public void setPositionGoal(double positionMeters);
 
@@ -48,7 +47,6 @@ public interface ElevatorIO {
    *
    * @param positionMeters The position goal of the elevator in meters.
    * @param slot The slot that the current position goal is being set for.
-   *
    */
   public void setPositionGoal(double positionMeters, GainSlot slot);
 

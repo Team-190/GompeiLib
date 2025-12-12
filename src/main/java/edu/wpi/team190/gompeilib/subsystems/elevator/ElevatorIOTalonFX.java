@@ -222,31 +222,31 @@ public class ElevatorIOTalonFX implements ElevatorIO {
             .withSlot(0));
   }
 
-    @Override
-    public void setPositionGoal(double positionMeters, GainSlot slot) {
-        positionGoalMeters = positionMeters;
-        int slotInt = 0;
-
-        switch (slot) {
-          case ZERO:
-            slotInt = 0;
-            break;
-          case ONE:
-            slotInt = 1;
-            break;
-          case TWO:
-            slotInt = 2;
-             break;
-        }
-
-        talonFX.setControl(
-                positionVoltageRequest
-                        .withPosition(
-                                positionMeters
-                                        / (2 * Math.PI * constants.DRUM_RADIUS)
-                                        * constants.ELEVATOR_GEAR_RATIO)
-                        .withSlot(slotInt));
+  @Override
+  public void setPositionGoal(double positionMeters, GainSlot slot) {
+    positionGoalMeters = positionMeters;
+    int slotInt = 0;
+    
+    switch (slot) {
+      case ZERO:
+        slotInt = 0;
+        break;
+      case ONE:
+        slotInt = 1;
+        break;
+      case TWO:
+        slotInt = 2;
+        break;
     }
+
+    talonFX.setControl(
+        positionVoltageRequest
+            .withPosition(
+                positionMeters
+                    / (2 * Math.PI * constants.DRUM_RADIUS)
+                    * constants.ELEVATOR_GEAR_RATIO)
+            .withSlot(slotInt));
+  }
 
   @Override
   public void setVoltage(double volts) {
