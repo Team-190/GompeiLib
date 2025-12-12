@@ -4,9 +4,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.team190.gompeilib.core.utility.GainSlot;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.team190.gompeilib.core.utility.GainSlot;
 import java.util.Arrays;
 
 public class ElevatorIOSim implements ElevatorIO {
@@ -96,7 +96,7 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void setPositionGoal(double positionMeters, int slot) {
+  public void setPositionGoal(double positionMeters, GainSlot slot) {
     setPositionGoal(positionMeters);
   }
 
