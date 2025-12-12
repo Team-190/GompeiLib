@@ -50,7 +50,7 @@ public interface ElevatorIO {
    * @param slot The slot that the current position goal is being set for.
    *
    */
-  public void setPositionGoal(double positionMeters, int slot);
+  public void setPositionGoal(double positionMeters, GainSlot slot);
 
   /**
    * Sets the voltage for the elevator.
