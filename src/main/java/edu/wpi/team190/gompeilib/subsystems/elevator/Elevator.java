@@ -63,7 +63,6 @@ public class Elevator extends SubsystemBase {
   }
 
   public double getPositionMeters() {
-      return inputs.positionMeters;
+    return inputs.positionMeters;
   }
-
 }

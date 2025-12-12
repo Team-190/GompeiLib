@@ -96,7 +96,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void setPositionGoal(double positionMeters, int slot) {
-      setPositionGoal(positionMeters);
+    setPositionGoal(positionMeters);
   }
 
   @Override
