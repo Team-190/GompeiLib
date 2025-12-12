@@ -2,6 +2,7 @@ package edu.wpi.team190.gompeilib.subsystems.elevator;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
+import edu.wpi.team190.gompeilib.core.utility.GainSlot;
 import edu.wpi.team190.gompeilib.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
 import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
@@ -37,6 +38,11 @@ public class Elevator extends SubsystemBase {
 
   public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG) {
     io.updateGains(kP, kD, kS, kV, kA, kG);
+  }
+
+  public void updateGains(
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
+    io.updateGains(kP, kD, kS, kV, kA, kG, slot);
   }
 
   public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
