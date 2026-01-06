@@ -48,21 +48,19 @@ public class Localization {
 
     public void addPoseObservations(List<VisionPoseObservation> poseObservations) {
         estimationRegions
-                .iterator()
-                .forEachRemaining(
+                .forEach(
                         zone ->
                                 poseObservations.stream()
-                                        .filter(observation -> zone.getTagIds().containsAll(observation.tagIds()))
+                                        .filter(observation -> zone.getAprilTags().keySet().containsAll(observation.tagIds()))
                                         .forEach(zone::addPoseObservation));
     }
 
     public void addTxTyObservations(List<VisionTxTyObservation> txTyObservations) {
         estimationRegions
-                .iterator()
-                .forEachRemaining(
+                .forEach(
                         zone ->
                                 txTyObservations.stream()
-                                        .filter(observation -> zone.getTagIds().contains(observation.tagId()))
+                                        .filter(observation -> zone.getAprilTags().containsKey(observation.tagId()))
                                         .forEach(
                                                 filteredObservation ->
                                                         zone.addTxTyObservation(filteredObservation, poseBuffer)));
