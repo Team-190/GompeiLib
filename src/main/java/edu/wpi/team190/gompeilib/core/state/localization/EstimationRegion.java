@@ -10,20 +10,43 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.team190.gompeilib.core.utility.GeometryUtil;
 import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionPoseObservation;
 import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionTxTyObservation;
-import java.util.Objects;
+
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
 
+/**
+ * Represents an independent localization context that estimates the robot's
+ * field-relative pose using a constrained subset of vision targets.
+ *
+ * <p>An {@code EstimationRegion} owns its own {@link SwerveDrivePoseEstimator}
+ * and is configured with a fixed set of AprilTags that are considered valid
+ * measurement sources for this region. This allows multiple estimators to run
+ * in parallel, each optimized for different areas of the field, tag groupings,
+ * or sensing conditions.</p>
+ *
+ * <p>The estimator continuously integrates drivetrain odometry and accepts
+ * vision updates in two forms:
+ * <ul>
+ *   <li>Full field-relative pose observations (e.g. solvePNP-based estimates)</li>
+ *   <li>Angular {@code tx/ty}-based observations that are projected into a
+ *       2D field pose using known AprilTag locations and the camera transform</li>
+ * </ul>
+ * Vision measurements are assumed to originate only from the tags assigned to
+ * this region; observations referencing unknown tags are ignored.</p>
+ *
+ * <p>This abstraction enables higher-level localization logic to dynamically
+ * select or weight estimators based on robot position, visibility, confidence,
+ * or game-specific constraints, without entangling tag-selection logic with
+ * the underlying state estimation.</p>
+ */
 public class EstimationRegion {
-  @Getter private final Set<AprilTag> aprilTags;
-  @Getter private final Set<Integer> tagIds;
+  @Getter private final Map<Integer, Pose3d> aprilTags;
   private final SwerveDrivePoseEstimator poseEstimator;
 
   public EstimationRegion(Set<AprilTag> aprilTags, SwerveDriveKinematics kinematics) {
-    this.aprilTags = aprilTags;
-
-    tagIds = aprilTags.stream().map(aprilTag -> aprilTag.ID).collect(Collectors.toSet());
+    this.aprilTags = aprilTags.stream().map(aprilTag -> Map.entry(aprilTag.ID, aprilTag.pose)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     SwerveModulePosition[] swerveModulePositions = new SwerveModulePosition[4];
     for (int i = 0; i < swerveModulePositions.length; i++) {
@@ -47,7 +70,6 @@ public class EstimationRegion {
 
   public void addTxTyObservation(
       VisionTxTyObservation observation, TimeInterpolatableBuffer<Pose2d> poseBuffer) {
-    int tagId = observation.tagId();
 
     // Get odometry-based pose at the timestamp
     var sample = poseBuffer.getSample(observation.timestamp());
@@ -66,27 +88,33 @@ public class EstimationRegion {
     Pose3d cameraPose = observation.cameraPose();
 
     // Project 3D distance onto horizontal plane
-    double distance2d =
-        observation.distance()
-            * Math.cos(-cameraPose.getRotation().getY() - ty); // pitch + tag vertical angle
+    Rotation3d camToTagRotation3d =
+            new Rotation3d(0.0, -cameraPose.getRotation().getY() - ty, 0.0);
+
+    Translation3d camToTag =
+            new Translation3d(observation.distance(), camToTagRotation3d);
+
+    double distance2d = camToTag.toTranslation2d().getNorm();
+
 
     // Compute rotation from camera to tag
-    Rotation2d camToTagRotation =
+    // tx and ty are flipped from WPILib convention.
+    Rotation2d camToTagRotation2d =
         sample
             .get()
             .getRotation()
             .plus(cameraPose.toPose2d().getRotation().plus(Rotation2d.fromRadians(-tx)));
+    int tagId = observation.tagId();
 
-    Pose2d tagPose2d =
-        Objects.requireNonNull(
-                aprilTags.stream().filter(tag -> tag.ID == tagId).findFirst().orElse(null))
-            .pose
+    Pose2d tagPose2d = aprilTags.get(tagId)
             .toPose2d();
     if (tagPose2d == null) return;
 
     // Compute camera position in field frame
+    Rotation2d tagToCameraRotation = camToTagRotation2d.plus(Rotation2d.kPi);
+
     Translation2d fieldToCameraTranslation =
-        new Pose2d(tagPose2d.getTranslation(), camToTagRotation.plus(Rotation2d.kPi))
+        new Pose2d(tagPose2d.getTranslation(), tagToCameraRotation)
             .transformBy(GeometryUtil.toTransform2d(distance2d, 0.0))
             .getTranslation();
 
