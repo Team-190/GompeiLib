@@ -3,6 +3,7 @@ package edu.wpi.team190.gompeilib.subsystems.vision.camera;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.team190.gompeilib.core.utility.GeometryUtil;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants.GompeiVisionConfig;
@@ -132,7 +133,7 @@ public class CameraGompeiVision extends Camera {
 
           break;
         default:
-          // Invalid frame
+          DriverStation.reportWarning("FAILED TO CAPTURE FRAMES", false);
           continue;
       }
 
