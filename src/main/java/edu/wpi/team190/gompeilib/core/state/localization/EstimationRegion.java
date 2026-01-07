@@ -71,10 +71,10 @@ public class EstimationRegion {
   }
 
   public void addTxTyObservation(
-      VisionMultiTxTyObservation observation, TimeInterpolatableBuffer<Pose2d> poseBuffer) {
+      VisionMultiTxTyObservation observation) {
 
     // Get odometry-based pose at the timestamp
-    var sample = poseBuffer.getSample(observation.timestamp());
+    var sample = poseEstimator.sampleAt(observation.timestamp());
     if (sample.isEmpty()) return;
 
     // Average tx and ty over four corners

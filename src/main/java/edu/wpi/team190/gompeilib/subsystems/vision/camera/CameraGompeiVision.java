@@ -235,8 +235,4 @@ public class CameraGompeiVision extends Camera {
 
     super.sendObservers();
   }
-
-  public void setCameraPose(Pose3d cameraPose) {
-    currentCameraPose = cameraPose;
-  }
 }

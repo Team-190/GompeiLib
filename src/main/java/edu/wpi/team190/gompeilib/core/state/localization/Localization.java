@@ -64,7 +64,7 @@ public class Localization {
                 .filter(observation -> zone.getAprilTags().containsKey(observation.tagId()))
                 .forEach(
                     filteredObservation ->
-                        zone.addTxTyObservation(filteredObservation, poseBuffer)));
+                        zone.addTxTyObservation(filteredObservation)));
   }
 
   public Optional<Pose2d> getEstimatedPose(FieldZone fieldZone) {
