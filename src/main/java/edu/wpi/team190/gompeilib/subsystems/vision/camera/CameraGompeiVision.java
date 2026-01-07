@@ -6,8 +6,8 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.team190.gompeilib.core.utility.GeometryUtil;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants.GompeiVisionConfig;
+import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionMultiTxTyObservation;
 import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionPoseObservation;
-import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionTxTyObservation;
 import edu.wpi.team190.gompeilib.subsystems.vision.io.CameraIOGompeiVision;
 import edu.wpi.team190.gompeilib.subsystems.vision.io.GompeiVisionIOInputsAutoLogged;
 import java.util.*;
@@ -31,16 +31,14 @@ public class CameraGompeiVision extends Camera {
   @Getter private final List<Pose3d> allTagPoses;
   @Getter private Pose2d robotPose;
 
-  private Pose3d currentCameraPose;
-
   public CameraGompeiVision(
       CameraIOGompeiVision io,
       GompeiVisionConfig config,
       Supplier<AprilTagFieldLayout> aprilTagFieldLayoutSupplier,
       Supplier<Pose2d> currentRobotPoseSupplier,
       List<Consumer<List<VisionPoseObservation>>> poseObservers,
-      List<Consumer<List<VisionTxTyObservation>>> txtyObservers) {
-    super(config.key(), poseObservers, txtyObservers);
+      List<Consumer<List<VisionMultiTxTyObservation>>> txtyObservers) {
+    super(config.key(), poseObservers, txtyObservers, new ArrayList<>());
 
     inputs = new GompeiVisionIOInputsAutoLogged();
     this.io = io;
@@ -53,12 +51,14 @@ public class CameraGompeiVision extends Camera {
 
     allTagPoses = new ArrayList<>();
     robotPose = Pose2d.kZero;
+
+    currentCameraPose = config.robotRelativePose();
   }
 
   @Override
   public void periodic() {
     poseObservationList.clear();
-    txTyObservationList.clear();
+    multiTxTyObservationList.clear();
 
     io.updateInputs(inputs);
     Logger.processInputs("Vision/Cameras/" + this.name, inputs);
@@ -195,8 +195,8 @@ public class CameraGompeiVision extends Camera {
           // Store data
           if (indexCounter < totalTargets) {
             indexCounter++;
-            txTyObservationList.add(
-                new VisionTxTyObservation(tagId, tx, ty, distance, timestamp, cameraPose));
+            multiTxTyObservationList.add(
+                new VisionMultiTxTyObservation(tagId, tx, ty, distance, timestamp, cameraPose));
             tagIds.add(tagId);
           } else {
             System.out.println("[WARN] More tag data than expected: indexCounter=" + indexCounter);
@@ -233,5 +233,9 @@ public class CameraGompeiVision extends Camera {
     }
 
     super.sendObservers();
+  }
+
+  public void setCameraPose(Pose3d cameraPose) {
+    currentCameraPose = cameraPose;
   }
 }

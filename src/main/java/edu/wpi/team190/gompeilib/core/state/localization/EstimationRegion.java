@@ -8,45 +8,47 @@ import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.team190.gompeilib.core.utility.GeometryUtil;
+import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionMultiTxTyObservation;
 import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionPoseObservation;
-import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionTxTyObservation;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
 
 /**
- * Represents an independent localization context that estimates the robot's
- * field-relative pose using a constrained subset of vision targets.
+ * Represents an independent localization context that estimates the robot's field-relative pose
+ * using a constrained subset of vision targets.
  *
- * <p>An {@code EstimationRegion} owns its own {@link SwerveDrivePoseEstimator}
- * and is configured with a fixed set of AprilTags that are considered valid
- * measurement sources for this region. This allows multiple estimators to run
- * in parallel, each optimized for different areas of the field, tag groupings,
- * or sensing conditions.</p>
+ * <p>An {@code EstimationRegion} owns its own {@link SwerveDrivePoseEstimator} and is configured
+ * with a fixed set of AprilTags that are considered valid measurement sources for this region. This
+ * allows multiple estimators to run in parallel, each optimized for different areas of the field,
+ * tag groupings, or sensing conditions.
  *
- * <p>The estimator continuously integrates drivetrain odometry and accepts
- * vision updates in two forms:
+ * <p>The estimator continuously integrates drivetrain odometry and accepts vision updates in two
+ * forms:
+ *
  * <ul>
- *   <li>Full field-relative pose observations (e.g. solvePNP-based estimates)</li>
- *   <li>Angular {@code tx/ty}-based observations that are projected into a
- *       2D field pose using known AprilTag locations and the camera transform</li>
+ *   <li>Full field-relative pose observations (e.g. solvePNP-based estimates)
+ *   <li>Angular {@code tx/ty}-based observations that are projected into a 2D field pose using
+ *       known AprilTag locations and the camera transform
  * </ul>
- * Vision measurements are assumed to originate only from the tags assigned to
- * this region; observations referencing unknown tags are ignored.</p>
  *
- * <p>This abstraction enables higher-level localization logic to dynamically
- * select or weight estimators based on robot position, visibility, confidence,
- * or game-specific constraints, without entangling tag-selection logic with
- * the underlying state estimation.</p>
+ * Vision measurements are assumed to originate only from the tags assigned to this region;
+ * observations referencing unknown tags are ignored.
+ *
+ * <p>This abstraction enables higher-level localization logic to dynamically select or weight
+ * estimators based on robot position, visibility, confidence, or game-specific constraints, without
+ * entangling tag-selection logic with the underlying state estimation.
  */
 public class EstimationRegion {
   @Getter private final Map<Integer, Pose3d> aprilTags;
   private final SwerveDrivePoseEstimator poseEstimator;
 
   public EstimationRegion(Set<AprilTag> aprilTags, SwerveDriveKinematics kinematics) {
-    this.aprilTags = aprilTags.stream().map(aprilTag -> Map.entry(aprilTag.ID, aprilTag.pose)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    this.aprilTags =
+        aprilTags.stream()
+            .map(aprilTag -> Map.entry(aprilTag.ID, aprilTag.pose))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     SwerveModulePosition[] swerveModulePositions = new SwerveModulePosition[4];
     for (int i = 0; i < swerveModulePositions.length; i++) {
@@ -69,7 +71,7 @@ public class EstimationRegion {
   }
 
   public void addTxTyObservation(
-      VisionTxTyObservation observation, TimeInterpolatableBuffer<Pose2d> poseBuffer) {
+      VisionMultiTxTyObservation observation, TimeInterpolatableBuffer<Pose2d> poseBuffer) {
 
     // Get odometry-based pose at the timestamp
     var sample = poseBuffer.getSample(observation.timestamp());
@@ -88,14 +90,11 @@ public class EstimationRegion {
     Pose3d cameraPose = observation.cameraPose();
 
     // Project 3D distance onto horizontal plane
-    Rotation3d camToTagRotation3d =
-            new Rotation3d(0.0, -cameraPose.getRotation().getY() - ty, 0.0);
+    Rotation3d camToTagRotation3d = new Rotation3d(0.0, -cameraPose.getRotation().getY() - ty, 0.0);
 
-    Translation3d camToTag =
-            new Translation3d(observation.distance(), camToTagRotation3d);
+    Translation3d camToTag = new Translation3d(observation.distance(), camToTagRotation3d);
 
     double distance2d = camToTag.toTranslation2d().getNorm();
-
 
     // Compute rotation from camera to tag
     // tx and ty are flipped from WPILib convention.
@@ -106,8 +105,7 @@ public class EstimationRegion {
             .plus(cameraPose.toPose2d().getRotation().plus(Rotation2d.fromRadians(-tx)));
     int tagId = observation.tagId();
 
-    Pose2d tagPose2d = aprilTags.get(tagId)
-            .toPose2d();
+    Pose2d tagPose2d = aprilTags.get(tagId).toPose2d();
     if (tagPose2d == null) return;
 
     // Compute camera position in field frame
@@ -131,7 +129,9 @@ public class EstimationRegion {
     double xystdev = 0.1 * Math.pow(observation.distance(), 1.2);
 
     poseEstimator.addVisionMeasurement(
-        robotPose, observation.timestamp(), VecBuilder.fill(xystdev, xystdev, Double.POSITIVE_INFINITY));
+        robotPose,
+        observation.timestamp(),
+        VecBuilder.fill(xystdev, xystdev, Double.POSITIVE_INFINITY));
   }
 
   public Pose2d getEstimatedPose() {

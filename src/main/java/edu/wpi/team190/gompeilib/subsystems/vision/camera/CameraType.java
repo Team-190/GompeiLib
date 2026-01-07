@@ -69,7 +69,6 @@ public enum CameraType {
     private static final double MEGATAG_XY_STANDARD_DEVIATION_COEFFICIENT = 0.1;
     private static final double MEGATAG_THETA_STANDARD_DEVIATION_COEFFICIENT = 0.1;
     private static final double MEGATAG_2_XY_STANDARD_DEVIATION_COEFFICIENT = 0.1;
-    private static final double COMPLEMENTARY_FILTER_SIGMA = 0.5;
   }
 
   private static class Limelight3Constants {

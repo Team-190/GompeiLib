@@ -1,12 +1,9 @@
 package edu.wpi.team190.gompeilib.subsystems.vision.io;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.*;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants;
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import lombok.Getter;
 
 public class CameraIOGompeiVision implements CameraIO {
@@ -16,10 +13,7 @@ public class CameraIOGompeiVision implements CameraIO {
   private final IntegerSubscriber captureFPSAprilTagSubscriber;
   private final IntegerSubscriber processingFPSAprilTagSubscriber;
 
-  public CameraIOGompeiVision(
-      VisionConstants.GompeiVisionConfig config,
-      Supplier<Pose2d> currentRobotPoseSupplier,
-      Function<Double, Optional<Pose2d>> bufferedPoseFunction) {
+  public CameraIOGompeiVision(VisionConstants.GompeiVisionConfig config) {
 
     this.name = config.key();
 
