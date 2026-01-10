@@ -39,7 +39,7 @@ public final class GompeiLib {
   /** Throws an exception if the library has not been initialized. */
   private static void checkInitialized() {
     if (!initialized) {
-      throw new IllegalStateException("GompeiLib.init() must be called before using the library.");
+      throw new IllegalStateException("GompeiLib.init() must be called before using GompeiLib.");
     }
   }
 
