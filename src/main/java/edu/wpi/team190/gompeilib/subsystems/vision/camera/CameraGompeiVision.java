@@ -25,6 +25,7 @@ public class CameraGompeiVision extends Camera {
 
   private final GompeiVisionConfig config;
   private final Supplier<AprilTagFieldLayout> aprilTagFieldLayoutSupplier;
+  private final double fieldBorderMarginMeters;
   private final Supplier<Pose2d> currentRobotPoseSupplier;
 
   @Getter private final String name;
@@ -36,6 +37,7 @@ public class CameraGompeiVision extends Camera {
       CameraIOGompeiVision io,
       GompeiVisionConfig config,
       Supplier<AprilTagFieldLayout> aprilTagFieldLayoutSupplier,
+      double fieldBorderMarginMeters,
       Supplier<Pose2d> currentRobotPoseSupplier,
       List<Consumer<List<VisionPoseObservation>>> poseObservers,
       List<Consumer<List<VisionMultiTxTyObservation>>> txtyObservers) {
@@ -46,6 +48,7 @@ public class CameraGompeiVision extends Camera {
 
     this.config = config;
     this.aprilTagFieldLayoutSupplier = aprilTagFieldLayoutSupplier;
+    this.fieldBorderMarginMeters = fieldBorderMarginMeters;
     this.currentRobotPoseSupplier = currentRobotPoseSupplier;
 
     this.name = this.config.key();
@@ -142,10 +145,13 @@ public class CameraGompeiVision extends Camera {
       }
 
       // Exit if robot pose is off the field
-      if (robotPose.getX() < -VisionConstants.FIELD_BORDER_MARGIN
-          || robotPose.getX() > VisionConstants.FIELD_LENGTH + VisionConstants.FIELD_BORDER_MARGIN
-          || robotPose.getY() < -VisionConstants.FIELD_BORDER_MARGIN
-          || robotPose.getY() > VisionConstants.FIELD_WIDTH + VisionConstants.FIELD_BORDER_MARGIN) {
+      double fieldLength = aprilTagFieldLayoutSupplier.get().getFieldLength();
+      double fieldWidth = aprilTagFieldLayoutSupplier.get().getFieldWidth();
+
+      if (robotPose.getX() < -fieldBorderMarginMeters
+          || robotPose.getX() > fieldLength + fieldBorderMarginMeters
+          || robotPose.getY() < -fieldBorderMarginMeters
+          || robotPose.getY() > fieldWidth + fieldBorderMarginMeters) {
         continue;
       }
 

@@ -126,7 +126,7 @@ public class EstimationRegion {
     // Use odometry rotation only
     robotPose = new Pose2d(robotPose.getTranslation(), sample.get().getRotation());
 
-    double xystdev = 0.1 * Math.pow(observation.distance(), 1.2);
+    double xystdev = LocalizationConstants.XY_STDDEV_COEFFICIENT * Math.pow(observation.distance(), LocalizationConstants.XY_STDDEV_DISTANCE_EXPONENT);
 
     poseEstimator.addVisionMeasurement(
         robotPose,

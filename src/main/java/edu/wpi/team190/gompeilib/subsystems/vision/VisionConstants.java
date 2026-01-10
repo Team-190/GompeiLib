@@ -12,9 +12,8 @@ import lombok.Builder;
 
 public class VisionConstants {
   public static final double AMBIGUITY_THRESHOLD = 0.4;
-  public static final double FIELD_BORDER_MARGIN = 0.5;
-  public static final double FIELD_LENGTH = Units.inchesToMeters(690.876);
-  public static final double FIELD_WIDTH = Units.inchesToMeters(317);
+  public static final double XY_STDEV_DISTANCE_EXPONENT = 1.2;
+  public static final double XY_STDEV_TAG_COUNT_EXPONENT = 2.0;
 
   @Builder
   public record LimelightConfig(

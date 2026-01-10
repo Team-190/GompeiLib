@@ -63,8 +63,7 @@ public class Localization {
             txTyObservations.stream()
                 .filter(observation -> zone.getAprilTags().containsKey(observation.tagId()))
                 .forEach(
-                    filteredObservation ->
-                        zone.addTxTyObservation(filteredObservation)));
+                        zone::addTxTyObservation));
   }
 
   public Optional<Pose2d> getEstimatedPose(FieldZone fieldZone) {

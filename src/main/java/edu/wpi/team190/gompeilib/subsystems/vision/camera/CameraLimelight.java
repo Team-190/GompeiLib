@@ -2,6 +2,7 @@ package edu.wpi.team190.gompeilib.subsystems.vision.camera;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants.LimelightConfig;
 import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionPoseObservation;
 import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionSingleTxTyObservation;
@@ -58,13 +59,13 @@ public class CameraLimelight extends Camera {
 
     double xyStdDev =
         config.megatagXYStdev()
-            * Math.pow(inputs.mt1PoseEstimate.avgTagDist(), 1.2)
-            / Math.pow(inputs.mt1PoseEstimate.tagCount(), 2);
+            * Math.pow(inputs.mt1PoseEstimate.avgTagDist(), VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
+            / Math.pow(inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
     double thetaStdev =
         inputs.mt1PoseEstimate.tagCount() > 1
             ? config.metatagThetaStdev()
-                * Math.pow(inputs.mt1PoseEstimate.avgTagDist(), 1.2)
-                / Math.pow(inputs.mt1PoseEstimate.tagCount(), 2)
+                * Math.pow(inputs.mt1PoseEstimate.avgTagDist(), VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
+                / Math.pow(inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT)
             : Double.POSITIVE_INFINITY;
 
     poseObservationList.add(
@@ -78,8 +79,8 @@ public class CameraLimelight extends Camera {
 
     xyStdDev =
         config.megatag2XYStdev()
-            * Math.pow(inputs.mt1PoseEstimate.avgTagDist(), 1.2)
-            / Math.pow(inputs.mt1PoseEstimate.tagCount(), 2);
+            * Math.pow(inputs.mt1PoseEstimate.avgTagDist(), VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
+            / Math.pow(inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
     thetaStdev = Double.POSITIVE_INFINITY;
 
     poseObservationList.add(
