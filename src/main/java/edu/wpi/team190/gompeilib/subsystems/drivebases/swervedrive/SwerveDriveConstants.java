@@ -1,14 +1,16 @@
 package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class SwerveDriveConstants {
   public final ReentrantLock lock;
@@ -36,6 +38,8 @@ public class SwerveDriveConstants {
   public final double DRIVER_DEADBAND;
   public final double OPERATOR_DEADBAND;
 
+  public final boolean isCANFD;
+
   public SwerveDriveConstants(
       DriveConfig driveConfig,
       Gains gains,
@@ -43,7 +47,8 @@ public class SwerveDriveConstants {
       AutoAlignNearConstants autoAlignNearConstants,
       double odometryFrequency,
       double driverDeadband,
-      double operatorDeadband) {
+      double operatorDeadband,
+      boolean isCANFD) {
     this.lock = new ReentrantLock();
     this.FRONT_LEFT = driveConfig.frontLeft();
     this.FRONT_RIGHT = driveConfig.frontRight();
@@ -56,6 +61,7 @@ public class SwerveDriveConstants {
     this.ODOMETRY_FREQUENCY = odometryFrequency;
     this.DRIVER_DEADBAND = driverDeadband;
     this.OPERATOR_DEADBAND = operatorDeadband;
+    this.isCANFD = isCANFD;
   }
 
   public record DriveConfig(
