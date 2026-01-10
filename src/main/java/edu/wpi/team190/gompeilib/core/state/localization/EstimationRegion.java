@@ -4,7 +4,6 @@ import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.team190.gompeilib.core.utility.GeometryUtil;
@@ -70,8 +69,7 @@ public class EstimationRegion {
         observation.pose(), observation.timestamp(), observation.stddevs());
   }
 
-  public void addTxTyObservation(
-      VisionMultiTxTyObservation observation) {
+  public void addTxTyObservation(VisionMultiTxTyObservation observation) {
 
     // Get odometry-based pose at the timestamp
     var sample = poseEstimator.sampleAt(observation.timestamp());
@@ -126,7 +124,9 @@ public class EstimationRegion {
     // Use odometry rotation only
     robotPose = new Pose2d(robotPose.getTranslation(), sample.get().getRotation());
 
-    double xystdev = LocalizationConstants.XY_STDDEV_COEFFICIENT * Math.pow(observation.distance(), LocalizationConstants.XY_STDDEV_DISTANCE_EXPONENT);
+    double xystdev =
+        LocalizationConstants.XY_STDDEV_COEFFICIENT
+            * Math.pow(observation.distance(), LocalizationConstants.XY_STDDEV_DISTANCE_EXPONENT);
 
     poseEstimator.addVisionMeasurement(
         robotPose,

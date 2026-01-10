@@ -2,7 +2,6 @@ package edu.wpi.team190.gompeilib.core.state.localization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -59,8 +58,7 @@ public class Localization {
         zone ->
             txTyObservations.stream()
                 .filter(observation -> zone.getAprilTags().containsKey(observation.tagId()))
-                .forEach(
-                        zone::addTxTyObservation));
+                .forEach(zone::addTxTyObservation));
   }
 
   public Optional<Pose2d> getEstimatedPose(FieldZone fieldZone) {
