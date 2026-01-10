@@ -1,9 +1,9 @@
 [versions]
-wpilib = "2025.3.1"
-phoenix6 = "25.4.0"
-choreo = "2025.0.3"
+wpilib = "2026.1.1"
+phoenix6 = "26.1.0"
+choreo = "2026.0.0-beta-1"
 aspectj = "1.9.21"
-advantagekit = "4.1.2"
+advantagekit = "26.0.0"
 quickbuf = "1.4"
 jackson = "2.17.2"
 

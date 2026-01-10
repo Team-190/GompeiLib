@@ -1,5 +1,6 @@
 package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -58,7 +59,7 @@ public class SwerveDriveConstants {
   }
 
   public record DriveConfig(
-      String canBus,
+      CANBus canBus,
       int pigeon2Id,
       double maxLinearVelocityMetersPerSecond,
       double wheelRadiusMeters,
