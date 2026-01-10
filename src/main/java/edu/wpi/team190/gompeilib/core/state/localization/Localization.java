@@ -15,7 +15,6 @@ public class Localization {
   private final List<EstimationRegion> estimationRegions;
 
   private final SwerveDriveOdometry swerveDriveOdometry;
-  private final TimeInterpolatableBuffer<Pose2d> poseBuffer;
 
   public Localization(
       List<FieldZone> estimationZones,
@@ -32,7 +31,6 @@ public class Localization {
               new SwerveModulePosition()
             },
             Pose2d.kZero);
-    this.poseBuffer = TimeInterpolatableBuffer.createBuffer(bufferLengthSeconds);
 
     this.estimationRegions =
         estimationZones.stream()
@@ -43,7 +41,6 @@ public class Localization {
   public void addOdometryObservation(
       double timestamp, Rotation2d rawHeading, SwerveModulePosition[] modulePositions) {
     swerveDriveOdometry.update(rawHeading, modulePositions);
-    poseBuffer.addSample(timestamp, swerveDriveOdometry.getPoseMeters());
     estimationRegions.forEach(
         region -> region.addOdometryObservation(timestamp, rawHeading, modulePositions));
   }
