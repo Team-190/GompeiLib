@@ -38,8 +38,6 @@ public class SwerveDriveConstants {
   public final double DRIVER_DEADBAND;
   public final double OPERATOR_DEADBAND;
 
-  public final boolean isCANFD;
-
   public SwerveDriveConstants(
       DriveConfig driveConfig,
       Gains gains,
@@ -47,8 +45,7 @@ public class SwerveDriveConstants {
       AutoAlignNearConstants autoAlignNearConstants,
       double odometryFrequency,
       double driverDeadband,
-      double operatorDeadband,
-      boolean isCANFD) {
+      double operatorDeadband) {
     this.lock = new ReentrantLock();
     this.FRONT_LEFT = driveConfig.frontLeft();
     this.FRONT_RIGHT = driveConfig.frontRight();
@@ -61,7 +58,6 @@ public class SwerveDriveConstants {
     this.ODOMETRY_FREQUENCY = odometryFrequency;
     this.DRIVER_DEADBAND = driverDeadband;
     this.OPERATOR_DEADBAND = operatorDeadband;
-    this.isCANFD = isCANFD;
   }
 
   public record DriveConfig(

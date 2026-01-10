@@ -13,6 +13,11 @@
 
 package edu.wpi.team190.gompeilib.core.utility;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive.SwerveDriveConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -20,13 +25,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.DoubleSupplier;
-
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusSignal;
-
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive.SwerveDriveConstants;
 
 /**
  * Provides an interface for asynchronously reading high-frequency measurements to a set of queues.
@@ -39,13 +37,14 @@ import edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive.SwerveDriveCo
 public class PhoenixOdometryThread extends Thread {
   private final SwerveDriveConstants driveConstants;
   private final Lock signalsLock =
-      new ReentrantLock(); // Prevents conflicts when registering signals
+          new ReentrantLock(); // Prevents conflicts when registering signals
   private BaseStatusSignal[] phoenixSignals = new BaseStatusSignal[0];
   private final List<DoubleSupplier> genericSignals = new ArrayList<>();
   private final List<Queue<Double>> phoenixQueues = new ArrayList<>();
   private final List<Queue<Double>> genericQueues = new ArrayList<>();
   private final List<Queue<Double>> timestampQueues = new ArrayList<>();
 
+  private static boolean isCANFD;
   private static PhoenixOdometryThread instance = null;
 
   public static PhoenixOdometryThread getInstance(SwerveDriveConstants driveConstants) {
@@ -57,6 +56,7 @@ public class PhoenixOdometryThread extends Thread {
 
   private PhoenixOdometryThread(SwerveDriveConstants driveConstants) {
     this.driveConstants = driveConstants;
+    isCANFD = driveConstants.DRIVE_CONFIG.canBus().isNetworkFD();
     setName("PhoenixOdometryThread");
     setDaemon(true);
   }
@@ -119,7 +119,7 @@ public class PhoenixOdometryThread extends Thread {
       // Wait for updates from all signals
       signalsLock.lock();
       try {
-        if (driveConstants.isCANFD && phoenixSignals.length > 0) {
+        if (isCANFD && phoenixSignals.length > 0) {
           BaseStatusSignal.waitForAll(2.0 / driveConstants.ODOMETRY_FREQUENCY, phoenixSignals);
         } else {
           // "waitForAll" does not support blocking on multiple signals with a bus
