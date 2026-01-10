@@ -8,6 +8,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
@@ -110,7 +111,12 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
     for (TalonFX follower : followTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config));
-      follower.setControl(new Follower(talonFX.getDeviceID(), !(follower.getDeviceID() % 2 == 0)));
+      follower.setControl(
+          new Follower(
+              talonFX.getDeviceID(),
+              (follower.getDeviceID() % 2 == 1)
+                  ? MotorAlignmentValue.Aligned
+                  : MotorAlignmentValue.Opposed));
     }
 
     appliedVolts = new ArrayList<>();
