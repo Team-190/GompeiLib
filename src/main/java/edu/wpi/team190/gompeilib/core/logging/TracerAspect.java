@@ -23,8 +23,6 @@ public class TracerAspect {
    * @return The return value of the original method.
    * @throws Throwable If the original method throws an exception.
    */
-  // --- 2. USE THE SIMPLE NAME IN THE POINTCUT ---
-  // This is cleaner and more robust than using the full package name.
   @Around("execution(@Trace * *.*(..))")
   public Object profile(ProceedingJoinPoint joinPoint) throws Throwable {
     // Use FPGA timestamp for high-resolution, synchronized timing
