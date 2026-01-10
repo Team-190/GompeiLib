@@ -14,7 +14,7 @@ repositories {
     maven { url = uri("https://frcmaven.wpi.edu/artifactory/release") }
     maven { url = uri("https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release") }
     maven { url = uri("https://maven.ctr-electronics.com/release/") }
-    maven { url = uri("https://lib.choreo.autos/dep") }
+    maven { url = uri("https://frcmaven.wpi.edu/artifactory/sleipnirgroup-mvn-release/") }
 }
 
 dependencies {
