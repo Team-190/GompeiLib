@@ -1,4 +1,4 @@
-package edu.wpi.team190.gompeilib.core;
+package edu.wpi.team190.gompeilib.core.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
