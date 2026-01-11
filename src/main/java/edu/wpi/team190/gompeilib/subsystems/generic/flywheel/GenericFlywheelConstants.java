@@ -1,5 +1,6 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
+import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 
@@ -15,19 +16,23 @@ public class GenericFlywheelConstants {
   public final Gains GAINS;
   public final Constraints CONSTRAINTS;
 
+  public final InvertedValue INVERSION;
+
   public GenericFlywheelConstants(
       int[] CAN_IDS,
       double CURRENT_LIMIT,
       double MOMENT_OF_INERTIA,
       DCMotor[] MOTOR_CONFIGS,
       Gains GAINS,
-      Constraints CONSTRAINTS) {
+      Constraints CONSTRAINTS,
+      InvertedValue INVERSION) {
     this.CAN_IDS = CAN_IDS;
     this.CURRENT_LIMIT = CURRENT_LIMIT;
     this.MOMENT_OF_INERTIA = MOMENT_OF_INERTIA;
     this.MOTOR_CONFIGS = MOTOR_CONFIGS;
     this.GAINS = GAINS;
     this.CONSTRAINTS = CONSTRAINTS;
+    this.INVERSION = INVERSION;
   }
 
   public record Gains(
