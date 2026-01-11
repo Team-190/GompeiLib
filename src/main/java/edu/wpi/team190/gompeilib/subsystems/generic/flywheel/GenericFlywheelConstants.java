@@ -9,19 +9,23 @@ public class GenericFlywheelConstants {
 
     public final double CURRENT_LIMIT;
     public final double MOMENT_OF_INERTIA;
+    public final double GEAR_RATIO
 
     public final DCMotor[] MOTOR_CONFIGS;
 
     public final Gains GAINS;
     public final Constraints CONSTRAINTS;
+    public final GenericFlywheelParameters GENERIC_FLYWHEEL_PARAMETERS;
 
-    public GenericFlywheelConstants(int[] CAN_IDS, double CURRENT_LIMIT, double MOMENT_OF_INERTIA, DCMotor[] MOTOR_CONFIGS, Gains GAINS, Constraints CONSTRAINTS) {
+    public GenericFlywheelConstants(int[] CAN_IDS, double CURRENT_LIMIT, double MOMENT_OF_INERTIA, DCMotor[] MOTOR_CONFIGS, Gains GAINS, Constraints CONSTRAINTS, GenericFlywheelParameters GENERIC_FLYWHEEL_PARAMETERS, double GEAR_RATIO) {
         this.CAN_IDS = CAN_IDS;
         this.CURRENT_LIMIT = CURRENT_LIMIT;
         this.MOMENT_OF_INERTIA = MOMENT_OF_INERTIA;
         this.MOTOR_CONFIGS = MOTOR_CONFIGS;
         this.GAINS = GAINS;
         this.CONSTRAINTS = CONSTRAINTS;
+        this.GENERIC_FLYWHEEL_PARAMETERS = GENERIC_FLYWHEEL_PARAMETERS;
+        this.GEAR_RATIO = GEAR_RATIO;
     }
 
     public record Gains(
@@ -38,4 +42,11 @@ public class GenericFlywheelConstants {
             LoggedTunableNumber cruisingVelocityMetersPerSecond,
             LoggedTunableNumber goalToleranceMeters) {
     }
+
+    public record GenericFlywheelParameters(
+      DCMotor MOTOR_CONFIG,
+      double CARRIAGE_MASS_KG,
+      double MIN_HEIGHT_METERS,
+      double MAX_HEIGHT_METERS,
+      int NUM_MOTORS) {}
 }
