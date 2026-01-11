@@ -7,42 +7,32 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public interface GenericFlywheelIO {
 
     @AutoLog
-    public static class WhiplashShooterIOInputs {
-        public Rotation2d positionRadians;
-        public double velocityRadiansPerSecond;
+    public static class GenericFlywheelIOInputs {
+        public Rotation2d positionRadians = new Rotation2d();
+        public double velocityRadiansPerSecond = 0.0;
 
         public double[] appliedVolts = new double[] {};
         public double[] currentsAmps = new double[] {};
         public double[] temperaturesCelsius = new double[] {};
 
-        public double velocityGoalRadiansPerSecond;
-        public double velocitySetpointRadiansPerSecond;
-        public double velocityErrorRadiansPerSecond;
+        public double velocityGoalRadiansPerSecond = 0.0;
+        public double velocitySetpointRadiansPerSecond = 0.0;
+        public double velocityErrorRadiansPerSecond = 0.0;
     }
 
-    public default void updateInputs(WhiplashShooterIOInputs inputs) {
-    }
+    public void updateInputs(GenericFlywheelIOInputs inputs);
 
-    public default void setVoltage(double volts) {
-    }
+    public void setVoltage(double volts);
 
-    public default void setVelocity(double[] velocityRadiansPerSecond) {
-    }
+    public void setVelocity(double[] velocityRadiansPerSecond);
 
-    public default void setPID(double kp, double ki, double kd) {
-    }
+    public void setPID(double kP, double kI, double kD);
 
-    public default void setFeedforward(double ks, double kv, double ka) {
-    }
+    public void setFeedforward(double kS, double kV, double kA);
 
-    public default void setProfile(
-            double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {
-    }
+    public void setProfile(double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond);
 
-    public default boolean atGoal() {
-        return false;
-    }
+    public boolean atGoal();
 
-    public default void stop() {
-    }
+    public void stop();
 }
