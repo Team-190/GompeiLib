@@ -1,5 +1,6 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
+import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 
@@ -9,15 +10,18 @@ public class GenericFlywheelConstants {
 
     public final double CURRENT_LIMIT;
     public final double MOMENT_OF_INERTIA;
-    public final double GEAR_RATIO
+    public final double GEAR_RATIO;
 
     public final DCMotor[] MOTOR_CONFIGS;
 
     public final Gains GAINS;
     public final Constraints CONSTRAINTS;
     public final GenericFlywheelParameters GENERIC_FLYWHEEL_PARAMETERS;
+    public final InvertedValue INVERSION;
 
-    public GenericFlywheelConstants(int[] CAN_IDS, double CURRENT_LIMIT, double MOMENT_OF_INERTIA, DCMotor[] MOTOR_CONFIGS, Gains GAINS, Constraints CONSTRAINTS, GenericFlywheelParameters GENERIC_FLYWHEEL_PARAMETERS, double GEAR_RATIO) {
+    public GenericFlywheelConstants(int[] CAN_IDS, double CURRENT_LIMIT, double MOMENT_OF_INERTIA,
+            DCMotor[] MOTOR_CONFIGS, Gains GAINS, Constraints CONSTRAINTS,
+            GenericFlywheelParameters GENERIC_FLYWHEEL_PARAMETERS, double GEAR_RATIO, InvertedValue INVERSION) {
         this.CAN_IDS = CAN_IDS;
         this.CURRENT_LIMIT = CURRENT_LIMIT;
         this.MOMENT_OF_INERTIA = MOMENT_OF_INERTIA;
@@ -26,6 +30,15 @@ public class GenericFlywheelConstants {
         this.CONSTRAINTS = CONSTRAINTS;
         this.GENERIC_FLYWHEEL_PARAMETERS = GENERIC_FLYWHEEL_PARAMETERS;
         this.GEAR_RATIO = GEAR_RATIO;
+        this.INVERSION = INVERSION;
+    }
+
+    public record GenericFlywheelParameters(
+            DCMotor MOTOR_CONFIG,
+            double CARRIAGE_MASS_KG,
+            double MIN_HEIGHT_METERS,
+            double MAX_HEIGHT_METERS,
+            int NUM_MOTORS) {
     }
 
     public record Gains(
@@ -38,15 +51,8 @@ public class GenericFlywheelConstants {
     }
 
     public record Constraints(
-            LoggedTunableNumber maxAccelerationMetersPerSecondSquared,
-            LoggedTunableNumber cruisingVelocityMetersPerSecond,
-            LoggedTunableNumber goalToleranceMeters) {
+            LoggedTunableNumber maxAccelerationRadiansPerSecondSquared,
+            LoggedTunableNumber cruisingVelocityRadiansPerSecond,
+            LoggedTunableNumber goalToleranceRadiansPerSecond) {
     }
-
-    public record GenericFlywheelParameters(
-      DCMotor MOTOR_CONFIG,
-      double CARRIAGE_MASS_KG,
-      double MIN_HEIGHT_METERS,
-      double MAX_HEIGHT_METERS,
-      int NUM_MOTORS) {}
 }

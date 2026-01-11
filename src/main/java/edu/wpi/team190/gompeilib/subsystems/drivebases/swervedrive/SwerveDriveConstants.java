@@ -1,16 +1,14 @@
 package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class SwerveDriveConstants {
   public final ReentrantLock lock;
