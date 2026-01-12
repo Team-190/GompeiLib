@@ -22,6 +22,4 @@ public interface RollerIO {
   public default void updateInputs(RollerIOInputs inputs) {}
 
   public default void setVoltage(double volts) {}
-
-  public default void setVelocity(AngularVelocity velocity) {}
 }

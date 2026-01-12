@@ -16,71 +16,71 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 
 public class RollerIOTalonFX implements RollerIO {
-  private final TalonFX talonFX;
+    private final TalonFX talonFX;
 
-  private final TalonFXConfiguration config;
+    private final TalonFXConfiguration config;
 
-  private final StatusSignal<Angle> positionRotations;
-  private final StatusSignal<AngularVelocity> velocityRotationsPerSecond;
-  private final StatusSignal<Voltage> appliedVoltage;
-  private final StatusSignal<Current> supplyCurrentAmps;
-  private final StatusSignal<Current> torqueCurrentAmps;
-  private final StatusSignal<Temperature> temperatureCelcius;
+    private final StatusSignal<Angle> positionRotations;
+    private final StatusSignal<AngularVelocity> velocityRotationsPerSecond;
+    private final StatusSignal<Voltage> appliedVoltage;
+    private final StatusSignal<Current> supplyCurrentAmps;
+    private final StatusSignal<Current> torqueCurrentAmps;
+    private final StatusSignal<Temperature> temperatureCelcius;
 
-  private final VoltageOut voltageRequest;
+    private final VoltageOut voltageRequest;
 
-  public RollerIOTalonFX(RollerConstants consts) {
-    talonFX = new TalonFX(consts.ROLLER_CAN_ID);
+    public RollerIOTalonFX(RollerConstants consts) {
+        talonFX = new TalonFX(consts.ROLLER_CAN_ID);
 
-    config = new TalonFXConfiguration();
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.CurrentLimits.SupplyCurrentLimit = consts.SUPPLY_CURRENT_LIMIT;
-    config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config = new TalonFXConfiguration();
+        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.CurrentLimits.SupplyCurrentLimit = consts.SUPPLY_CURRENT_LIMIT;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
+        PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
-    positionRotations = talonFX.getPosition();
-    velocityRotationsPerSecond = talonFX.getVelocity();
-    appliedVoltage = talonFX.getMotorVoltage();
-    supplyCurrentAmps = talonFX.getSupplyCurrent();
-    torqueCurrentAmps = talonFX.getTorqueCurrent();
-    temperatureCelcius = talonFX.getDeviceTemp();
+        positionRotations = talonFX.getPosition();
+        velocityRotationsPerSecond = talonFX.getVelocity();
+        appliedVoltage = talonFX.getMotorVoltage();
+        supplyCurrentAmps = talonFX.getSupplyCurrent();
+        torqueCurrentAmps = talonFX.getTorqueCurrent();
+        temperatureCelcius = talonFX.getDeviceTemp();
 
-    voltageRequest = new VoltageOut(0);
+        voltageRequest = new VoltageOut(0);
 
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0,
-        positionRotations,
-        velocityRotationsPerSecond,
-        appliedVoltage,
-        supplyCurrentAmps,
-        torqueCurrentAmps,
-        temperatureCelcius);
+        BaseStatusSignal.setUpdateFrequencyForAll(
+                50.0,
+                positionRotations,
+                velocityRotationsPerSecond,
+                appliedVoltage,
+                supplyCurrentAmps,
+                torqueCurrentAmps,
+                temperatureCelcius);
 
-    talonFX.optimizeBusUtilization();
-  }
+        talonFX.optimizeBusUtilization();
+    }
 
-  @Override
-  public void updateInputs(RollerIOInputs inputs) {
-    BaseStatusSignal.refreshAll(
-        positionRotations,
-        velocityRotationsPerSecond,
-        appliedVoltage,
-        supplyCurrentAmps,
-        torqueCurrentAmps,
-        temperatureCelcius);
+    @Override
+    public void updateInputs(RollerIOInputs inputs) {
+        BaseStatusSignal.refreshAll(
+                positionRotations,
+                velocityRotationsPerSecond,
+                appliedVoltage,
+                supplyCurrentAmps,
+                torqueCurrentAmps,
+                temperatureCelcius);
 
-    inputs.position = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
-    inputs.velocity =
-        velocityRotationsPerSecond.getValue();
-    inputs.appliedVolts = appliedVoltage.getValueAsDouble();
-    inputs.supplyCurrentAmps = supplyCurrentAmps.getValueAsDouble();
-    inputs.torqueCurrentAmps = torqueCurrentAmps.getValueAsDouble();
-    inputs.temperatureCelsius = temperatureCelcius.getValue();
-  }
+        inputs.position = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
+        inputs.velocity =
+                velocityRotationsPerSecond.getValue();
+        inputs.appliedVolts = appliedVoltage.getValueAsDouble();
+        inputs.supplyCurrentAmps = supplyCurrentAmps.getValueAsDouble();
+        inputs.torqueCurrentAmps = torqueCurrentAmps.getValueAsDouble();
+        inputs.temperatureCelsius = temperatureCelcius.getValue();
+    }
 
-  @Override
-  public void setVoltage(double volts) {
-    talonFX.setControl(voltageRequest.withOutput(volts).withEnableFOC(true));
-  }
+    @Override
+    public void setVoltage(double volts) {
+        talonFX.setControl(voltageRequest.withOutput(volts).withEnableFOC(true));
+    }
 }
