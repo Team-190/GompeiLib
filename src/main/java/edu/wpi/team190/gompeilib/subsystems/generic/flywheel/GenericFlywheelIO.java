@@ -32,7 +32,7 @@ public interface GenericFlywheelIO {
   public void setProfile(
       double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond);
 
-  public boolean atGoal();
+  public boolean atGoal(GenericFlywheelConstants constants);
 
   public void stop();
 }
