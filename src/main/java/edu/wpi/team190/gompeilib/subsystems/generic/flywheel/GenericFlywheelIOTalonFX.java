@@ -4,13 +4,18 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
+import edu.wpi.team190.gompeilib.subsystems.generic.flywheel.GenericFlywheelIO.GenericFlywheelIOInputs;
 
 import java.sql.Array;
 import java.util.ArrayList;
@@ -97,6 +102,8 @@ public class GenericFlywheelIOTalonFX {
 
         BaseStatusSignal.setUpdateFrequencyForAll(50, statusSignals); //TODO: Make frequency a variable
 
+        PhoenixUtil.registerSignals(constants.ON_CANIVORE, statusSignals);
+
         talonFX.optimizeBusUtilization();
         for (TalonFX follower : followerTalonFX) {
             follower.optimizeBusUtilization();
@@ -107,5 +114,25 @@ public class GenericFlywheelIOTalonFX {
 
         velocityControlRequest = new VelocityVoltage(0);
     }
+
+    public void updateInputs(GenericFlywheelIOInputs inputs) {
+        inputs.positionRadians = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
+        inputs.velocityRadiansPerSecond =
+                Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());
+
+        for (int i = 0; i < followerTalonFX.length+1; i++) {
+            inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
+        }
+
+        for (int i = 0; i < followerTalonFX.length+1; i++) {
+            inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
+        }
+
+        for (int i = 0; i < followerTalonFX.length+1; i++) {
+            inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValueAsDouble();
+        }
+
+    }
+
 
 }
