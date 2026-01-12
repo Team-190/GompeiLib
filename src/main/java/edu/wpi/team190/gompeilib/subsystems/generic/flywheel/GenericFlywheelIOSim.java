@@ -50,7 +50,8 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
             motorSim.getAngularVelocityRadPerSec() * 0.02); // Riemann Sum with Loop Period
     inputs.velocityRadiansPerSecond = motorSim.getAngularVelocityRadPerSec();
     Arrays.fill(inputs.appliedVolts, appliedVolts);
-    Arrays.fill(inputs.currentsAmps, motorSim.getCurrentDrawAmps());
+    Arrays.fill(inputs.supplyCurrentAmps, motorSim.getCurrentDrawAmps());
+    Arrays.fill(inputs.torqueCurrentAmps, motorSim.getCurrentDrawAmps());
     inputs.velocityGoalRadiansPerSecond = profile.getGoal();
     inputs.velocitySetpointRadiansPerSecond = feedback.getSetpoint();
     inputs.velocityErrorRadiansPerSecond = feedback.getError();
