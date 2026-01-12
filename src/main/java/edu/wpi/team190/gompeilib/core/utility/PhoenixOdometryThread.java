@@ -56,6 +56,7 @@ public class PhoenixOdometryThread extends Thread {
 
   private PhoenixOdometryThread(SwerveDriveConstants driveConstants) {
     this.driveConstants = driveConstants;
+    isCANFD = driveConstants.DRIVE_CONFIG.canBus().isNetworkFD();
     setName("PhoenixOdometryThread");
     setDaemon(true);
   }
