@@ -19,6 +19,8 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
 
   private double appliedVolts;
 
+  GenericFlywheelConstants constants;
+
   public GenericFlywheelIOSim(GenericFlywheelConstants constants) {
     motorSim =
         new FlywheelSim(
@@ -38,6 +40,8 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
         new SimpleMotorFeedforward(constants.GAINS.kS().get(), constants.GAINS.kV().get());
 
     appliedVolts = 0.0;
+
+    this.constants = constants;
   }
 
   @Override
@@ -88,7 +92,7 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
   }
 
   @Override
-  public boolean atGoal(GenericFlywheelConstants constants) {
+  public boolean atGoal() {
     return (Math.abs(profile.getGoal() - feedback.getSetpoint())
             <= constants.CONSTRAINTS.goalToleranceRadiansPerSecond().get())
         && feedback.atSetpoint();
