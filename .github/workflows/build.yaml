@@ -1,4 +1,4 @@
-name: Build and Publish GompeiLib
+name: Build GompeiLib
 
 on:
   push:
