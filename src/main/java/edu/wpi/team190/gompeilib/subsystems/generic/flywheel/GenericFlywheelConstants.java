@@ -54,13 +54,12 @@ public class GenericFlywheelConstants {
       double MAX_HEIGHT_METERS,
       int NUM_MOTORS) {}
 
-    public record Gains(
-            LoggedTunableNumber kP,
-            LoggedTunableNumber kD,
-            LoggedTunableNumber kS,
-            LoggedTunableNumber kV,
-            LoggedTunableNumber kA) {
-    }
+  public record Gains(
+      LoggedTunableNumber kP,
+      LoggedTunableNumber kD,
+      LoggedTunableNumber kS,
+      LoggedTunableNumber kV,
+      LoggedTunableNumber kA) {}
 
   public record Constraints(
       LoggedTunableNumber maxAccelerationRadiansPerSecondSquared,

@@ -109,7 +109,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
       statusSignals[i] = signalsList.get(i);
     }
 
-    BaseStatusSignal.setUpdateFrequencyForAll(1/GompeiLib.getLoopPeriod(), statusSignals);
+    BaseStatusSignal.setUpdateFrequencyForAll(1 / GompeiLib.getLoopPeriod(), statusSignals);
 
     PhoenixUtil.registerSignals(constants.ON_CANIVORE, statusSignals);
 
@@ -128,9 +128,9 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public void updateInputs(GenericFlywheelIOInputs inputs) {
-    inputs.positionRadians = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
+    inputs.positionRadians = Rotation2d.fromRotations(positionRotations.getValueAsDouble() / constants.GEAR_RATIO);
     inputs.velocityRadiansPerSecond =
-        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());
+        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble()) / constants.GEAR_RATIO;
 
     for (int i = 0; i < followerTalonFX.length + 1; i++) {
       inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
@@ -139,11 +139,11 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
       inputs.temperatureCelsius[i] = temperatureCelcius.get(i).getValueAsDouble();
     }
 
-    inputs.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond;
+    inputs.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond / constants.GEAR_RATIO;
     inputs.velocitySetpointRadiansPerSecond =
-        Units.rotationsToRadians(velocitySetpointRotationsPerSecond.getValueAsDouble());
+        Units.rotationsToRadians(velocitySetpointRotationsPerSecond.getValueAsDouble()) / constants.GEAR_RATIO;
     inputs.velocityErrorRadiansPerSecond =
-        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());
+        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble()) / constants.GEAR_RATIO;
   }
 
   @Override
@@ -153,10 +153,10 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public void setVelocity(double velocityRadiansPerSecond) {
-    velocityGoalRadiansPerSecond = velocityRadiansPerSecond;
+    velocityGoalRadiansPerSecond = velocityRadiansPerSecond / constants.GEAR_RATIO;
     talonFX.setControl(
         velocityControlRequest
-            .withVelocity(Units.radiansToRotations(velocityRadiansPerSecond))
+            .withVelocity(Units.radiansToRotations(velocityGoalRadiansPerSecond))
             .withEnableFOC(constants.ENABLE_FOC));
   }
 
@@ -164,35 +164,34 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   public void setPID(double kP, double kI, double kD) {
     talonFXConfiguration.Slot0.withKP(kP).withKI(kI).withKD(kD);
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
-      for (TalonFX follower: followerTalonFX) {
-          PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
-      }
-
+    for (TalonFX follower : followerTalonFX) {
+      PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
+    }
   }
 
   @Override
   public void setFeedforward(double kS, double kV, double kA) {
     talonFXConfiguration.Slot0.withKS(kS).withKV(kV).withKA(kA);
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
-      for (TalonFX follower: followerTalonFX) {
-          PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
-      }
+    for (TalonFX follower : followerTalonFX) {
+      PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
+    }
   }
 
   @Override
   public void setProfile(
       double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {
     talonFXConfiguration.MotionMagic.withMotionMagicAcceleration(
-        Units.radiansToRotations(maxAccelerationRadiansPerSecondSquared));
+        Units.radiansToRotations(maxAccelerationRadiansPerSecondSquared) / constants.GEAR_RATIO);
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
-      for (TalonFX follower: followerTalonFX) {
-          PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
-      }
+    for (TalonFX follower : followerTalonFX) {
+      PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
+    }
   }
 
   @Override
   public boolean atGoal() {
-    return Math.abs(velocityErrorRotationsPerSecond.getValueAsDouble())
+    return Math.abs(velocityErrorRotationsPerSecond.getValueAsDouble() / constants.GEAR_RATIO)
         <= Units.radiansToRotations(constants.CONSTRAINTS.goalToleranceRadiansPerSecond().get());
   }
 
