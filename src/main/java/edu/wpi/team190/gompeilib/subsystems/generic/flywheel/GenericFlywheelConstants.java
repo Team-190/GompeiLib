@@ -48,7 +48,6 @@ public class GenericFlywheelConstants {
             LoggedTunableNumber kP,
             LoggedTunableNumber kD,
             LoggedTunableNumber kS,
-            LoggedTunableNumber kG,
             LoggedTunableNumber kV,
             LoggedTunableNumber kA) {
     }
