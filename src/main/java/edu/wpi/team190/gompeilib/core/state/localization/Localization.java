@@ -69,4 +69,10 @@ public class Localization {
     }
     return Optional.empty();
   }
+
+  public void resetPose(Pose2d pose) {
+    for (EstimationRegion region : estimationRegions) {
+      region.resetPose(pose);
+    }
+  }
 }
