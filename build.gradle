@@ -7,7 +7,12 @@ plugins {
 }
 
 group = 'edu.wpi.team190'
-version = '2026.1.1'
+def baseVersion = '2026.1.1'
+
+def suffix = System.getenv("VERSION_SUFFIX") ?: ""
+def sha = System.getenv("GITHUB_SHA")?.take(7) ?: ""
+
+version = baseVersion + suffix + (suffix && sha ? "+$sha" : "")
 
 repositories {
     mavenCentral()

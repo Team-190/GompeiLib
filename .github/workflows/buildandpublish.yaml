@@ -5,7 +5,9 @@ name: Build and Publish GompeiLib
 
 on:
   push:
-    branches: [ "main" ] # Runs whenever you push to the main branch
+    branches:
+      - main
+      - development
 
 jobs:
   # --- JOB 1: BUILD & TEST ---
@@ -48,6 +50,13 @@ jobs:
           distribution: 'temurin'
 
       # Run the 'publish' task to upload the library to GitHub Packages.
+      - name: Set version suffix
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == "development" ]]; then
+            echo "VERSION_SUFFIX=-dev" >> $GITHUB_ENV
+          else
+            echo "VERSION_SUFFIX=" >> $GITHUB_ENV
+          fi
       - name: Publish to GitHub Packages
         run: ./gradlew publish
         env:
