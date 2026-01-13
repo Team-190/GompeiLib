@@ -1,8 +1,7 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
-import org.littletonrobotics.junction.AutoLog;
-
 import edu.wpi.first.math.geometry.Rotation2d;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface GenericFlywheelIO {
 
