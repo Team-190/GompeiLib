@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'edu.wpi.team190'
-version = '2026.1.1'
+version = project.hasProperty("releaseVersion") ? project.property("releaseVersion") : "0.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -51,11 +51,8 @@ if (System.getenv("CI") == "true") {
         repositories {
             maven {
                 name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/Team-190/GompeiLib") // Assuming this is your URL
+                url = uri("https://maven.pkg.github.com/Team-190/GompeiLib")
                 credentials {
-                    // This uses findProperty, which safely returns null if the property
-                    // isn't found, preventing the "Could not get unknown property" error
-                    // during local builds without credentials.
                     username = System.getenv("GPR_USER") ?: project.findProperty("gpr.user")
                     password = System.getenv("GPR_KEY") ?: project.findProperty("gpr.key")
                 }
