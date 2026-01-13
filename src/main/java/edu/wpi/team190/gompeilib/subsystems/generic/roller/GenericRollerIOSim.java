@@ -1,4 +1,4 @@
-package edu.wpi.team190.gompeilib.subsystems.roller;
+package edu.wpi.team190.gompeilib.subsystems.generic.roller;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -8,12 +8,12 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 
-public class RollerIOSim implements RollerIO {
+public class GenericRollerIOSim implements GenericRollerIO {
   private final DCMotorSim sim;
 
   private double appliedVolts;
 
-  public RollerIOSim(RollerConstants consts) {
+  public GenericRollerIOSim(GenericRollerConstants consts) {
     sim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
