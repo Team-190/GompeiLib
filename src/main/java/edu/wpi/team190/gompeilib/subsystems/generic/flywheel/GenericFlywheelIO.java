@@ -11,8 +11,9 @@ public interface GenericFlywheelIO {
     public double velocityRadiansPerSecond = 0.0;
 
     public double[] appliedVolts = new double[] {};
-    public double[] currentsAmps = new double[] {};
-    public double[] temperaturesCelsius = new double[] {};
+    public double[] supplyCurrentAmps = new double[] {};
+    public double[] torqueCurrentAmps = new double[] {};
+    public double[] temperatureCelsius = new double[] {};
 
     public double velocityGoalRadiansPerSecond = 0.0;
     public double velocitySetpointRadiansPerSecond = 0.0;
