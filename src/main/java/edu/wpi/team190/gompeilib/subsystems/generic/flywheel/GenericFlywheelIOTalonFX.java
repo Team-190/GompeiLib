@@ -128,9 +128,11 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public void updateInputs(GenericFlywheelIOInputs inputs) {
-    inputs.positionRadians = Rotation2d.fromRotations(positionRotations.getValueAsDouble() / constants.GEAR_RATIO);
+    inputs.positionRadians =
+        Rotation2d.fromRotations(positionRotations.getValueAsDouble() / constants.GEAR_RATIO);
     inputs.velocityRadiansPerSecond =
-        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble()) / constants.GEAR_RATIO;
+        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble())
+            / constants.GEAR_RATIO;
 
     for (int i = 0; i < followerTalonFX.length + 1; i++) {
       inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
@@ -141,9 +143,11 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
     inputs.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond / constants.GEAR_RATIO;
     inputs.velocitySetpointRadiansPerSecond =
-        Units.rotationsToRadians(velocitySetpointRotationsPerSecond.getValueAsDouble()) / constants.GEAR_RATIO;
+        Units.rotationsToRadians(velocitySetpointRotationsPerSecond.getValueAsDouble())
+            / constants.GEAR_RATIO;
     inputs.velocityErrorRadiansPerSecond =
-        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble()) / constants.GEAR_RATIO;
+        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble())
+            / constants.GEAR_RATIO;
   }
 
   @Override

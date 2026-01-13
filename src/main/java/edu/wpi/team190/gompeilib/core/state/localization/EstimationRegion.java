@@ -137,4 +137,8 @@ public class EstimationRegion {
   public Pose2d getEstimatedPose() {
     return poseEstimator.getEstimatedPosition();
   }
+
+  public void resetPose(Pose2d pose) {
+    poseEstimator.resetPose(pose);
+  }
 }
