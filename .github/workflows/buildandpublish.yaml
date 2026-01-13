@@ -34,15 +34,24 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # --- NEW STEP: DELETE EXISTING PACKAGE VERSION ---
-      # This uses the GitHub CLI (installed on runners by default) 
-      # to delete the version so the publish step doesn't conflict.
-      - name: Delete existing package version
+      - name: Delete existing package
         run: |
-          gh package delete "GompeiLib" --package-type maven --yes || echo "Package not found, skipping delete."
+          # Detect if the owner is an Org or a User
+          OWNER_TYPE=$(gh api /users/${{ github.repository_owner }} --jq .type)
+          
+          if [ "$OWNER_TYPE" == "Organization" ]; then
+            ENDPOINT="orgs/${{ github.repository_owner }}/packages/maven/GompeiLib"
+          else
+            ENDPOINT="user/packages/maven/GompeiLib"
+          fi
+
+          echo "Attempting to delete package at: $ENDPOINT"
+          
+          # Delete the package
+          gh api --method DELETE "$ENDPOINT" || echo "Package not found or already deleted."
         env:
           GITHUB_TOKEN: ${{ secrets.GPR_KEY }}
-
+          
       - name: Publish to GitHub Packages
         run: ./gradlew publish
         env:
