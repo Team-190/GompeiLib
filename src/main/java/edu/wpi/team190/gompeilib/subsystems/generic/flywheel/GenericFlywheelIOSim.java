@@ -7,7 +7,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.team190.gompeilib.core.utility.LinearProfile;
+
 import java.util.Arrays;
+
+import edu.wpi.team190.gompeilib.core.GompeiLib;
 
 public class GenericFlywheelIOSim implements GenericFlywheelIO {
 
@@ -35,7 +38,7 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
     profile =
         new LinearProfile(
             constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get(),
-            0.02); // Loop cycle
+            1/GompeiLib.getLoopPeriod()); 
     feedforward =
         new SimpleMotorFeedforward(constants.GAINS.kS().get(), constants.GAINS.kV().get());
 
@@ -47,11 +50,11 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
   @Override
   public void updateInputs(GenericFlywheelIOInputs inputs) {
     motorSim.setInputVoltage(MathUtil.clamp(appliedVolts, -12.0, 12.0));
-    motorSim.update(0.02); // Loop Period
+    motorSim.update(1/GompeiLib.getLoopPeriod()); 
 
     inputs.positionRadians =
         Rotation2d.fromRadians(
-            motorSim.getAngularVelocityRadPerSec() * 0.02); // Riemann Sum with Loop Period
+            motorSim.getAngularVelocityRadPerSec() * 1/GompeiLib.getLoopPeriod()); 
     inputs.velocityRadiansPerSecond = motorSim.getAngularVelocityRadPerSec();
     Arrays.fill(inputs.appliedVolts, appliedVolts);
     Arrays.fill(inputs.supplyCurrentAmps, motorSim.getCurrentDrawAmps());
