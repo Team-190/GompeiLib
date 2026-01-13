@@ -3,14 +3,14 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
+import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import edu.wpi.team190.gompeilib.subsystems.generic.flywheel.GenericFlywheelIO.GenericFlywheelIOInputs;
 import java.util.ArrayList;
@@ -58,12 +58,19 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
         .withKP(constants.GAINS.kP().getAsDouble())
         .withKD(constants.GAINS.kD().getAsDouble())
         .withKS(constants.GAINS.kS().getAsDouble())
-        .withKV(constants.GAINS.kV().getAsDouble());
+        .withKV(constants.GAINS.kV().getAsDouble())
+        .withKA(constants.GAINS.kA().getAsDouble());
     talonFXConfiguration.MotorOutput.withInverted(constants.INVERSION);
 
     talonFX.getConfigurator().apply(talonFXConfiguration);
     for (TalonFX follower : followerTalonFX) {
-      follower.getConfigurator().apply(talonFXConfiguration);
+      PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
+      follower.setControl(
+          new Follower(
+              talonFX.getDeviceID(),
+              (follower.getDeviceID() % 2 == 1)
+                  ? MotorAlignmentValue.Aligned
+                  : MotorAlignmentValue.Opposed));
     }
 
     positionRotations = talonFX.getPosition();
@@ -99,7 +106,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
       statusSignals[i] = signalsList.get(i);
     }
 
-    BaseStatusSignal.setUpdateFrequencyForAll(50, statusSignals); // TODO: Make frequency a variable
+    BaseStatusSignal.setUpdateFrequencyForAll(1/GompeiLib.getLoopPeriod(), statusSignals);
 
     PhoenixUtil.registerSignals(constants.ON_CANIVORE, statusSignals);
 
@@ -124,17 +131,8 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
     for (int i = 0; i < followerTalonFX.length + 1; i++) {
       inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
-    }
-
-    for (int i = 0; i < followerTalonFX.length + 1; i++) {
       inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
-    }
-
-    for (int i = 0; i < followerTalonFX.length + 1; i++) {
       inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValueAsDouble();
-    }
-
-    for (int i = 0; i < followerTalonFX.length + 1; i++) {
       inputs.temperatureCelsius[i] = temperatureCelcius.get(i).getValueAsDouble();
     }
 
@@ -163,12 +161,19 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   public void setPID(double kP, double kI, double kD) {
     talonFXConfiguration.Slot0.withKP(kP).withKI(kI).withKD(kD);
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
+      for (TalonFX follower: followerTalonFX) {
+          PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
+      }
+
   }
 
   @Override
   public void setFeedforward(double kS, double kV, double kA) {
     talonFXConfiguration.Slot0.withKS(kS).withKV(kV).withKA(kA);
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
+      for (TalonFX follower: followerTalonFX) {
+          PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
+      }
   }
 
   @Override
@@ -177,13 +182,14 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     talonFXConfiguration.MotionMagic.withMotionMagicAcceleration(
         Units.radiansToRotations(maxAccelerationRadiansPerSecondSquared));
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
+      for (TalonFX follower: followerTalonFX) {
+          PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
+      }
   }
 
   @Override
   public boolean atGoal() {
-    return Math.abs(
-            Units.radiansToRotations(velocityGoalRadiansPerSecond)
-                - velocityRotationsPerSecond.getValueAsDouble())
+    return velocityErrorRotationsPerSecond.getValueAsDouble()
         <= Units.radiansToRotations(constants.CONSTRAINTS.goalToleranceRadiansPerSecond().get());
   }
 
