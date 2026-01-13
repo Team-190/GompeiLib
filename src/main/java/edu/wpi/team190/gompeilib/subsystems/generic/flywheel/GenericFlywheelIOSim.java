@@ -93,9 +93,7 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
 
   @Override
   public boolean atGoal() {
-    return (Math.abs(profile.getGoal() - feedback.getSetpoint())
-            <= constants.CONSTRAINTS.goalToleranceRadiansPerSecond().get())
-        && feedback.atSetpoint();
+    return feedback.atSetpoint();
   }
 
   @Override
