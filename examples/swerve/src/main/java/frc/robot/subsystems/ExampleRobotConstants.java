@@ -1,6 +1,8 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.v0_Funky;
 
-import com.ctre.phoenix6.CANBus;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -15,29 +17,34 @@ import edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive.SwerveDriveCo
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants.LimelightConfig;
 import edu.wpi.team190.gompeilib.subsystems.vision.camera.CameraType;
 
-public class ExampleRobotConstants {
+public class V0_FunkyConstants {
   public static final DriveConfig DRIVE_CONFIG =
       new DriveConfig(
-          new CANBus("Drive"),
-          1,
-          5.0,
-          Units.inchesToMeters(2.0),
+          TunerConstantsExampleRobot.kCANBus,
+          TunerConstantsExampleRobot.DrivetrainConstants.Pigeon2Id,
+          TunerConstantsExampleRobot.kSpeedAt12Volts.in(MetersPerSecond),
+          TunerConstantsExampleRobot.kWheelRadius.in(Meters),
           DCMotor.getKrakenX60Foc(1),
           DCMotor.getKrakenX44Foc(1),
           TunerConstantsExampleRobot.FrontLeft,
           TunerConstantsExampleRobot.FrontRight,
           TunerConstantsExampleRobot.BackLeft,
           TunerConstantsExampleRobot.BackRight,
-          25.0,
-          25.0);
+          Units.inchesToMeters(34.5),
+          Units.inchesToMeters(34.5));
   public static final Gains GAINS =
       new Gains(
-          new LoggedTunableNumber("Drive/Teleop/Drive Ks", 0.0),
-          new LoggedTunableNumber("Drive/Teleop/Drive Kv", 0.0),
-          new LoggedTunableNumber("Drive/Teleop/Drive Kp", 0.0),
-          new LoggedTunableNumber("Drive/Teleop/Drive Kd", 0.0),
-          new LoggedTunableNumber("Drive/Teleop/Turn Kp", 0.0),
-          new LoggedTunableNumber("Drive/Teleop/Turn Kd", 0.0));
+          new LoggedTunableNumber(
+              "Drive/Teleop/Drive Ks", TunerConstantsExampleRobot.driveGains.kS),
+          new LoggedTunableNumber(
+              "Drive/Teleop/Drive Kv", TunerConstantsExampleRobot.driveGains.kV),
+          new LoggedTunableNumber(
+              "Drive/Teleop/Drive Kp", TunerConstantsExampleRobot.driveGains.kP),
+          new LoggedTunableNumber(
+              "Drive/Teleop/Drive Kd", TunerConstantsExampleRobot.driveGains.kD),
+          new LoggedTunableNumber("Drive/Teleop/Turn Kp", TunerConstantsExampleRobot.steerGains.kP),
+          new LoggedTunableNumber(
+              "Drive/Teleop/Turn Kd", TunerConstantsExampleRobot.steerGains.kD));
   public static final AutoGains AUTO_GAINS =
       new AutoGains(
           new LoggedTunableNumber("Drive/Auto/Translation Kp", 0.0),
@@ -78,8 +85,8 @@ public class ExampleRobotConstants {
 
   public static final LimelightConfig LIMELIGHT_CONFIG =
       LimelightConfig.builder()
-          .key("center")
-          .cameraType(CameraType.LIMELIGHT_3G)
+          .key("limelight")
+          .cameraType(CameraType.LIMELIGHT_4)
           .horizontalFOV(82.0)
           .verticalFOV(56.2)
           .megatagXYStdev(0.1)
