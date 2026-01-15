@@ -63,5 +63,7 @@ public class ArmConstants {
   public record Constraints(
       LoggedTunableNumber MAX_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED,
       LoggedTunableNumber CRUISING_VELOCITY_ROTATIONS_PER_SECOND,
-      LoggedTunableNumber GOAL_TOLERANCE_RADIANS) {} // Units intentionally apply to arm rotations, not motor rotations
+      LoggedTunableNumber
+          GOAL_TOLERANCE_RADIANS) {} // Units intentionally apply to arm rotations, not motor
+  // rotations
 }
