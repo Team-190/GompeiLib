@@ -107,3 +107,7 @@ spotless {
         endWithNewline()
     }
 }
+
+tasks.named("build") {
+    dependsOn(gradle.includedBuild("swerve").task(":build"))
+}
