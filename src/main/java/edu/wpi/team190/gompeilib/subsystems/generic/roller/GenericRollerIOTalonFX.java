@@ -1,4 +1,4 @@
-package edu.wpi.team190.gompeilib.subsystems.roller;
+package edu.wpi.team190.gompeilib.subsystems.generic.roller;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -15,7 +15,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 
-public class RollerIOTalonFX implements RollerIO {
+public class GenericRollerIOTalonFX implements GenericRollerIO {
   private final TalonFX talonFX;
 
   private final TalonFXConfiguration config;
@@ -29,7 +29,7 @@ public class RollerIOTalonFX implements RollerIO {
 
   private final VoltageOut voltageRequest;
 
-  public RollerIOTalonFX(RollerConstants consts) {
+  public GenericRollerIOTalonFX(GenericRollerConstants consts) {
     talonFX = new TalonFX(consts.ROLLER_CAN_ID);
 
     config = new TalonFXConfiguration();

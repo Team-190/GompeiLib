@@ -6,9 +6,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -69,7 +67,12 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 
   private final TorqueCurrentFOC torqueCurrentRequest;
   private final VelocityTorqueCurrentFOC velocityTorqueCurrentRequest;
+  private final VelocityVoltage velocityVoltageRequest;
   private final MotionMagicTorqueCurrentFOC positionTorqueCurrentRequest;
+  private final MotionMagicVoltage positionVoltageRequest;
+
+  private final SwerveModuleConstants.ClosedLoopOutputType driveClosedLoopOutputType;
+  private final SwerveModuleConstants.ClosedLoopOutputType turnClosedLoopOutputType;
 
   public SwerveModuleIOTalonFX(
       SwerveDriveConstants driveConstants,
@@ -158,7 +161,12 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 
     torqueCurrentRequest = new TorqueCurrentFOC(0.0);
     velocityTorqueCurrentRequest = new VelocityTorqueCurrentFOC(0.0);
+    velocityVoltageRequest = new VelocityVoltage(0.0);
     positionTorqueCurrentRequest = new MotionMagicTorqueCurrentFOC(0.0);
+    positionVoltageRequest = new MotionMagicVoltage(0.0);
+
+    driveClosedLoopOutputType = constants.DriveMotorClosedLoopOutput;
+    turnClosedLoopOutputType = constants.SteerMotorClosedLoopOutput;
 
     // Configure periodic frames
     BaseStatusSignal.setUpdateFrequencyForAll(
@@ -276,7 +284,11 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
   @Trace
   public void setTurnPosition(Rotation2d rotation) {
     turnPositionGoal = rotation;
-    turnTalonFX.setControl(positionTorqueCurrentRequest.withPosition(rotation.getRotations()));
+    if (turnClosedLoopOutputType.equals(SwerveModuleConstants.ClosedLoopOutputType.Voltage))
+      turnTalonFX.setControl(positionVoltageRequest.withPosition(rotation.getRotations()));
+    if (turnClosedLoopOutputType.equals(
+        SwerveModuleConstants.ClosedLoopOutputType.TorqueCurrentFOC))
+      turnTalonFX.setControl(positionTorqueCurrentRequest.withPosition(rotation.getRotations()));
   }
 
   @Override
