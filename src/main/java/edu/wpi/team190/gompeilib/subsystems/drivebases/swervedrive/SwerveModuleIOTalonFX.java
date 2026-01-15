@@ -168,7 +168,7 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
     positionVoltageRequest = new MotionMagicVoltage(0.0);
 
     driveClosedLoopOutputType = constants.DriveMotorClosedLoopOutput;
-    turnClosedLoopOutputType = constants.DriveMotorClosedLoopOutput;
+    turnClosedLoopOutputType = constants.SteerMotorClosedLoopOutput;
 
     // Configure periodic frames
     BaseStatusSignal.setUpdateFrequencyForAll(
