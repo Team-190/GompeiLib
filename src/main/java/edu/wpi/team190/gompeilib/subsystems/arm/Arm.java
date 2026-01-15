@@ -32,8 +32,8 @@ public class Arm {
     return inputs.position;
   }
 
-  public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG) {
-    io.updateGains(kP, kD, kS, kV, kA, kG);
+  public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
+    io.updateGains(kP, kD, kS, kV, kA, kG, slot);
   }
 
   public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
@@ -50,15 +50,15 @@ public class Arm {
   }
 
   public void setPositionGoal(Rotation2d rotationGoal) {
-      inputs.positionGoal = rotationGoal;
+    inputs.positionGoal = rotationGoal;
   }
 
   public void setVoltage(double volts) {
-      io.setVoltage(volts);
+    io.setVoltage(volts);
   }
 
-  public void setSlot(GainSlot slot){
-      inputs.slot = slot;
+  public void setSlot(GainSlot slot) {
+    inputs.slot = slot;
   }
 
   public SysIdRoutine getCharacterization(
@@ -69,7 +69,6 @@ public class Arm {
             Volts.of(voltageIncrement),
             Seconds.of(timeSeconds),
             null),
-        new SysIdRoutine.Mechanism(
-            (voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
+        new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
   }
 }

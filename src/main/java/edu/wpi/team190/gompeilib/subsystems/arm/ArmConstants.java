@@ -16,6 +16,8 @@ public class ArmConstants {
 
   public final CurrentLimits CURRENT_LIMITS;
 
+  public final double MOMENT_OF_INERTIA;
+
   public ArmConstants(
       int ARM_CAN_ID,
       ArmParameters ARM_PARAMETERS,
@@ -23,7 +25,8 @@ public class ArmConstants {
       Gains SLOT1_GAINS,
       Gains SLOT2_GAINS,
       Constraints CONSTRAINTS,
-      CurrentLimits CURRENT_LIMITS) {
+      CurrentLimits CURRENT_LIMITS,
+      double MOMENT_OF_INERTIA) {
     this.ARM_CAN_ID = ARM_CAN_ID;
     this.ARM_PARAMETERS = ARM_PARAMETERS;
     this.SLOT0_GAINS = SLOT0_GAINS;
@@ -31,6 +34,7 @@ public class ArmConstants {
     this.SLOT2_GAINS = SLOT2_GAINS;
     this.CONSTRAINTS = CONSTRAINTS;
     this.CURRENT_LIMITS = CURRENT_LIMITS;
+    this.MOMENT_OF_INERTIA = MOMENT_OF_INERTIA;
   }
 
   public record ArmParameters(
