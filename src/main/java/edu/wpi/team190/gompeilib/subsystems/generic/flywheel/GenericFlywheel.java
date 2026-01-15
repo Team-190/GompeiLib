@@ -10,6 +10,7 @@ public class GenericFlywheel {
   private final GenericFlywheelIOInputsAutoLogged inputs;
 
   private double velocityGoalRadiansPerSecond;
+  private double voltageGoalVolts;
 
   private boolean isClosedLoop;
 
@@ -18,6 +19,7 @@ public class GenericFlywheel {
     inputs = new GenericFlywheelIOInputsAutoLogged();
 
     velocityGoalRadiansPerSecond = 0;
+    voltageGoalVolts = 0;
 
     isClosedLoop = true;
   }
@@ -26,12 +28,19 @@ public class GenericFlywheel {
     io.updateInputs(inputs);
     if (isClosedLoop) {
       io.setVelocity(velocityGoalRadiansPerSecond);
+    } else {
+      io.setVoltage(voltageGoalVolts);
     }
   }
 
   public void setGoal(double velocityGoalRadiansPerSecond) {
     isClosedLoop = true;
     this.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond;
+  }
+
+  public void setVoltage(double volts) {
+    isClosedLoop = false;
+    this.voltageGoalVolts = volts;
   }
 
   public boolean atGoal() {

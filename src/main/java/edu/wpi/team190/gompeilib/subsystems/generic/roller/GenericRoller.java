@@ -12,6 +12,8 @@ public class GenericRoller {
   private final RollerIOInputsAutoLogged inputs;
   private final String aKitTopic;
 
+  private double voltageGoalVolts;
+
   public GenericRoller(GenericRollerIO io, Subsystem subsystem, int index) {
     this.io = io;
     inputs = new RollerIOInputsAutoLogged();
@@ -22,11 +24,11 @@ public class GenericRoller {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(aKitTopic, inputs);
+
+    io.setVoltage(voltageGoalVolts);
   }
 
-  public Command runRoller(DoubleSupplier forward, DoubleSupplier reverse) {
-    return Commands.runEnd(
-        () -> io.setVoltage(12 * (forward.getAsDouble() - reverse.getAsDouble())),
-        () -> io.setVoltage(0));
+  public void setVoltage(double volts) {
+    voltageGoalVolts = volts;
   }
 }
