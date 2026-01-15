@@ -2,7 +2,6 @@ package edu.wpi.team190.gompeilib.subsystems.arm;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
-import edu.wpi.team190.gompeilib.subsystems.elevator.Elevator;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
@@ -35,7 +34,8 @@ public interface ArmIO {
 
   public void setPositionGoal(Rotation2d positionGoal);
 
-  public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot);
+  public void updateGains(
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot);
 
   public void updateConstraints(double maxAcceleration, double cruisingVelocity);
 }

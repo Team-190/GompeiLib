@@ -9,7 +9,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
-
 import java.util.Arrays;
 
 public class ArmIOSim implements ArmIO {
@@ -51,82 +50,80 @@ public class ArmIOSim implements ArmIO {
                 constants.CONSTRAINTS.MAX_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED().get()));
 
     feedforward =
-            new ArmFeedforward(
-                    constants.SLOT0_GAINS.kS().get(),
-                    constants.SLOT0_GAINS.kV().get(),
-                    constants.SLOT0_GAINS.kA().get(),
-                    constants.SLOT0_GAINS.kG().get()
-            );
-
+        new ArmFeedforward(
+            constants.SLOT0_GAINS.kS().get(),
+            constants.SLOT0_GAINS.kV().get(),
+            constants.SLOT0_GAINS.kA().get(),
+            constants.SLOT0_GAINS.kG().get());
   }
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
-      if (isClosedLoop)
-          appliedVolts =
-                  feedback.calculate(armSim.getAngleRads())
-                          + feedforward.calculate(
-                          feedback.getSetpoint().position, feedback.getSetpoint().velocity);
+    if (isClosedLoop)
+      appliedVolts =
+          feedback.calculate(armSim.getAngleRads())
+              + feedforward.calculate(
+                  feedback.getSetpoint().position, feedback.getSetpoint().velocity);
 
-      appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
-      armSim.setInputVoltage(appliedVolts);
-      armSim.update(GompeiLib.getLoopPeriod());
+    appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
+    armSim.setInputVoltage(appliedVolts);
+    armSim.update(GompeiLib.getLoopPeriod());
 
-      inputs.position = Rotation2d.fromRadians(armSim.getAngleRads());
-      inputs.velocityRadiansPerSecond = armSim.getVelocityRadPerSec();
+    inputs.position = Rotation2d.fromRadians(armSim.getAngleRads());
+    inputs.velocityRadiansPerSecond = armSim.getVelocityRadPerSec();
 
-      Arrays.fill(inputs.appliedVolts,appliedVolts);
-      Arrays.fill(inputs.supplyCurrentAmps,armSim.getCurrentDrawAmps());
-      Arrays.fill(inputs.torqueCurrentAmps,armSim.getCurrentDrawAmps());
+    Arrays.fill(inputs.appliedVolts, appliedVolts);
+    Arrays.fill(inputs.supplyCurrentAmps, armSim.getCurrentDrawAmps());
+    Arrays.fill(inputs.torqueCurrentAmps, armSim.getCurrentDrawAmps());
 
-      inputs.positionGoal = Rotation2d.fromRadians(feedback.getGoal().position);
-      inputs.positionSetpoint = Rotation2d.fromRadians(feedback.getSetpoint().position);
-      inputs.positionError = Rotation2d.fromRadians(feedback.getPositionError());
+    inputs.positionGoal = Rotation2d.fromRadians(feedback.getGoal().position);
+    inputs.positionSetpoint = Rotation2d.fromRadians(feedback.getSetpoint().position);
+    inputs.positionError = Rotation2d.fromRadians(feedback.getPositionError());
   }
 
   @Override
   public void setVoltage(double appliedVolts) {
-      isClosedLoop = false;
-      this.appliedVolts = appliedVolts;
+    isClosedLoop = false;
+    this.appliedVolts = appliedVolts;
   }
 
   @Override
   public void setSlot(GainSlot slot) {
-      switch(slot){
-          case ZERO:
-              feedback.setPID(constants.SLOT0_GAINS.kP().get(),0.0,constants.SLOT0_GAINS.kD().get());
-               break;
-          case ONE:
-              feedback.setPID(constants.SLOT1_GAINS.kP().get(),0.0,constants.SLOT1_GAINS.kD().get());
-              break;
-          case TWO:
-              feedback.setPID(constants.SLOT2_GAINS.kP().get(),0.0,constants.SLOT2_GAINS.kD().get());
-              break;
-
-      }
+    switch (slot) {
+      case ZERO:
+        feedback.setPID(constants.SLOT0_GAINS.kP().get(), 0.0, constants.SLOT0_GAINS.kD().get());
+        break;
+      case ONE:
+        feedback.setPID(constants.SLOT1_GAINS.kP().get(), 0.0, constants.SLOT1_GAINS.kD().get());
+        break;
+      case TWO:
+        feedback.setPID(constants.SLOT2_GAINS.kP().get(), 0.0, constants.SLOT2_GAINS.kD().get());
+        break;
+    }
   }
 
   @Override
   public void setPosition(Rotation2d position) {
-      armSim.setState(position.getRadians(),0);
+    armSim.setState(position.getRadians(), 0);
   }
 
   @Override
   public void setPositionGoal(Rotation2d rotationGoal) {
-      isClosedLoop = true;
-      feedback.setGoal(rotationGoal.getRadians());
+    isClosedLoop = true;
+    feedback.setGoal(rotationGoal.getRadians());
   }
 
   @Override
-  public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
-      feedback.setPID(kP, 0, kD);
-      feedforward = new ArmFeedforward(kS, kG, kV);
+  public void updateGains(
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
+    feedback.setPID(kP, 0, kD);
+    feedforward = new ArmFeedforward(kS, kG, kV);
   }
 
   @Override
-  public void updateConstraints(double cruisingVelocityRadiansPerSecond,
-                                double maxAccelerationRadiansPerSecondSquared ) {
-      feedback.setConstraints(
-              new Constraints(cruisingVelocityRadiansPerSecond, maxAccelerationRadiansPerSecondSquared));
+  public void updateConstraints(
+      double cruisingVelocityRadiansPerSecond, double maxAccelerationRadiansPerSecondSquared) {
+    feedback.setConstraints(
+        new Constraints(cruisingVelocityRadiansPerSecond, maxAccelerationRadiansPerSecondSquared));
   }
 }

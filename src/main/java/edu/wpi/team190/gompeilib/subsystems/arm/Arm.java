@@ -6,19 +6,16 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
-import edu.wpi.team190.gompeilib.subsystems.arm.ArmIO.ArmIOInputs;
 
 public class Arm {
   public ArmIO io;
-  public ArmConstants armConstants;
   public ArmIOInputsAutoLogged inputs;
   private boolean isClosedLoop;
 
   private Rotation2d rotationGoal;
 
-  public Arm(ArmConstants constants, ArmIO io) {
+  public Arm(ArmIO io) {
     this.io = io;
-    this.armConstants = constants;
     this.inputs = new ArmIOInputsAutoLogged();
   }
 
@@ -32,7 +29,8 @@ public class Arm {
     return inputs.position;
   }
 
-  public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
+  public void updateGains(
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
     io.updateGains(kP, kD, kS, kV, kA, kG, slot);
   }
 
@@ -40,17 +38,13 @@ public class Arm {
     io.updateConstraints(maxAcceleration, cruisingVelocity);
   }
 
-  public void updateInputs(ArmIOInputs inputs) {
-    io.updateInputs(inputs);
-  }
-
   public void setPosition(Rotation2d positionGoal) {
     inputs.position = positionGoal;
-    isClosedLoop = true;
   }
 
-  public void setPositionGoal(Rotation2d rotationGoal) {
+  public void setPositionGoal(Rotation2d positionGoal) {
     inputs.positionGoal = rotationGoal;
+    isClosedLoop = true;
   }
 
   public void setVoltage(double volts) {
