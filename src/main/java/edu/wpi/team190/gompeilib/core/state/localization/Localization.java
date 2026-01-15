@@ -70,9 +70,14 @@ public class Localization {
     return Optional.empty();
   }
 
+  public Rotation2d getHeading() {
+    return swerveDriveOdometry.getPoseMeters().getRotation();
+  }
+
   public void resetPose(Pose2d pose) {
     for (EstimationRegion region : estimationRegions) {
       region.resetPose(pose);
     }
+    swerveDriveOdometry.resetPose(pose);
   }
 }
