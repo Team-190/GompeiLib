@@ -20,22 +20,30 @@ public interface GenericFlywheelIO {
     public double velocityErrorRadiansPerSecond = 0.0;
   }
 
-  public default void updateInputs(GenericFlywheelIOInputs inputs) {};
+  public default void updateInputs(GenericFlywheelIOInputs inputs) {}
+  ;
 
-  public default void setVoltage(double volts) {};
+  public default void setVoltage(double volts) {}
+  ;
 
-  public default void setVelocity(double velocityRadiansPerSecond) {};
+  public default void setVelocity(double velocityRadiansPerSecond) {}
+  ;
 
-  public default void setPID(double kP, double kI, double kD) {};
+  public default void setPID(double kP, double kI, double kD) {}
+  ;
 
-  public default void setFeedforward(double kS, double kV, double kA) {};
+  public default void setFeedforward(double kS, double kV, double kA) {}
+  ;
 
   public default void setProfile(
-      double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {};
+      double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {}
+  ;
 
   public default boolean atGoal() {
-      return false;
-  };
+    return false;
+  }
+  ;
 
-  public default void stop() {};
+  public default void stop() {}
+  ;
 }
