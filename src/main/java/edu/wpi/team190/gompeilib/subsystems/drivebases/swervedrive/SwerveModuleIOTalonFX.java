@@ -76,7 +76,6 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
   private final SwerveModuleConstants.ClosedLoopOutputType driveClosedLoopOutputType;
   private final SwerveModuleConstants.ClosedLoopOutputType turnClosedLoopOutputType;
 
-
   public SwerveModuleIOTalonFX(
       SwerveDriveConstants driveConstants,
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
@@ -286,8 +285,11 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
   @Trace
   public void setTurnPosition(Rotation2d rotation) {
     turnPositionGoal = rotation;
-    if (turnClosedLoopOutputType.equals(SwerveModuleConstants.ClosedLoopOutputType.Voltage)) turnTalonFX.setControl(positionVoltageRequest.withPosition(rotation.getRotations()));
-    if (turnClosedLoopOutputType.equals(SwerveModuleConstants.ClosedLoopOutputType.TorqueCurrentFOC)) turnTalonFX.setControl(positionTorqueCurrentRequest.withPosition(rotation.getRotations()));
+    if (turnClosedLoopOutputType.equals(SwerveModuleConstants.ClosedLoopOutputType.Voltage))
+      turnTalonFX.setControl(positionVoltageRequest.withPosition(rotation.getRotations()));
+    if (turnClosedLoopOutputType.equals(
+        SwerveModuleConstants.ClosedLoopOutputType.TorqueCurrentFOC))
+      turnTalonFX.setControl(positionTorqueCurrentRequest.withPosition(rotation.getRotations()));
   }
 
   @Override

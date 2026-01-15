@@ -20,31 +20,28 @@ import edu.wpi.team190.gompeilib.subsystems.vision.camera.CameraType;
 public class V0_FunkyConstants {
   public static final DriveConfig DRIVE_CONFIG =
       new DriveConfig(
-          TunerConstantsExampleRobot.kCANBus,
-          TunerConstantsExampleRobot.DrivetrainConstants.Pigeon2Id,
-          TunerConstantsExampleRobot.kSpeedAt12Volts.in(MetersPerSecond),
-          TunerConstantsExampleRobot.kWheelRadius.in(Meters),
+          V0_FunkyTunerConstants.kCANBus,
+          V0_FunkyTunerConstants.DrivetrainConstants.Pigeon2Id,
+          V0_FunkyTunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
+          V0_FunkyTunerConstants.kWheelRadius.in(Meters),
           DCMotor.getKrakenX60Foc(1),
           DCMotor.getKrakenX44Foc(1),
-          TunerConstantsExampleRobot.FrontLeft,
-          TunerConstantsExampleRobot.FrontRight,
-          TunerConstantsExampleRobot.BackLeft,
-          TunerConstantsExampleRobot.BackRight,
+          V0_FunkyTunerConstants.FrontLeft,
+          V0_FunkyTunerConstants.FrontRight,
+          V0_FunkyTunerConstants.BackLeft,
+          V0_FunkyTunerConstants.BackRight,
+          V0_FunkyTunerConstants.kDriveClosedLoopOutput,
+          V0_FunkyTunerConstants.kSteerClosedLoopOutput,
           Units.inchesToMeters(34.5),
           Units.inchesToMeters(34.5));
   public static final Gains GAINS =
       new Gains(
-          new LoggedTunableNumber(
-              "Drive/Teleop/Drive Ks", TunerConstantsExampleRobot.driveGains.kS),
-          new LoggedTunableNumber(
-              "Drive/Teleop/Drive Kv", TunerConstantsExampleRobot.driveGains.kV),
-          new LoggedTunableNumber(
-              "Drive/Teleop/Drive Kp", TunerConstantsExampleRobot.driveGains.kP),
-          new LoggedTunableNumber(
-              "Drive/Teleop/Drive Kd", TunerConstantsExampleRobot.driveGains.kD),
-          new LoggedTunableNumber("Drive/Teleop/Turn Kp", TunerConstantsExampleRobot.steerGains.kP),
-          new LoggedTunableNumber(
-              "Drive/Teleop/Turn Kd", TunerConstantsExampleRobot.steerGains.kD));
+          new LoggedTunableNumber("Drive/Teleop/Drive Ks", V0_FunkyTunerConstants.driveGains.kS),
+          new LoggedTunableNumber("Drive/Teleop/Drive Kv", V0_FunkyTunerConstants.driveGains.kV),
+          new LoggedTunableNumber("Drive/Teleop/Drive Kp", V0_FunkyTunerConstants.driveGains.kP),
+          new LoggedTunableNumber("Drive/Teleop/Drive Kd", V0_FunkyTunerConstants.driveGains.kD),
+          new LoggedTunableNumber("Drive/Teleop/Turn Kp", V0_FunkyTunerConstants.steerGains.kP),
+          new LoggedTunableNumber("Drive/Teleop/Turn Kd", V0_FunkyTunerConstants.steerGains.kD));
   public static final AutoGains AUTO_GAINS =
       new AutoGains(
           new LoggedTunableNumber("Drive/Auto/Translation Kp", 0.0),
