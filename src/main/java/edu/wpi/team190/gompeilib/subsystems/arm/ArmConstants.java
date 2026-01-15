@@ -33,7 +33,7 @@ public class ArmConstants {
     this.CURRENT_LIMITS = CURRENT_LIMITS;
   }
 
-  public static record ArmParameters(
+  public record ArmParameters(
       DCMotor MOTOR_CONFIG,
       Rotation2d MIN_ANGLE,
       Rotation2d MAX_ANGLE,
@@ -43,7 +43,7 @@ public class ArmConstants {
       double MASS_KG,
       double MOMENT_OF_INERTIA_KG_M_SQUARED) {}
 
-  public static record Gains(
+  public record Gains(
       LoggedTunableNumber kP,
       LoggedTunableNumber kD,
       LoggedTunableNumber kS,
@@ -51,12 +51,12 @@ public class ArmConstants {
       LoggedTunableNumber kV,
       LoggedTunableNumber kA) {}
 
-  public static record CurrentLimits(
+  public record CurrentLimits(
       double ARM_SUPPLY_CURRENT_LIMIT,
       double ARM_STATOR_CURRENT_LIMIT,
       double ARM_TORQUE_CURRENT_LIMIT) {}
 
-  public static record Constraints(
+  public record Constraints(
       LoggedTunableNumber MAX_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED,
       LoggedTunableNumber CRUISING_VELOCITY_ROTATIONS_PER_SECOND,
       LoggedTunableNumber GOAL_TOLERANCE_RADIANS) {}

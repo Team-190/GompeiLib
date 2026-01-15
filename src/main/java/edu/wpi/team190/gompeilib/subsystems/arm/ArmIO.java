@@ -9,24 +9,24 @@ public interface ArmIO {
   public static class ArmIOInputs {
     public Rotation2d position = new Rotation2d();
 
-    public GainSlot slot;
-
     public double velocityRadiansPerSecond = 0.0;
     public double accelerationRadiansPerSecondSquared = 0.0;
 
     public double[] appliedVolts = new double[] {};
     public double[] supplyCurrentAmps = new double[] {};
     public double[] torqueCurrentAmps = new double[] {};
-    public double[] temperatureCelcius = new double[] {};
+    public double[] temperatureCelsius = new double[] {};
 
     public Rotation2d positionGoal = new Rotation2d();
     public Rotation2d positionSetpoint = new Rotation2d();
     public Rotation2d positionError = new Rotation2d();
+
+    public GainSlot slot;
   }
 
   public void updateInputs(ArmIOInputs inputs);
 
-  public void setArmVoltage(double volts);
+  public void setVoltage(double volts);
 
   public void setSlot(GainSlot slot);
 

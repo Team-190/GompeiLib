@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
 import edu.wpi.team190.gompeilib.subsystems.arm.ArmIO.ArmIOInputs;
 
-import java.util.Arrays;
-
 public class Arm {
   public ArmIO io;
   public ArmConstants armConstants;
@@ -30,7 +28,7 @@ public class Arm {
     if (isClosedLoop) io.setPositionGoal(rotationGoal);
   }
 
-  public Rotation2d getArmAngle() {
+  public Rotation2d getArmPosition() {
     return inputs.position;
   }
 
@@ -48,6 +46,7 @@ public class Arm {
 
   public void setPosition(Rotation2d positionGoal) {
     inputs.position = positionGoal;
+    isClosedLoop = true;
   }
 
   public void setPositionGoal(Rotation2d rotationGoal) {
@@ -55,8 +54,7 @@ public class Arm {
   }
 
   public void setVoltage(double volts) {
-      Arrays.fill(inputs.appliedVolts, volts);
-      isClosedLoop = false;
+      io.setVoltage(volts);
   }
 
   public void setSlot(GainSlot slot){
@@ -72,6 +70,6 @@ public class Arm {
             Seconds.of(timeSeconds),
             null),
         new SysIdRoutine.Mechanism(
-            (voltage) -> io.setArmVoltage(voltage.in(Volts)), null, subsystem));
+            (voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
   }
 }
