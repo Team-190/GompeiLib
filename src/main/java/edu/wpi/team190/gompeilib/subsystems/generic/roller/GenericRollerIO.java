@@ -1,4 +1,4 @@
-package edu.wpi.team190.gompeilib.subsystems.roller;
+package edu.wpi.team190.gompeilib.subsystems.generic.roller;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -9,7 +9,7 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface RollerIO {
+public interface GenericRollerIO {
   @AutoLog
   public static class RollerIOInputs {
     public Rotation2d position = new Rotation2d();

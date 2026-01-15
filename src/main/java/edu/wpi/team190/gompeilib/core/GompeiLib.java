@@ -1,17 +1,12 @@
 package edu.wpi.team190.gompeilib.core;
 
+import edu.wpi.team190.gompeilib.core.robot.RobotMode;
+
 /** Main class for the GompeiLib library. Must be initialized by calling init() in robotInit(). */
 public final class GompeiLib {
 
-  // Define an enum within the library to avoid depending on the robot code's enum.
-  public static enum Mode {
-    REAL,
-    SIM,
-    REPLAY
-  }
-
   private static boolean initialized = false;
-  private static Mode currentMode;
+  private static RobotMode currentMode;
   private static boolean tuningMode;
   private static double loopPeriod;
 
@@ -23,7 +18,7 @@ public final class GompeiLib {
    * @param isTuning Whether tuning mode is enabled.
    * @param loopPeriodSecs The robot's main loop period in seconds.
    */
-  public static void init(Mode mode, boolean isTuning, double loopPeriodSecs) {
+  public static void init(RobotMode mode, boolean isTuning, double loopPeriodSecs) {
     if (initialized) {
       System.err.println("GompeiLib has already been initialized!");
       return;
@@ -44,7 +39,7 @@ public final class GompeiLib {
   }
 
   // Public getters for other classes in your library to use.
-  public static Mode getMode() {
+  public static RobotMode getMode() {
     checkInitialized();
     return currentMode;
   }
