@@ -6,8 +6,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.team190.gompeilib.core.state.localization.FieldZone;
 import edu.wpi.team190.gompeilib.core.state.localization.Localization;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class V0_FunkyRobotState {
   private static AprilTagFieldLayout fieldLayout;
@@ -17,8 +17,7 @@ public class V0_FunkyRobotState {
   static {
     fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
 
-    FieldZone globalZone =
-        new FieldZone(fieldLayout.getTags().stream().collect(Collectors.toSet()));
+    FieldZone globalZone = new FieldZone(new HashSet<>(fieldLayout.getTags()));
 
     fieldZones = List.of(globalZone);
 
