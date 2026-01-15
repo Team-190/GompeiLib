@@ -73,6 +73,8 @@ public class SwerveDriveConstants {
           backLeft,
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           backRight,
+      SwerveModuleConstants.ClosedLoopOutputType driveClosedLoopOutputType,
+      SwerveModuleConstants.ClosedLoopOutputType steerClosedLoopOutputType,
       double bumperWidth,
       double bumperLength) {
     public double driveBaseRadius() {

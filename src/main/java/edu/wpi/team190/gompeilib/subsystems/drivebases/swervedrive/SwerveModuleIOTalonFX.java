@@ -70,7 +70,12 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 
   private final TorqueCurrentFOC torqueCurrentRequest;
   private final VelocityTorqueCurrentFOC velocityTorqueCurrentRequest;
-  private final MotionMagicVoltage positionTorqueCurrentRequest;
+  private final MotionMagicTorqueCurrentFOC positionTorqueCurrentRequest;
+  private final MotionMagicVoltage positionVoltageRequest;
+
+  private final SwerveModuleConstants.ClosedLoopOutputType driveClosedLoopOutputType;
+  private final SwerveModuleConstants.ClosedLoopOutputType turnClosedLoopOutputType;
+
 
   public SwerveModuleIOTalonFX(
       SwerveDriveConstants driveConstants,
@@ -159,7 +164,11 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 
     torqueCurrentRequest = new TorqueCurrentFOC(0.0);
     velocityTorqueCurrentRequest = new VelocityTorqueCurrentFOC(0.0);
-    positionTorqueCurrentRequest = new MotionMagicVoltage(0.0);
+    positionTorqueCurrentRequest = new MotionMagicTorqueCurrentFOC(0.0);
+    positionVoltageRequest = new MotionMagicVoltage(0.0);
+
+    driveClosedLoopOutputType = constants.DriveMotorClosedLoopOutput;
+    turnClosedLoopOutputType = constants.DriveMotorClosedLoopOutput;
 
     // Configure periodic frames
     BaseStatusSignal.setUpdateFrequencyForAll(
@@ -277,7 +286,8 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
   @Trace
   public void setTurnPosition(Rotation2d rotation) {
     turnPositionGoal = rotation;
-    turnTalonFX.setControl(positionTorqueCurrentRequest.withPosition(rotation.getRotations()));
+    if (turnClosedLoopOutputType.equals(SwerveModuleConstants.ClosedLoopOutputType.Voltage)) turnTalonFX.setControl(positionVoltageRequest.withPosition(rotation.getRotations()));
+    if (turnClosedLoopOutputType.equals(SwerveModuleConstants.ClosedLoopOutputType.TorqueCurrentFOC)) turnTalonFX.setControl(positionTorqueCurrentRequest.withPosition(rotation.getRotations()));
   }
 
   @Override
