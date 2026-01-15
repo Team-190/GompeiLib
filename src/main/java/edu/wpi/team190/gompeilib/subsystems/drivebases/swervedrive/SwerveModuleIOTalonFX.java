@@ -7,6 +7,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -69,7 +70,7 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 
   private final TorqueCurrentFOC torqueCurrentRequest;
   private final VelocityTorqueCurrentFOC velocityTorqueCurrentRequest;
-  private final MotionMagicTorqueCurrentFOC positionTorqueCurrentRequest;
+  private final MotionMagicVoltage positionTorqueCurrentRequest;
 
   public SwerveModuleIOTalonFX(
       SwerveDriveConstants driveConstants,
@@ -158,7 +159,7 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 
     torqueCurrentRequest = new TorqueCurrentFOC(0.0);
     velocityTorqueCurrentRequest = new VelocityTorqueCurrentFOC(0.0);
-    positionTorqueCurrentRequest = new MotionMagicTorqueCurrentFOC(0.0);
+    positionTorqueCurrentRequest = new MotionMagicVoltage(0.0);
 
     // Configure periodic frames
     BaseStatusSignal.setUpdateFrequencyForAll(
