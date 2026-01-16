@@ -24,46 +24,42 @@ public class ArmIOSim implements ArmIO {
   private ArmConstants constants;
 
   public ArmIOSim(ArmConstants constants) {
-    armSim =
-        new SingleJointedArmSim(
-            LinearSystemId.createSingleJointedArmSystem(
-                constants.ARM_PARAMETERS.MOTOR_CONFIG(),
-                constants.MOMENT_OF_INERTIA,
-                constants.ARM_PARAMETERS.GEAR_RATIO()),
+    armSim = new SingleJointedArmSim(
+        LinearSystemId.createSingleJointedArmSystem(
             constants.ARM_PARAMETERS.MOTOR_CONFIG(),
-            constants.ARM_PARAMETERS.GEAR_RATIO(),
-            constants.ARM_PARAMETERS.LENGTH_METERS(),
-            constants.ARM_PARAMETERS.MIN_ANGLE().getRadians(),
-            constants.ARM_PARAMETERS.MAX_ANGLE().getRadians(),
-            true,
-            constants.ARM_PARAMETERS.MIN_ANGLE().getRadians());
+            constants.MOMENT_OF_INERTIA,
+            constants.ARM_PARAMETERS.GEAR_RATIO()),
+        constants.ARM_PARAMETERS.MOTOR_CONFIG(),
+        constants.ARM_PARAMETERS.GEAR_RATIO(),
+        constants.ARM_PARAMETERS.LENGTH_METERS(),
+        constants.ARM_PARAMETERS.MIN_ANGLE().getRadians(),
+        constants.ARM_PARAMETERS.MAX_ANGLE().getRadians(),
+        true,
+        constants.ARM_PARAMETERS.MIN_ANGLE().getRadians());
 
     appliedVolts = 0.0;
 
-    feedback =
-        new ProfiledPIDController(
-            constants.SLOT0_GAINS.kP().get(),
-            0.0,
-            constants.SLOT0_GAINS.kD().get(),
-            new Constraints(
-                constants.CONSTRAINTS.CRUISING_VELOCITY_ROTATIONS_PER_SECOND().get(),
-                constants.CONSTRAINTS.MAX_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED().get()));
+    feedback = new ProfiledPIDController(
+        constants.SLOT0_GAINS.kP().get(),
+        0.0,
+        constants.SLOT0_GAINS.kD().get(),
+        new Constraints(
+            constants.CONSTRAINTS.CRUISING_VELOCITY_ROTATIONS_PER_SECOND().get(),
+            constants.CONSTRAINTS.MAX_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED().get()));
 
-    feedforward =
-        new ArmFeedforward(
-            constants.SLOT0_GAINS.kS().get(),
-            constants.SLOT0_GAINS.kV().get(),
-            constants.SLOT0_GAINS.kA().get(),
-            constants.SLOT0_GAINS.kG().get());
+    feedforward = new ArmFeedforward(
+        constants.SLOT0_GAINS.kS().get(),
+        constants.SLOT0_GAINS.kV().get(),
+        constants.SLOT0_GAINS.kA().get(),
+        constants.SLOT0_GAINS.kG().get());
   }
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
     if (isClosedLoop)
-      appliedVolts =
-          feedback.calculate(armSim.getAngleRads())
-              + feedforward.calculate(
-                  feedback.getSetpoint().position, feedback.getSetpoint().velocity);
+      appliedVolts = feedback.calculate(armSim.getAngleRads())
+          + feedforward.calculate(
+              feedback.getSetpoint().position, feedback.getSetpoint().velocity);
 
     appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
     armSim.setInputVoltage(appliedVolts);
@@ -71,6 +67,12 @@ public class ArmIOSim implements ArmIO {
 
     inputs.position = Rotation2d.fromRadians(armSim.getAngleRads());
     inputs.velocityRadiansPerSecond = armSim.getVelocityRadPerSec();
+
+    inputs.appliedVolts = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
+    inputs.supplyCurrentAmps = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
+    inputs.torqueCurrentAmps = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
+    inputs.temperatureCelsius = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
+
 
     Arrays.fill(inputs.appliedVolts, appliedVolts);
     Arrays.fill(inputs.supplyCurrentAmps, armSim.getCurrentDrawAmps());

@@ -89,16 +89,15 @@ public class ArmIOTalonFX implements ArmIO {
 
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.ClosedLoopGeneral.ContinuousWrap = true;
-    config.MotionMagic =
-        new MotionMagicConfigs()
-            .withMotionMagicAcceleration(
-                AngularAcceleration.ofRelativeUnits(
-                    constants.CONSTRAINTS.MAX_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED().get(),
-                    RotationsPerSecondPerSecond))
-            .withMotionMagicCruiseVelocity(
-                AngularVelocity.ofRelativeUnits(
-                    constants.CONSTRAINTS.CRUISING_VELOCITY_ROTATIONS_PER_SECOND().get(),
-                    RotationsPerSecond));
+    config.MotionMagic = new MotionMagicConfigs()
+        .withMotionMagicAcceleration(
+            AngularAcceleration.ofRelativeUnits(
+                constants.CONSTRAINTS.MAX_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED().get(),
+                RotationsPerSecondPerSecond))
+        .withMotionMagicCruiseVelocity(
+            AngularVelocity.ofRelativeUnits(
+                constants.CONSTRAINTS.CRUISING_VELOCITY_ROTATIONS_PER_SECOND().get(),
+                RotationsPerSecond));
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
@@ -166,6 +165,11 @@ public class ArmIOTalonFX implements ArmIO {
     inputs.position = new Rotation2d(positionRotations.getValue());
     inputs.velocityRadiansPerSecond = velocityRotationsPerSecond.getValue().in(RadiansPerSecond);
 
+    inputs.appliedVolts = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
+    inputs.supplyCurrentAmps = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
+    inputs.torqueCurrentAmps = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
+    inputs.temperatureCelsius = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
+
     for (int i = 0; i < constants.ARM_PARAMETERS.NUM_MOTORS(); i++) {
       inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
       inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
@@ -174,8 +178,7 @@ public class ArmIOTalonFX implements ArmIO {
     }
 
     inputs.positionGoal = new Rotation2d(positionVoltageRequest.getPositionMeasure());
-    inputs.positionSetpoint =
-        Rotation2d.fromRotations(positionSetpointRotations.getValueAsDouble());
+    inputs.positionSetpoint = Rotation2d.fromRotations(positionSetpointRotations.getValueAsDouble());
     inputs.positionError = Rotation2d.fromRotations(positionErrorRotations.getValueAsDouble());
   }
 
@@ -235,12 +238,11 @@ public class ArmIOTalonFX implements ArmIO {
 
   @Override
   public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
-    config.MotionMagic =
-        new MotionMagicConfigs()
-            .withMotionMagicAcceleration(
-                AngularAcceleration.ofRelativeUnits(maxAcceleration, RotationsPerSecondPerSecond))
-            .withMotionMagicCruiseVelocity(
-                AngularVelocity.ofRelativeUnits(cruisingVelocity, RotationsPerSecond));
+    config.MotionMagic = new MotionMagicConfigs()
+        .withMotionMagicAcceleration(
+            AngularAcceleration.ofRelativeUnits(maxAcceleration, RotationsPerSecondPerSecond))
+        .withMotionMagicCruiseVelocity(
+            AngularVelocity.ofRelativeUnits(cruisingVelocity, RotationsPerSecond));
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
     for (int i = 0; i < constants.ARM_PARAMETERS.NUM_MOTORS() - 1; i++) {

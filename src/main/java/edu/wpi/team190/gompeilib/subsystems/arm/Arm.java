@@ -22,7 +22,8 @@ public class Arm {
   public void periodic() {
     io.updateInputs(inputs);
 
-    if (isClosedLoop) io.setPositionGoal(rotationGoal);
+    if (isClosedLoop)
+      io.setPositionGoal(rotationGoal);
   }
 
   public Rotation2d getArmPosition() {
@@ -39,11 +40,11 @@ public class Arm {
   }
 
   public void setPosition(Rotation2d positionGoal) {
-    inputs.position = positionGoal;
+    io.setPositionGoal(positionGoal);
   }
 
   public void setPositionGoal(Rotation2d positionGoal) {
-    inputs.positionGoal = rotationGoal;
+    io.setPositionGoal(positionGoal);
     isClosedLoop = true;
   }
 
@@ -52,7 +53,7 @@ public class Arm {
   }
 
   public void setSlot(GainSlot slot) {
-    inputs.slot = slot;
+    io.setSlot(slot);
   }
 
   public SysIdRoutine getCharacterization(
