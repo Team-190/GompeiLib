@@ -69,6 +69,11 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.velocityMetersPerSecond = sim.getVelocityMetersPerSecond();
     inputs.accelerationMetersPerSecondSquared = -1; // TODO: Replace with calculation based on velocity
 
+    inputs.appliedVolts = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
+    inputs.supplyCurrentAmps = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
+    inputs.torqueCurrentAmps = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
+    inputs.temperatureCelsius = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
+
     Arrays.fill(inputs.appliedVolts, appliedVolts);
     Arrays.fill(inputs.supplyCurrentAmps, sim.getCurrentDrawAmps());
     Arrays.fill(inputs.torqueCurrentAmps, sim.getCurrentDrawAmps());
