@@ -174,6 +174,11 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     inputs.velocityMetersPerSecond = velocityRotationsPerSecond.getValueAsDouble();
     inputs.accelerationMetersPerSecondSquared = -1; // TODO: Replace with an actual value
 
+    inputs.appliedVolts = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
+    inputs.supplyCurrentAmps = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
+    inputs.torqueCurrentAmps = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
+    inputs.temperatureCelsius = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
+
     for (int i = 0; i < constants.ELEVATOR_PARAMETERS.NUM_MOTORS(); i++) {
       inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
       inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
