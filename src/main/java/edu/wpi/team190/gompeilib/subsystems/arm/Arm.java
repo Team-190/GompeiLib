@@ -39,8 +39,8 @@ public class Arm {
     io.updateConstraints(maxAcceleration, cruisingVelocity);
   }
 
-  public void setPosition(Rotation2d positionGoal) {
-    io.setPositionGoal(positionGoal);
+  public void setPosition(Rotation2d position) {
+    io.setPosition(position);
   }
 
   public void setPositionGoal(Rotation2d positionGoal) {
