@@ -105,6 +105,8 @@ deploy {
     }
 }
 
+def GLibRepoPath = "edu.wpi.team190:gompeilib:2026.+"
+
 repositories {
     def gprUser = project.findProperty("gpr.user")
     def gprKey = project.findProperty("gpr.key")
@@ -123,22 +125,23 @@ repositories {
                 }
             }
             filter {
-                includeGroup("edu.wpi.team190")
+                includeGroup "edu.wpi.team190"
             }
         }
     } else {
+        GLibRepoPath = "com.github.Team-190:gompeilib:2026.+"
         // Fallback to JitPack if credentials are missing
-        print("Falling back to jitpack.io because user or key not found.")
         exclusiveContent {
             forRepository {
                 maven { url = uri("https://jitpack.io") }
             }
             filter {
-                includeGroup("edu.wpi.team190")
+                includeGroup "com.github.Team-190"
             }
         }
     }
 }
+
 
 import groovy.json.JsonSlurper
 
@@ -166,7 +169,7 @@ dependencies {
     implementation 'org.jgrapht:jgrapht-io:1.5.1'
 
 
-    implementation 'edu.wpi.team190:gompeilib:LATEST'
+    implementation "$GLibRepoPath"
     // This is required for the @Tracer annotations to work at runtime
     implementation 'org.aspectj:aspectjrt:1.9.21'
     implementation 'org.aspectj:aspectjtools:1.9.21'
