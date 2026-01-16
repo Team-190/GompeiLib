@@ -106,22 +106,36 @@ deploy {
 }
 
 repositories {
-    // This tells Gradle that the following repository should ONLY be used
-    // for dependencies that match the filter.
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "GompeiLibGitHubPackages"
-                url = uri("https://maven.pkg.github.com/Team-190/GompeiLib")
-                credentials {
-                    username = project.findProperty("gpr.user")
-                    password = project.findProperty("gpr.key")
+    def gprUser = project.findProperty("gpr.user")
+    def gprKey = project.findProperty("gpr.key")
+
+    if (gprUser != null && gprKey != null) {
+        // Use GitHub Packages if credentials exist
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = "GompeiLibGitHubPackages"
+                    url = uri("https://maven.pkg.github.com/Team-190/GompeiLib")
+                    credentials {
+                        username = gprUser
+                        password = gprKey
+                    }
                 }
             }
+            filter {
+                includeGroup("edu.wpi.team190")
+            }
         }
-        // The filter tells Gradle to only look for dependencies in the "edu.wpi.team190" group.
-        filter {
-            includeGroup "edu.wpi.team190"
+    } else {
+        // Fallback to JitPack if credentials are missing
+        print("Falling back to jitpack.io because user or key not found.")
+        exclusiveContent {
+            forRepository {
+                maven { url = uri("https://jitpack.io") }
+            }
+            filter {
+                includeGroup("edu.wpi.team190")
+            }
         }
     }
 }
@@ -137,7 +151,7 @@ wpi.java.debugJni = false
 def includeDesktopSupport = true
 
 // Configuration for AdvantageKit
-task(replayWatch, type: JavaExec) {
+tasks.register('replayWatch', JavaExec) {
     mainClass = "org.littletonrobotics.junction.ReplayWatch"
     classpath = sourceSets.main.runtimeClasspath
 }
