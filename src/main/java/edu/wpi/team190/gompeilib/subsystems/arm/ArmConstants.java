@@ -18,6 +18,8 @@ public class ArmConstants {
 
   public final double MOMENT_OF_INERTIA;
 
+  public final boolean ENABLE_FOC;
+
   public ArmConstants(
       int ARM_CAN_ID,
       ArmParameters ARM_PARAMETERS,
@@ -26,7 +28,8 @@ public class ArmConstants {
       Gains SLOT2_GAINS,
       Constraints CONSTRAINTS,
       CurrentLimits CURRENT_LIMITS,
-      double MOMENT_OF_INERTIA) {
+      double MOMENT_OF_INERTIA,
+      boolean ENABLE_FOC) {
     this.ARM_CAN_ID = ARM_CAN_ID;
     this.ARM_PARAMETERS = ARM_PARAMETERS;
     this.SLOT0_GAINS = SLOT0_GAINS;
@@ -35,6 +38,7 @@ public class ArmConstants {
     this.CONSTRAINTS = CONSTRAINTS;
     this.CURRENT_LIMITS = CURRENT_LIMITS;
     this.MOMENT_OF_INERTIA = MOMENT_OF_INERTIA;
+    this.ENABLE_FOC = ENABLE_FOC;
   }
 
   public record ArmParameters(

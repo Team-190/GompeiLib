@@ -184,18 +184,18 @@ public class ArmIOTalonFX implements ArmIO {
 
   @Override
   public void setVoltage(double volts) {
-    talonFX.setControl(voltageRequest.withOutput(volts).withEnableFOC(true));
+    talonFX.setControl(voltageRequest.withOutput(volts).withEnableFOC(constants.ENABLE_FOC));
   }
 
   @Override
-  public void setPosition(Rotation2d rotation) {
-    talonFX.setPosition(rotation.getRotations());
+  public void setPosition(Rotation2d position) {
+    talonFX.setPosition(position.getRotations());
   }
 
   @Override
-  public void setPositionGoal(Rotation2d rotation) {
+  public void setPositionGoal(Rotation2d positionGoal) {
     talonFX.setControl(
-        positionVoltageRequest.withPosition(rotation.getRotations()).withEnableFOC(true));
+        positionVoltageRequest.withPosition(positionGoal.getRotations()).withEnableFOC(constants.ENABLE_FOC));
   }
 
   @Override

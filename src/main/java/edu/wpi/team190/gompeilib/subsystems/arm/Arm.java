@@ -22,8 +22,7 @@ public class Arm {
   public void periodic() {
     io.updateInputs(inputs);
 
-    if (isClosedLoop)
-      io.setPositionGoal(rotationGoal);
+    if (isClosedLoop) io.setPositionGoal(rotationGoal);
   }
 
   public Rotation2d getArmPosition() {
