@@ -1,13 +1,10 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
-import edu.wpi.team190.gompeilib.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
-import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
 
-public class Elevator extends SubsystemBase {
+public class Elevator {
   public final ElevatorIO io;
   public final ElevatorConstants elevatorConstants;
   public final ElevatorIOInputsAutoLogged inputs;
@@ -24,9 +21,7 @@ public class Elevator extends SubsystemBase {
 
   @Trace
   public void periodic() {
-    elevatorConstants.lock.lock();
     io.updateInputs(inputs);
-    elevatorConstants.lock.unlock();
 
     Logger.processInputs("Elevator", inputs);
     Logger.recordOutput("Elevator/Position", position);
@@ -49,22 +44,17 @@ public class Elevator extends SubsystemBase {
     io.updateConstraints(maxAcceleration, cruisingVelocity);
   }
 
-  public void updateInputs(ElevatorIOInputs inputs) {
-    io.updateInputs(inputs);
-    Logger.processInputs("Elevator", this.inputs);
-  }
-
   public void setPosition(double positionMeters) {
-    inputs.positionMeters = positionMeters;
+    io.setPosition(positionMeters);
   }
 
   public void setPositionGoal(double positionMeters) {
-    inputs.positionMeters = positionMeters;
+    io.setPositionGoal(positionGoalMeters);
     isClosedLoop = true;
   }
 
   public void setVoltage(double volts) {
-    Arrays.fill(inputs.appliedVolts, volts);
+    io.setVoltage(volts);
     isClosedLoop = false;
   }
 
