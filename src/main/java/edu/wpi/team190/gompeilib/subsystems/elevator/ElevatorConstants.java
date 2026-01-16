@@ -2,10 +2,8 @@ package edu.wpi.team190.gompeilib.subsystems.elevator;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class ElevatorConstants {
-  public final ReentrantLock lock;
   public final int ELEVATOR_CAN_ID;
   public final boolean ON_CANIVORE;
   public final double ELEVATOR_GEAR_RATIO;
@@ -32,7 +30,6 @@ public class ElevatorConstants {
       Gains SLOT1_GAINS,
       Gains SLOT2_GAINS,
       Constraints CONSTRAINTS) {
-    this.lock = new ReentrantLock();
 
     this.ELEVATOR_CAN_ID = ELEVATOR_CAN_ID;
     this.ON_CANIVORE = ON_CANIVORE;
@@ -55,17 +52,20 @@ public class ElevatorConstants {
       LoggedTunableNumber kS,
       LoggedTunableNumber kG,
       LoggedTunableNumber kV,
-      LoggedTunableNumber kA) {}
+      LoggedTunableNumber kA) {
+  }
 
   public record Constraints(
       LoggedTunableNumber maxAccelerationMetersPerSecondSquared,
       LoggedTunableNumber cruisingVelocityMetersPerSecond,
-      LoggedTunableNumber goalToleranceMeters) {}
+      LoggedTunableNumber goalToleranceMeters) {
+  }
 
   public record ElevatorParameters(
       DCMotor ELEVATOR_MOTOR_CONFIG,
       double CARRIAGE_MASS_KG,
       double MIN_HEIGHT_METERS,
       double MAX_HEIGHT_METERS,
-      int NUM_MOTORS) {}
+      int NUM_MOTORS) {
+  }
 }

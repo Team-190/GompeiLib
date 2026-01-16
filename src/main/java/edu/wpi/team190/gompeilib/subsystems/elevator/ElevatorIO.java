@@ -43,12 +43,19 @@ public interface ElevatorIO {
   public void setPositionGoal(double positionMeters);
 
   /**
-   * Sets the position goal of the elevator, while taking in the current slot as an input
+   * Sets the position goal of the elevator, while taking in the current slot as
+   * an input
    *
    * @param positionMeters The position goal of the elevator in meters.
-   * @param slot The slot that the current position goal is being set for.
+   * @param slot           The slot that the current position goal is being set
+   *                       for.
    */
   public void setPositionGoal(double positionMeters, GainSlot slot);
+
+  /**
+   * @param slot The slot to set the elevator to.
+   */
+  public void setSlot(GainSlot slot);
 
   /**
    * Sets the voltage for the elevator.
@@ -68,15 +75,16 @@ public interface ElevatorIO {
    * @param kG the gravity gain.
    */
   public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG);
+
   /**
    * Sets the gains for the elevator.
    *
-   * @param kP the proportional gain.
-   * @param kD the derivative gain.
-   * @param kS the static gain.
-   * @param kV the velocity gain.
-   * @param kA the acceleration gain.
-   * @param kG the gravity gain.
+   * @param kP   the proportional gain.
+   * @param kD   the derivative gain.
+   * @param kS   the static gain.
+   * @param kV   the velocity gain.
+   * @param kA   the acceleration gain.
+   * @param kG   the gravity gain.
    * @param slot the PID slot to change the gains for
    */
   public void updateGains(
@@ -85,7 +93,7 @@ public interface ElevatorIO {
   /**
    * Sets the constraints for the elevator.
    *
-   * @param maxAcceleration the max acceleration of the elevator.
+   * @param maxAcceleration  the max acceleration of the elevator.
    * @param cruisingVelocity the cruising velocity
    */
   public void updateConstraints(double maxAcceleration, double cruisingVelocity);

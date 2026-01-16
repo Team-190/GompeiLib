@@ -18,50 +18,46 @@ public class ElevatorIOSim implements ElevatorIO {
   private double appliedVolts;
   private boolean isClosedLoop;
 
-  private final int numMotors;
+  private final ElevatorConstants constants;
 
   public ElevatorIOSim(ElevatorConstants constants) {
-    sim =
-        new ElevatorSim(
-            LinearSystemId.createElevatorSystem(
-                constants.ELEVATOR_PARAMETERS.ELEVATOR_MOTOR_CONFIG(),
-                constants.ELEVATOR_PARAMETERS.CARRIAGE_MASS_KG(),
-                constants.DRUM_RADIUS,
-                constants.ELEVATOR_GEAR_RATIO),
+    sim = new ElevatorSim(
+        LinearSystemId.createElevatorSystem(
             constants.ELEVATOR_PARAMETERS.ELEVATOR_MOTOR_CONFIG(),
-            constants.ELEVATOR_PARAMETERS.MIN_HEIGHT_METERS(),
-            constants.ELEVATOR_PARAMETERS.MAX_HEIGHT_METERS(),
-            true,
-            constants.ELEVATOR_PARAMETERS.MIN_HEIGHT_METERS());
+            constants.ELEVATOR_PARAMETERS.CARRIAGE_MASS_KG(),
+            constants.DRUM_RADIUS,
+            constants.ELEVATOR_GEAR_RATIO),
+        constants.ELEVATOR_PARAMETERS.ELEVATOR_MOTOR_CONFIG(),
+        constants.ELEVATOR_PARAMETERS.MIN_HEIGHT_METERS(),
+        constants.ELEVATOR_PARAMETERS.MAX_HEIGHT_METERS(),
+        true,
+        constants.ELEVATOR_PARAMETERS.MIN_HEIGHT_METERS());
 
-    feedback =
-        new ProfiledPIDController(
-            constants.SLOT0_GAINS.kP().get(),
-            0,
-            constants.SLOT0_GAINS.kD().get(),
-            new TrapezoidProfile.Constraints(
-                constants.CONSTRAINTS.cruisingVelocityMetersPerSecond().get(),
-                constants.CONSTRAINTS.maxAccelerationMetersPerSecondSquared().get()));
+    feedback = new ProfiledPIDController(
+        constants.SLOT0_GAINS.kP().get(),
+        0,
+        constants.SLOT0_GAINS.kD().get(),
+        new TrapezoidProfile.Constraints(
+            constants.CONSTRAINTS.cruisingVelocityMetersPerSecond().get(),
+            constants.CONSTRAINTS.maxAccelerationMetersPerSecondSquared().get()));
 
-    feedforward =
-        new ElevatorFeedforward(
-            constants.SLOT0_GAINS.kS().get(),
-            constants.SLOT0_GAINS.kG().get(),
-            constants.SLOT0_GAINS.kV().get(),
-            constants.SLOT0_GAINS.kA().get());
+    feedforward = new ElevatorFeedforward(
+        constants.SLOT0_GAINS.kS().get(),
+        constants.SLOT0_GAINS.kG().get(),
+        constants.SLOT0_GAINS.kV().get(),
+        constants.SLOT0_GAINS.kA().get());
 
     appliedVolts = 0;
     isClosedLoop = true;
 
-    numMotors = constants.ELEVATOR_PARAMETERS.NUM_MOTORS();
+    this.constants = constants;
   }
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     if (isClosedLoop) {
-      appliedVolts =
-          feedback.calculate(sim.getPositionMeters())
-              + feedforward.calculate((feedback.getSetpoint().velocity));
+      appliedVolts = feedback.calculate(sim.getPositionMeters())
+          + feedforward.calculate((feedback.getSetpoint().velocity));
     }
 
     appliedVolts = MathUtil.clamp(appliedVolts, -12, 12);
@@ -71,8 +67,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
     inputs.positionSetpointMeters = sim.getPositionMeters();
     inputs.velocityMetersPerSecond = sim.getVelocityMetersPerSecond();
-    inputs.accelerationMetersPerSecondSquared =
-        -1; // TODO: Replace with calculation based on velocity
+    inputs.accelerationMetersPerSecondSquared = -1; // TODO: Replace with calculation based on velocity
 
     Arrays.fill(inputs.appliedVolts, appliedVolts);
     Arrays.fill(inputs.supplyCurrentAmps, sim.getCurrentDrawAmps());
@@ -98,6 +93,21 @@ public class ElevatorIOSim implements ElevatorIO {
   @Override
   public void setPositionGoal(double positionMeters, GainSlot slot) {
     setPositionGoal(positionMeters);
+  }
+
+  @Override
+  public void setSlot(GainSlot slot) {
+    switch (slot) {
+      case ZERO:
+        feedback.setPID(constants.SLOT0_GAINS.kP().get(), 0.0, constants.SLOT0_GAINS.kD().get());
+        break;
+      case ONE:
+        feedback.setPID(constants.SLOT1_GAINS.kP().get(), 0.0, constants.SLOT1_GAINS.kD().get());
+        break;
+      case TWO:
+        feedback.setPID(constants.SLOT2_GAINS.kP().get(), 0.0, constants.SLOT2_GAINS.kD().get());
+        break;
+    }
   }
 
   @Override
