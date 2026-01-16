@@ -4,19 +4,26 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import org.littletonrobotics.junction.Logger;
 
 public class GenericFlywheel {
   private final GenericFlywheelIO io;
   private final GenericFlywheelIOInputsAutoLogged inputs;
+
+  private final int index;
+  private final String aKitTopic;
 
   private double velocityGoalRadiansPerSecond;
   private double voltageGoalVolts;
 
   private boolean isClosedLoop;
 
-  public GenericFlywheel(GenericFlywheelIO io) {
+  public GenericFlywheel(GenericFlywheelIO io, Subsystem subsystem, int index) {
     this.io = io;
     inputs = new GenericFlywheelIOInputsAutoLogged();
+
+    this.index = index;
+    aKitTopic = subsystem.getName() + "/Flywheels" + index;
 
     velocityGoalRadiansPerSecond = 0;
     voltageGoalVolts = 0;
@@ -26,6 +33,7 @@ public class GenericFlywheel {
 
   public void periodic() {
     io.updateInputs(inputs);
+    Logger.processInputs(aKitTopic, inputs);
     if (isClosedLoop) {
       io.setVelocity(velocityGoalRadiansPerSecond);
     } else {

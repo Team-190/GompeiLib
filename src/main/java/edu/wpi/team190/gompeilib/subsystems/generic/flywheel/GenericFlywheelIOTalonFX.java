@@ -134,7 +134,12 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
         Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble())
             / constants.GEAR_RATIO;
 
-    for (int i = 0; i < followerTalonFX.length + 1; i++) {
+    inputs.appliedVolts = new double[constants.CAN_IDS.length];
+    inputs.supplyCurrentAmps = new double[constants.CAN_IDS.length];
+    inputs.torqueCurrentAmps = new double[constants.CAN_IDS.length];
+    inputs.temperatureCelsius = new double[constants.CAN_IDS.length];
+
+    for (int i = 0; i < constants.CAN_IDS.length; i++) {
       inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
       inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
       inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValueAsDouble();

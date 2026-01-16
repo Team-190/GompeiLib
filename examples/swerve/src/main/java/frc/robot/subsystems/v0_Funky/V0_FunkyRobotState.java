@@ -33,11 +33,10 @@ public class V0_FunkyRobotState {
   }
 
   public static Rotation2d getHeading() {
-    if (localization.getEstimatedPose(fieldZones.get(0)).isEmpty()) return Rotation2d.kZero;
-    return localization.getEstimatedPose(fieldZones.get(0)).get().getRotation();
+    return localization.getHeading();
   }
 
   public static Pose2d getGlobalPose() {
-    return localization.getEstimatedPose(fieldZones.get(0)).get();
+    return localization.getEstimatedPose(fieldZones.get(0));
   }
 }
