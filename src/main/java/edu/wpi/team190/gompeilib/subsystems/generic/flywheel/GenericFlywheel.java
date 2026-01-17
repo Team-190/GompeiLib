@@ -69,12 +69,12 @@ public class GenericFlywheel {
   }
 
   public SysIdRoutine getCharacterization(
-      double startingVoltage, double voltageIncrement, double timeSeconds, Subsystem subsystem) {
+      double rampVoltage, double stepVoltage, double timeoutSeconds, Subsystem subsystem) {
     return new SysIdRoutine(
         new SysIdRoutine.Config(
-            Volts.of(startingVoltage).per(Second),
-            Volts.of(voltageIncrement),
-            Seconds.of(timeSeconds),
+            Volts.of(rampVoltage).per(Second),
+            Volts.of(stepVoltage),
+            Seconds.of(timeoutSeconds),
             null),
         new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
   }
