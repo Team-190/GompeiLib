@@ -88,17 +88,17 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         .withStatorCurrentLimit(constants.ELEVATOR_STATOR_CURRENT_LIMIT)
         .withStatorCurrentLimitEnable(true);
 
-    config.Feedback.SensorToMechanismRatio = constants.ELEVATOR_GEAR_RATIO / (2 * Math.PI * constants.DRUM_RADIUS);
+    config.Feedback.SensorToMechanismRatio =
+        constants.ELEVATOR_GEAR_RATIO / (2 * Math.PI * constants.DRUM_RADIUS);
 
     config.SoftwareLimitSwitch.withForwardSoftLimitThreshold(
-        constants.ELEVATOR_PARAMETERS.MAX_HEIGHT_METERS())
+            constants.ELEVATOR_PARAMETERS.MAX_HEIGHT_METERS())
         .withForwardSoftLimitEnable(true)
-        .withReverseSoftLimitThreshold(
-            constants.ELEVATOR_PARAMETERS.MIN_HEIGHT_METERS())
+        .withReverseSoftLimitThreshold(constants.ELEVATOR_PARAMETERS.MIN_HEIGHT_METERS())
         .withReverseSoftLimitEnable(true);
 
     config.MotionMagic.withMotionMagicAcceleration(
-        constants.CONSTRAINTS.maxAccelerationMetersPerSecondSquared().getAsDouble())
+            constants.CONSTRAINTS.maxAccelerationMetersPerSecondSquared().getAsDouble())
         .withMotionMagicCruiseVelocity(
             constants.CONSTRAINTS.cruisingVelocityMetersPerSecond().getAsDouble());
 
@@ -153,8 +153,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
       statusSignals[i] = signalsList.get(i);
     }
 
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        GompeiLib.getLoopPeriod(), statusSignals);
+    BaseStatusSignal.setUpdateFrequencyForAll(GompeiLib.getLoopPeriod(), statusSignals);
 
     talonFX.optimizeBusUtilization();
     for (TalonFX follower : followTalonFX) {
@@ -198,10 +197,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   @Override
   public void setPositionGoal(double positionMeters) {
     positionGoalMeters = positionMeters;
-    talonFX.setControl(
-        positionVoltageRequest
-            .withPosition(positionMeters)
-            .withSlot(0));
+    talonFX.setControl(positionVoltageRequest.withPosition(positionMeters).withSlot(0));
   }
 
   @Override
@@ -221,10 +217,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         break;
     }
 
-    talonFX.setControl(
-        positionVoltageRequest
-            .withPosition(positionMeters)
-            .withSlot(slotInt));
+    talonFX.setControl(positionVoltageRequest.withPosition(positionMeters).withSlot(slotInt));
   }
 
   @Override
