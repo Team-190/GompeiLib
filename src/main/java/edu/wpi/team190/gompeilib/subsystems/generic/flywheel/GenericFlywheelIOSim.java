@@ -26,9 +26,7 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
     motorSim =
         new FlywheelSim(
             LinearSystemId.createFlywheelSystem(
-                constants.MOTOR_CONFIG,
-                constants.MOMENT_OF_INERTIA,
-                constants.GEAR_RATIO),
+                constants.MOTOR_CONFIG, constants.MOMENT_OF_INERTIA, constants.GEAR_RATIO),
             constants.MOTOR_CONFIG);
 
     feedback = new PIDController(constants.GAINS.kP().get(), 0.0, constants.GAINS.kD().get());

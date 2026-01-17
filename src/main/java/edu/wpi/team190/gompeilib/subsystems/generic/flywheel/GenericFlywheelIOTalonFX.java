@@ -129,8 +129,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public void updateInputs(GenericFlywheelIOInputs inputs) {
-    inputs.positionRadians =
-        Rotation2d.fromRotations(positionRotations.getValueAsDouble());
+    inputs.positionRadians = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
     inputs.velocityRadiansPerSecond =
         Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());
 
