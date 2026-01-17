@@ -1,5 +1,9 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
 import org.littletonrobotics.junction.Logger;
@@ -9,26 +13,21 @@ public class Elevator {
   public final ElevatorConstants elevatorConstants;
   public final ElevatorIOInputsAutoLogged inputs;
 
-  private boolean isClosedLoop;
-  private double position;
-  private double positionGoalMeters;
+  private final String aKitTopic;
 
-  public Elevator(ElevatorConstants elevatorConstants, ElevatorIO io) {
+  public Elevator(
+      ElevatorConstants elevatorConstants, Subsystem subsystem, int index, ElevatorIO io) {
     this.io = io;
     this.elevatorConstants = elevatorConstants;
     this.inputs = new ElevatorIOInputsAutoLogged();
+
+    aKitTopic = subsystem.getName() + "/Elevators" + index;
   }
 
   @Trace
   public void periodic() {
     io.updateInputs(inputs);
-
-    Logger.processInputs("Elevator", inputs);
-    Logger.recordOutput("Elevator/Position", position);
-
-    if (isClosedLoop) {
-      io.setPositionGoal(positionGoalMeters);
-    }
+    Logger.processInputs(aKitTopic, inputs);
   }
 
   public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG) {
@@ -49,16 +48,25 @@ public class Elevator {
   }
 
   public void setPositionGoal(double positionMeters) {
-    io.setPositionGoal(positionGoalMeters);
-    isClosedLoop = true;
+    io.setPositionGoal(positionMeters);
   }
 
   public void setVoltage(double volts) {
     io.setVoltage(volts);
-    isClosedLoop = false;
   }
 
   public double getPositionMeters() {
     return inputs.positionMeters;
+  }
+
+  public SysIdRoutine getCharacterization(
+      double rampVoltage, double stepVoltage, double timeoutSeconds, Subsystem subsystem) {
+    return new SysIdRoutine(
+        new SysIdRoutine.Config(
+            Volts.of(rampVoltage).per(Second),
+            Volts.of(stepVoltage),
+            Seconds.of(timeoutSeconds),
+            (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
+        new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
   }
 }
