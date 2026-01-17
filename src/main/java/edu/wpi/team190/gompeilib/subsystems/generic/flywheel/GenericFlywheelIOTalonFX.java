@@ -15,7 +15,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
-import edu.wpi.team190.gompeilib.subsystems.generic.flywheel.GenericFlywheelIO.GenericFlywheelIOInputs;
 import java.util.ArrayList;
 
 public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
