@@ -52,20 +52,17 @@ public class ElevatorConstants {
       LoggedTunableNumber kS,
       LoggedTunableNumber kG,
       LoggedTunableNumber kV,
-      LoggedTunableNumber kA) {
-  }
+      LoggedTunableNumber kA) {}
 
   public record Constraints(
       LoggedTunableNumber maxAccelerationMetersPerSecondSquared,
       LoggedTunableNumber cruisingVelocityMetersPerSecond,
-      LoggedTunableNumber goalToleranceMeters) {
-  }
+      LoggedTunableNumber goalToleranceMeters) {}
 
   public record ElevatorParameters(
       DCMotor ELEVATOR_MOTOR_CONFIG,
       double CARRIAGE_MASS_KG,
       double MIN_HEIGHT_METERS,
       double MAX_HEIGHT_METERS,
-      int NUM_MOTORS) {
-  }
+      int NUM_MOTORS) {}
 }
