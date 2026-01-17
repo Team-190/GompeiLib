@@ -29,7 +29,7 @@ public class GenericFlywheel {
   }
 
   public void setVoltage(double volts) {
-      io.setVelocity(volts);
+    io.setVelocity(volts);
   }
 
   public boolean atGoal() {

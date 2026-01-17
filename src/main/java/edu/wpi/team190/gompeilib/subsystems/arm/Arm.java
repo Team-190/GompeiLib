@@ -11,11 +11,8 @@ import org.littletonrobotics.junction.Logger;
 public class Arm {
   public ArmIO io;
   public ArmIOInputsAutoLogged inputs;
-  private boolean isClosedLoop;
 
   private final String aKitTopic;
-
-  private Rotation2d rotationGoal;
 
   public Arm(ArmIO io, Subsystem subsystem, int index) {
     this.io = io;
@@ -26,10 +23,7 @@ public class Arm {
 
   public void periodic() {
     io.updateInputs(inputs);
-
     Logger.processInputs(aKitTopic, inputs);
-
-    if (isClosedLoop) io.setPositionGoal(rotationGoal);
   }
 
   public Rotation2d getArmPosition() {
@@ -51,7 +45,6 @@ public class Arm {
 
   public void setPositionGoal(Rotation2d positionGoal) {
     io.setPositionGoal(positionGoal);
-    isClosedLoop = true;
   }
 
   public void setVoltage(double volts) {
