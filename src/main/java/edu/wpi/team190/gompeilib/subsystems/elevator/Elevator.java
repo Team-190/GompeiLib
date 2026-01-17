@@ -27,8 +27,7 @@ public class Elevator {
   @Trace
   public void periodic() {
     io.updateInputs(inputs);
-
-    Logger.processInputs("Elevator", inputs);
+    Logger.processInputs(aKitTopic, inputs);
   }
 
   public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG) {
