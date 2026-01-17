@@ -26,7 +26,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   private final ArrayList<StatusSignal<Voltage>> appliedVolts;
   private final ArrayList<StatusSignal<Current>> supplyCurrentAmps;
   private final ArrayList<StatusSignal<Current>> torqueCurrentAmps;
-  private final ArrayList<StatusSignal<Temperature>> temperatureCelcius;
+  private final ArrayList<StatusSignal<Temperature>> temperatureCelsius;
   private double velocityGoalRadiansPerSecond;
   private final StatusSignal<Double> velocitySetpointRotationsPerSecond;
   private final StatusSignal<Double> velocityErrorRotationsPerSecond;
@@ -83,12 +83,12 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     appliedVolts = new ArrayList<>();
     supplyCurrentAmps = new ArrayList<>();
     torqueCurrentAmps = new ArrayList<>();
-    temperatureCelcius = new ArrayList<>();
+    temperatureCelsius = new ArrayList<>();
 
     appliedVolts.add(talonFX.getMotorVoltage());
     supplyCurrentAmps.add(talonFX.getSupplyCurrent());
     torqueCurrentAmps.add(talonFX.getTorqueCurrent());
-    temperatureCelcius.add(talonFX.getDeviceTemp());
+    temperatureCelsius.add(talonFX.getDeviceTemp());
 
     velocityGoalRadiansPerSecond = 0.0;
 
@@ -102,7 +102,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     signalsList.addAll(appliedVolts);
     signalsList.addAll(supplyCurrentAmps);
     signalsList.addAll(torqueCurrentAmps);
-    signalsList.addAll(temperatureCelcius);
+    signalsList.addAll(temperatureCelsius);
 
     statusSignals = new StatusSignal[signalsList.size()];
 
@@ -143,7 +143,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
       inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
       inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
       inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValueAsDouble();
-      inputs.temperatureCelsius[i] = temperatureCelcius.get(i).getValueAsDouble();
+      inputs.temperatureCelsius[i] = temperatureCelsius.get(i).getValueAsDouble();
     }
 
     inputs.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond;
@@ -198,7 +198,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public boolean atGoal() {
-    return Math.abs(velocityErrorRotationsPerSecond.getValueAsDouble()
+    return Math.abs(velocityErrorRotationsPerSecond.getValueAsDouble())
         <= Units.radiansToRotations(constants.CONSTRAINTS.goalToleranceRadiansPerSecond().get());
   }
 
