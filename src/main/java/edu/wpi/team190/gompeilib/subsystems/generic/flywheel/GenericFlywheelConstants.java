@@ -15,11 +15,10 @@ public class GenericFlywheelConstants {
   public final double MOMENT_OF_INERTIA;
   public final double GEAR_RATIO;
 
-  public final DCMotor[] MOTOR_CONFIGS;
+  public final DCMotor MOTOR_CONFIG;
 
   public final Gains GAINS;
   public final Constraints CONSTRAINTS;
-  public final GenericFlywheelParameters GENERIC_FLYWHEEL_PARAMETERS;
   public final InvertedValue INVERSION;
 
   public GenericFlywheelConstants(
@@ -28,10 +27,9 @@ public class GenericFlywheelConstants {
       boolean ENABLE_FOC,
       double CURRENT_LIMIT,
       double MOMENT_OF_INERTIA,
-      DCMotor[] MOTOR_CONFIGS,
       Gains GAINS,
+      DCMotor MOTOR_CONFIG,
       Constraints CONSTRAINTS,
-      GenericFlywheelParameters GENERIC_FLYWHEEL_PARAMETERS,
       double GEAR_RATIO,
       InvertedValue INVERSION) {
     this.CAN_IDS = CAN_IDS;
@@ -39,20 +37,12 @@ public class GenericFlywheelConstants {
     this.ENABLE_FOC = ENABLE_FOC;
     this.CURRENT_LIMIT = CURRENT_LIMIT;
     this.MOMENT_OF_INERTIA = MOMENT_OF_INERTIA;
-    this.MOTOR_CONFIGS = MOTOR_CONFIGS;
     this.GAINS = GAINS;
+    this.MOTOR_CONFIG = MOTOR_CONFIG;
     this.CONSTRAINTS = CONSTRAINTS;
-    this.GENERIC_FLYWHEEL_PARAMETERS = GENERIC_FLYWHEEL_PARAMETERS;
     this.GEAR_RATIO = GEAR_RATIO;
     this.INVERSION = INVERSION;
   }
-
-  public record GenericFlywheelParameters(
-      DCMotor MOTOR_CONFIG,
-      double CARRIAGE_MASS_KG,
-      double MIN_HEIGHT_METERS,
-      double MAX_HEIGHT_METERS,
-      int NUM_MOTORS) {}
 
   public record Gains(
       LoggedTunableNumber kP,

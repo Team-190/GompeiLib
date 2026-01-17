@@ -15,7 +15,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
-import edu.wpi.team190.gompeilib.subsystems.generic.flywheel.GenericFlywheelIO.GenericFlywheelIOInputs;
 import java.util.ArrayList;
 
 public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
@@ -27,7 +26,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   private final ArrayList<StatusSignal<Voltage>> appliedVolts;
   private final ArrayList<StatusSignal<Current>> supplyCurrentAmps;
   private final ArrayList<StatusSignal<Current>> torqueCurrentAmps;
-  private final ArrayList<StatusSignal<Temperature>> temperatureCelcius;
+  private final ArrayList<StatusSignal<Temperature>> temperatureCelsius;
   private double velocityGoalRadiansPerSecond;
   private final StatusSignal<Double> velocitySetpointRotationsPerSecond;
   private final StatusSignal<Double> velocityErrorRotationsPerSecond;
@@ -65,6 +64,8 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
         .withKA(constants.GAINS.kA().getAsDouble());
     talonFXConfiguration.MotorOutput.withInverted(constants.INVERSION);
 
+    talonFXConfiguration.Feedback.SensorToMechanismRatio = constants.GEAR_RATIO;
+
     talonFX.getConfigurator().apply(talonFXConfiguration);
     for (TalonFX follower : followerTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
@@ -82,12 +83,12 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     appliedVolts = new ArrayList<>();
     supplyCurrentAmps = new ArrayList<>();
     torqueCurrentAmps = new ArrayList<>();
-    temperatureCelcius = new ArrayList<>();
+    temperatureCelsius = new ArrayList<>();
 
     appliedVolts.add(talonFX.getMotorVoltage());
     supplyCurrentAmps.add(talonFX.getSupplyCurrent());
     torqueCurrentAmps.add(talonFX.getTorqueCurrent());
-    temperatureCelcius.add(talonFX.getDeviceTemp());
+    temperatureCelsius.add(talonFX.getDeviceTemp());
 
     velocityGoalRadiansPerSecond = 0.0;
 
@@ -101,7 +102,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     signalsList.addAll(appliedVolts);
     signalsList.addAll(supplyCurrentAmps);
     signalsList.addAll(torqueCurrentAmps);
-    signalsList.addAll(temperatureCelcius);
+    signalsList.addAll(temperatureCelsius);
 
     statusSignals = new StatusSignal[signalsList.size()];
 
@@ -128,11 +129,9 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public void updateInputs(GenericFlywheelIOInputs inputs) {
-    inputs.positionRadians =
-        Rotation2d.fromRotations(positionRotations.getValueAsDouble() / constants.GEAR_RATIO);
+    inputs.positionRadians = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
     inputs.velocityRadiansPerSecond =
-        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble())
-            / constants.GEAR_RATIO;
+        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());
 
     inputs.appliedVolts = new double[constants.CAN_IDS.length];
     inputs.supplyCurrentAmps = new double[constants.CAN_IDS.length];
@@ -143,16 +142,14 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
       inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
       inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
       inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValueAsDouble();
-      inputs.temperatureCelsius[i] = temperatureCelcius.get(i).getValueAsDouble();
+      inputs.temperatureCelsius[i] = temperatureCelsius.get(i).getValueAsDouble();
     }
 
-    inputs.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond / constants.GEAR_RATIO;
+    inputs.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond;
     inputs.velocitySetpointRadiansPerSecond =
-        Units.rotationsToRadians(velocitySetpointRotationsPerSecond.getValueAsDouble())
-            / constants.GEAR_RATIO;
+        Units.rotationsToRadians(velocitySetpointRotationsPerSecond.getValueAsDouble());
     inputs.velocityErrorRadiansPerSecond =
-        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble())
-            / constants.GEAR_RATIO;
+        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());
   }
 
   @Override
@@ -162,7 +159,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public void setVelocity(double velocityRadiansPerSecond) {
-    velocityGoalRadiansPerSecond = velocityRadiansPerSecond / constants.GEAR_RATIO;
+    velocityGoalRadiansPerSecond = velocityRadiansPerSecond;
     talonFX.setControl(
         velocityControlRequest
             .withVelocity(Units.radiansToRotations(velocityGoalRadiansPerSecond))
@@ -191,7 +188,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   public void setProfile(
       double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {
     talonFXConfiguration.MotionMagic.withMotionMagicAcceleration(
-        Units.radiansToRotations(maxAccelerationRadiansPerSecondSquared) / constants.GEAR_RATIO);
+        Units.radiansToRotations(maxAccelerationRadiansPerSecondSquared));
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
     for (TalonFX follower : followerTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
@@ -200,7 +197,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public boolean atGoal() {
-    return Math.abs(velocityErrorRotationsPerSecond.getValueAsDouble() / constants.GEAR_RATIO)
+    return Math.abs(velocityErrorRotationsPerSecond.getValueAsDouble())
         <= Units.radiansToRotations(constants.CONSTRAINTS.goalToleranceRadiansPerSecond().get());
   }
 
