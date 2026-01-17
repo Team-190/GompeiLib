@@ -6,21 +6,28 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
+import org.littletonrobotics.junction.Logger;
 
 public class Arm {
   public ArmIO io;
   public ArmIOInputsAutoLogged inputs;
   private boolean isClosedLoop;
 
+  private final String aKitTopic;
+
   private Rotation2d rotationGoal;
 
-  public Arm(ArmIO io) {
+  public Arm(ArmIO io, Subsystem subsystem, int index) {
     this.io = io;
     this.inputs = new ArmIOInputsAutoLogged();
+
+    aKitTopic = subsystem.getName() + "/Arms" + index;
   }
 
   public void periodic() {
     io.updateInputs(inputs);
+
+    Logger.processInputs(aKitTopic, inputs);
 
     if (isClosedLoop) io.setPositionGoal(rotationGoal);
   }
@@ -56,13 +63,13 @@ public class Arm {
   }
 
   public SysIdRoutine getCharacterization(
-      double startingVoltage, double voltageIncrement, double timeSeconds, Subsystem subsystem) {
+      double rampVoltage, double stepVoltage, double timeoutSeconds, Subsystem subsystem) {
     return new SysIdRoutine(
         new SysIdRoutine.Config(
-            Volts.of(startingVoltage).per(Second),
-            Volts.of(voltageIncrement),
-            Seconds.of(timeSeconds),
-            null),
+            Volts.of(rampVoltage).per(Second),
+            Volts.of(stepVoltage),
+            Seconds.of(timeoutSeconds),
+            (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
         new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
   }
 }

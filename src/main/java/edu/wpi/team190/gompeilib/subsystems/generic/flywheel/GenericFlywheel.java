@@ -2,7 +2,6 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
@@ -76,7 +75,7 @@ public class GenericFlywheel {
             Volts.of(rampVoltage).per(Second),
             Volts.of(stepVoltage),
             Seconds.of(timeoutSeconds),
-            (state) -> SignalLogger.writeString("flywheel " + index, state.toString())),
+            (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
         new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
   }
 }
