@@ -1,5 +1,7 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.roller;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
 import org.littletonrobotics.junction.Logger;
@@ -11,10 +13,10 @@ public class GenericRoller {
 
   private double voltageGoalVolts;
 
-  public GenericRoller(GenericRollerIO io, Subsystem subsystem, int index) {
+  public GenericRoller(GenericRollerIO io, Subsystem subsystem, String name) {
     this.io = io;
     inputs = new RollerIOInputsAutoLogged();
-    aKitTopic = subsystem.getName() + "/Rollers" + index;
+    aKitTopic = subsystem.getName() + "/" + name + " Rollers";
   }
 
   @Trace
@@ -25,7 +27,10 @@ public class GenericRoller {
     io.setVoltage(voltageGoalVolts);
   }
 
-  public void setVoltage(double volts) {
-    voltageGoalVolts = volts;
+  public Command setVoltage(double volts) {
+    return Commands.runOnce(
+        () -> {
+          voltageGoalVolts = volts;
+        });
   }
 }
