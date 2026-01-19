@@ -4,7 +4,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build
 
-BuildConstants.java
+*/BuildConstants.java
 
 ### IntelliJ IDEA ###
 /.idea
