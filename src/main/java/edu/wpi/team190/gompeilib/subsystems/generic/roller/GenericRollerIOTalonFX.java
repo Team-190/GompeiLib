@@ -71,9 +71,6 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
 
   @Override
   public void updateInputs(RollerIOInputs inputs) {
-    BaseStatusSignal.refreshAll(
-        positionRotations, velocity, appliedVoltage, supplyCurrent, torqueCurrent, temperature);
-
     inputs.position = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
     inputs.velocity = velocity.getValue();
     inputs.appliedVolts = appliedVoltage.getValue();
