@@ -45,7 +45,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     talonFX = new TalonFX(constants.CAN_IDS[0]);
     followerTalonFX = new TalonFX[constants.CAN_IDS.length - 1];
     for (int i = 1; i < constants.CAN_IDS.length; i++) {
-      followerTalonFX[i - 1] = new TalonFX(constants.CAN_IDS[i]);
+      followerTalonFX[i - 1] = new TalonFX(constants.CAN_IDS[i], talonFX.getNetwork());
     }
 
     talonFXConfiguration = new TalonFXConfiguration();

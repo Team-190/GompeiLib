@@ -153,7 +153,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
       statusSignals[i] = signalsList.get(i);
     }
 
-    BaseStatusSignal.setUpdateFrequencyForAll(GompeiLib.getLoopPeriod(), statusSignals);
+    BaseStatusSignal.setUpdateFrequencyForAll(1/GompeiLib.getLoopPeriod(), statusSignals);
 
     talonFX.optimizeBusUtilization();
     for (TalonFX follower : followTalonFX) {
@@ -171,8 +171,6 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
     inputs.positionMeters = positionRotations.getValueAsDouble();
     inputs.velocityMetersPerSecond = velocityRotationsPerSecond.getValueAsDouble();
-    inputs.accelerationMetersPerSecondSquared = -1; // TODO: Replace with an actual value
-
     inputs.appliedVolts = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
     inputs.supplyCurrentAmps = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
     inputs.torqueCurrentAmps = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
@@ -243,8 +241,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   @Override
   public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG) {
-    config.Slot0.withKP(kP).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
-    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config));
+    updateGains(kP,kD,kS,kV,kA,kG, GainSlot.ZERO);
   }
 
   @Override
@@ -262,13 +259,19 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         config.Slot2.withKP(kP).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
         break;
     }
-    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config));
+    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
+    for (TalonFX follower : followTalonFX) {
+        PhoenixUtil.tryUntilOk(5, ()-> follower.getConfigurator().apply(config, 0.25));
+    }
   }
 
   @Override
   public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
     config.MotionMagic.withMotionMagicAcceleration(maxAcceleration)
         .withMotionMagicCruiseVelocity(cruisingVelocity);
-    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config));
+    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
+    for (TalonFX follower : followTalonFX) {
+        PhoenixUtil.tryUntilOk(5, ()-> follower.getConfigurator().apply(config, 0.25));
+    }
   }
 }
