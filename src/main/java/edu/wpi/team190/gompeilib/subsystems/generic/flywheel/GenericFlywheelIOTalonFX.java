@@ -1,9 +1,14 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -38,6 +43,8 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   private final NeutralOut neutralControlRequest;
   private final VoltageOut voltageControlRequest;
   private final VelocityVoltage velocityControlRequest;
+  private final MotionMagicVelocityTorqueCurrentFOC velocityTorqueCurrentRequest;
+  
 
   GenericFlywheelConstants constants;
 
@@ -75,6 +82,19 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
               (follower.getDeviceID() % 2 == 1)
                   ? MotorAlignmentValue.Aligned
                   : MotorAlignmentValue.Opposed));
+
+    talonFXConfiguration.MotionMagic =
+        new MotionMagicConfigs()
+            .withMotionMagicAcceleration(
+                AngularAcceleration.ofRelativeUnits(
+                    constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get(),
+                    RotationsPerSecondPerSecond))
+            .withMotionMagicCruiseVelocity(
+                AngularVelocity.ofRelativeUnits(
+                    constants.CONSTRAINTS.cruisingVelocityRadiansPerSecond().get(),
+                    RotationsPerSecond));
+
+    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
     }
 
     positionRotations = talonFX.getPosition();
@@ -123,6 +143,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     voltageControlRequest = new VoltageOut(0.0);
 
     velocityControlRequest = new VelocityVoltage(0);
+    velocityTorqueCurrentRequest = new MotionMagicVelocityTorqueCurrentFOC(0.0);
 
     this.constants = constants;
   }
@@ -167,6 +188,15 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   }
 
   @Override
+  public void setVelocityTorque(double velocityRadiansPerSecond) {
+    velocityGoalRadiansPerSecond = velocityRadiansPerSecond;
+    talonFX.setControl(
+      velocityTorqueCurrentRequest
+      .withVelocity(Units.radiansToRotations(velocityGoalRadiansPerSecond))
+    );
+  }
+
+  @Override
   public void setPID(double kP, double kI, double kD) {
     talonFXConfiguration.Slot0.withKP(kP).withKI(kI).withKD(kD);
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
@@ -204,5 +234,16 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   @Override
   public void stop() {
     talonFX.setControl(neutralControlRequest);
+  }
+
+  @Override
+  public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
+    talonFXConfiguration.MotionMagic =
+        new MotionMagicConfigs()
+            .withMotionMagicAcceleration(
+                AngularAcceleration.ofRelativeUnits(maxAcceleration, RotationsPerSecondPerSecond))
+            .withMotionMagicCruiseVelocity(
+                AngularVelocity.ofRelativeUnits(cruisingVelocity, RotationsPerSecond));
+    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
   }
 }

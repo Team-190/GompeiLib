@@ -29,6 +29,9 @@ public interface GenericFlywheelIO {
   public default void setVelocity(double velocityRadiansPerSecond) {}
   ;
 
+  public default void setVelocityTorque(double velocityRadiansPerSecond) {}
+  ;
+
   public default void setPID(double kP, double kI, double kD) {}
   ;
 
@@ -45,5 +48,8 @@ public interface GenericFlywheelIO {
   ;
 
   public default void stop() {}
+  ;
+
+  public default void updateConstraints(double maxAcceleration, double cruisingVelocity) {}
   ;
 }

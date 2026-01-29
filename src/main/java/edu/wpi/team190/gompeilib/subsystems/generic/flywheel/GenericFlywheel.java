@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.team190.gompeilib.subsystems.generic.flywheel.GenericFlywheelState.FlywheelState;
+
 import org.littletonrobotics.junction.Logger;
 
 public class GenericFlywheel {
@@ -13,6 +15,8 @@ public class GenericFlywheel {
   private final GenericFlywheelIOInputsAutoLogged inputs;
 
   private final String aKitTopic;
+
+  private FlywheelState currentState;
 
   private double velocityGoalRadiansPerSecond;
   private double voltageGoalVolts;
@@ -29,15 +33,21 @@ public class GenericFlywheel {
     voltageGoalVolts = 0;
 
     isClosedLoop = true;
+    currentState = FlywheelState.IDLE;                                                                                                               ;
   }
 
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(aKitTopic, inputs);
-    if (isClosedLoop) {
-      io.setVelocity(velocityGoalRadiansPerSecond);
-    } else {
-      io.setVoltage(voltageGoalVolts);
+      switch (currentState) {
+        case VELOCITY_VOLTAGE_CONTROL:
+          io.setVelocity(velocityGoalRadiansPerSecond);
+        case VELOCITY_TORQUE_CONTROL:
+          io.setVelocityTorque(velocityGoalRadiansPerSecond);
+        case VOLTAGE_CONTROL:
+          io.setVoltage(voltageGoalVolts);
+        case IDLE:
+          break;
     }
   }
 
@@ -72,6 +82,10 @@ public class GenericFlywheel {
   public void setProfile(
       double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {
     io.setProfile(maxAccelerationRadiansPerSecondSquared, goalToleranceRadiansPerSecond);
+  }
+
+  public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
+    io.updateConstraints(maxAcceleration, cruisingVelocity);
   }
 
   public SysIdRoutine getCharacterization(
