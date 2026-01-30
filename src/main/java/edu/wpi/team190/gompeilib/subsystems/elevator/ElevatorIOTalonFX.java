@@ -153,7 +153,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
       statusSignals[i] = signalsList.get(i);
     }
 
-    BaseStatusSignal.setUpdateFrequencyForAll(1/GompeiLib.getLoopPeriod(), statusSignals);
+    BaseStatusSignal.setUpdateFrequencyForAll(1 / GompeiLib.getLoopPeriod(), statusSignals);
 
     talonFX.optimizeBusUtilization();
     for (TalonFX follower : followTalonFX) {
@@ -241,7 +241,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   @Override
   public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG) {
-    updateGains(kP,kD,kS,kV,kA,kG, GainSlot.ZERO);
+    updateGains(kP, kD, kS, kV, kA, kG, GainSlot.ZERO);
   }
 
   @Override
@@ -261,7 +261,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     }
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
     for (TalonFX follower : followTalonFX) {
-        PhoenixUtil.tryUntilOk(5, ()-> follower.getConfigurator().apply(config, 0.25));
+      PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config, 0.25));
     }
   }
 
@@ -271,7 +271,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         .withMotionMagicCruiseVelocity(cruisingVelocity);
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
     for (TalonFX follower : followTalonFX) {
-        PhoenixUtil.tryUntilOk(5, ()-> follower.getConfigurator().apply(config, 0.25));
+      PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config, 0.25));
     }
   }
 }
