@@ -44,7 +44,6 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   private final VoltageOut voltageControlRequest;
   private final VelocityVoltage velocityControlRequest;
   private final MotionMagicVelocityTorqueCurrentFOC velocityTorqueCurrentRequest;
-  
 
   GenericFlywheelConstants constants;
 
@@ -83,18 +82,18 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
                   ? MotorAlignmentValue.Aligned
                   : MotorAlignmentValue.Opposed));
 
-    talonFXConfiguration.MotionMagic =
-        new MotionMagicConfigs()
-            .withMotionMagicAcceleration(
-                AngularAcceleration.ofRelativeUnits(
-                    constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get(),
-                    RotationsPerSecondPerSecond))
-            .withMotionMagicCruiseVelocity(
-                AngularVelocity.ofRelativeUnits(
-                    constants.CONSTRAINTS.cruisingVelocityRadiansPerSecond().get(),
-                    RotationsPerSecond));
+      talonFXConfiguration.MotionMagic =
+          new MotionMagicConfigs()
+              .withMotionMagicAcceleration(
+                  AngularAcceleration.ofRelativeUnits(
+                      constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get(),
+                      RotationsPerSecondPerSecond))
+              .withMotionMagicCruiseVelocity(
+                  AngularVelocity.ofRelativeUnits(
+                      constants.CONSTRAINTS.cruisingVelocityRadiansPerSecond().get(),
+                      RotationsPerSecond));
 
-    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
+      PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
     }
 
     positionRotations = talonFX.getPosition();
@@ -191,9 +190,8 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   public void setVelocityTorque(double velocityRadiansPerSecond) {
     velocityGoalRadiansPerSecond = velocityRadiansPerSecond;
     talonFX.setControl(
-      velocityTorqueCurrentRequest
-      .withVelocity(Units.radiansToRotations(velocityGoalRadiansPerSecond))
-    );
+        velocityTorqueCurrentRequest.withVelocity(
+            Units.radiansToRotations(velocityGoalRadiansPerSecond)));
   }
 
   @Override
@@ -216,9 +214,15 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public void setProfile(
-      double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {
-    talonFXConfiguration.MotionMagic.withMotionMagicAcceleration(
-        Units.radiansToRotations(maxAccelerationRadiansPerSecondSquared));
+      double maxAccelerationRadiansPerSecondSquared,
+      double cruisingVelocity,
+      double goalToleranceRadiansPerSecond) {
+    talonFXConfiguration
+        .MotionMagic
+        .withMotionMagicAcceleration(
+            Units.radiansToRotations(maxAccelerationRadiansPerSecondSquared))
+        .withMotionMagicCruiseVelocity(
+            AngularVelocity.ofRelativeUnits(cruisingVelocity, RotationsPerSecond));
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
     for (TalonFX follower : followerTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
@@ -234,16 +238,5 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   @Override
   public void stop() {
     talonFX.setControl(neutralControlRequest);
-  }
-
-  @Override
-  public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
-    talonFXConfiguration.MotionMagic =
-        new MotionMagicConfigs()
-            .withMotionMagicAcceleration(
-                AngularAcceleration.ofRelativeUnits(maxAcceleration, RotationsPerSecondPerSecond))
-            .withMotionMagicCruiseVelocity(
-                AngularVelocity.ofRelativeUnits(cruisingVelocity, RotationsPerSecond));
-    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
   }
 }

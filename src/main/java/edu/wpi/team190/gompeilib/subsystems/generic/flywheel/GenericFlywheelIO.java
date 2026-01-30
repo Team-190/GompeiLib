@@ -39,7 +39,9 @@ public interface GenericFlywheelIO {
   ;
 
   public default void setProfile(
-      double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {}
+      double maxAccelerationRadiansPerSecondSquared,
+      double cruisingVelocity,
+      double goalToleranceRadiansPerSecond) {}
   ;
 
   public default boolean atGoal() {
@@ -48,8 +50,5 @@ public interface GenericFlywheelIO {
   ;
 
   public default void stop() {}
-  ;
-
-  public default void updateConstraints(double maxAcceleration, double cruisingVelocity) {}
   ;
 }

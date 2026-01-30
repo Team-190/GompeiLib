@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
 import org.littletonrobotics.junction.Logger;
 
 public class GenericFlywheel {
@@ -14,8 +13,9 @@ public class GenericFlywheel {
   private final GenericFlywheelIOInputsAutoLogged inputs;
 
   private final String aKitTopic;
+  private final SysIdRoutine characterizationRoutine;
 
-  private FlywheelState currentState;
+  private GenericFlywheelState currentState;
 
   private double velocityGoalRadiansPerSecond;
   private double voltageGoalVolts;
@@ -24,32 +24,53 @@ public class GenericFlywheel {
     this.io = io;
     inputs = new GenericFlywheelIOInputsAutoLogged();
 
-    aKitTopic = subsystem.getName() + "/" + name + " Flywheel";
+    aKitTopic = subsystem.getName() + "/" + " Flywheel" + name;
+
+    characterizationRoutine =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                Volts.of(0.5).per(Second),
+                Volts.of(3.5),
+                Seconds.of(10),
+                (state) -> Logger.recordOutput(aKitTopic + "/SysID State", state.toString())),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
 
     velocityGoalRadiansPerSecond = 0;
     voltageGoalVolts = 0;
 
-    currentState = FlywheelState.IDLE;                                                                                                               ;
+    currentState = GenericFlywheelState.IDLE;
+    ;
   }
 
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(aKitTopic, inputs);
-      switch (currentState) {
-        case VELOCITY_VOLTAGE_CONTROL:
-          io.setVelocity(velocityGoalRadiansPerSecond);
-        case VELOCITY_TORQUE_CONTROL:
-          io.setVelocityTorque(velocityGoalRadiansPerSecond);
-        case VOLTAGE_CONTROL:
-          io.setVoltage(voltageGoalVolts);
-        case IDLE:
-          break;
+
+    Logger.recordOutput(aKitTopic + "/Velocity Goal", velocityGoalRadiansPerSecond);
+    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts);
+    Logger.recordOutput(aKitTopic + "/Current State", currentState.name());
+    Logger.recordOutput(aKitTopic + "/At Goal", io.atGoal());
+
+    switch (currentState) {
+      case VELOCITY_VOLTAGE_CONTROL:
+        io.setVelocity(velocityGoalRadiansPerSecond);
+      case VELOCITY_TORQUE_CONTROL:
+        io.setVelocityTorque(velocityGoalRadiansPerSecond);
+      case VOLTAGE_CONTROL:
+        io.setVoltage(voltageGoalVolts);
+      case IDLE:
+        break;
     }
   }
 
-  public Command setGoal(double velocityGoalRadiansPerSecond) {
+  public Command setGoal(double velocityGoalRadiansPerSecond, boolean torqueControl) {
     return Commands.runOnce(
         () -> {
+          currentState =
+              torqueControl
+                  ? GenericFlywheelState.VELOCITY_TORQUE_CONTROL
+                  : GenericFlywheelState.VELOCITY_VOLTAGE_CONTROL;
           this.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond;
         });
   }
@@ -57,8 +78,13 @@ public class GenericFlywheel {
   public Command setVoltage(double volts) {
     return Commands.runOnce(
         () -> {
+          currentState = GenericFlywheelState.VOLTAGE_CONTROL;
           this.voltageGoalVolts = volts;
         });
+  }
+
+  public boolean atGoal() {
+    return io.atGoal();
   }
 
   public Command waitUntilAtGoal() {
@@ -74,30 +100,22 @@ public class GenericFlywheel {
   }
 
   public void setProfile(
-      double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {
-    io.setProfile(maxAccelerationRadiansPerSecondSquared, goalToleranceRadiansPerSecond);
+      double maxAccelerationRadiansPerSecondSquared,
+      double cruisingVelocity,
+      double goalToleranceRadiansPerSecond) {
+    io.setProfile(
+        maxAccelerationRadiansPerSecondSquared, cruisingVelocity, goalToleranceRadiansPerSecond);
   }
 
-  public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
-    io.updateConstraints(maxAcceleration, cruisingVelocity);
+  public Command sysIdRoutine() {
+    return Commands.sequence(
+        Commands.runOnce(() -> currentState = GenericFlywheelState.IDLE),
+        characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
   }
-
-  public SysIdRoutine getCharacterization(
-      double rampVoltage, double stepVoltage, double timeoutSeconds, Subsystem subsystem) {
-    currentState = FlywheelState.IDLE;     
-    return new SysIdRoutine(
-        new SysIdRoutine.Config(
-            Volts.of(rampVoltage).per(Second),
-            Volts.of(stepVoltage),
-            Seconds.of(timeoutSeconds),
-            (state) -> Logger.recordOutput(aKitTopic + "/SysID State", state.toString())),
-        new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
-  }
-
-  public enum FlywheelState {
-        VELOCITY_VOLTAGE_CONTROL,
-        VELOCITY_TORQUE_CONTROL,
-        VOLTAGE_CONTROL,
-        IDLE
-    }
 }
