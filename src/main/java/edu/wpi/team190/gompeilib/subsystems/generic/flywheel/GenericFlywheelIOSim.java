@@ -85,7 +85,9 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
 
   @Override
   public void setProfile(
-      double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {
+      double maxAccelerationRadiansPerSecondSquared,
+      double cruisingVelocity,
+      double goalToleranceRadiansPerSecond) {
     profile.setMaxAcceleration(maxAccelerationRadiansPerSecondSquared);
     feedback.setTolerance(goalToleranceRadiansPerSecond);
   }

@@ -13,38 +13,64 @@ public class GenericFlywheel {
   private final GenericFlywheelIOInputsAutoLogged inputs;
 
   private final String aKitTopic;
+  private final SysIdRoutine characterizationRoutine;
+
+  private GenericFlywheelState currentState;
 
   private double velocityGoalRadiansPerSecond;
   private double voltageGoalVolts;
-
-  private boolean isClosedLoop;
 
   public GenericFlywheel(GenericFlywheelIO io, Subsystem subsystem, String name) {
     this.io = io;
     inputs = new GenericFlywheelIOInputsAutoLogged();
 
-    aKitTopic = subsystem.getName() + "/" + name + " Flywheel";
+    aKitTopic = subsystem.getName() + "/" + " Flywheel" + name;
+
+    characterizationRoutine =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                Volts.of(0.5).per(Second),
+                Volts.of(3.5),
+                Seconds.of(10),
+                (state) -> Logger.recordOutput(aKitTopic + "/SysID State", state.toString())),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
 
     velocityGoalRadiansPerSecond = 0;
     voltageGoalVolts = 0;
 
-    isClosedLoop = true;
+    currentState = GenericFlywheelState.IDLE;
+    ;
   }
 
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(aKitTopic, inputs);
-    if (isClosedLoop) {
-      io.setVelocity(velocityGoalRadiansPerSecond);
-    } else {
-      io.setVoltage(voltageGoalVolts);
+
+    Logger.recordOutput(aKitTopic + "/Velocity Goal", velocityGoalRadiansPerSecond);
+    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts);
+    Logger.recordOutput(aKitTopic + "/Current State", currentState.name());
+    Logger.recordOutput(aKitTopic + "/At Goal", io.atGoal());
+
+    switch (currentState) {
+      case VELOCITY_VOLTAGE_CONTROL:
+        io.setVelocity(velocityGoalRadiansPerSecond);
+      case VELOCITY_TORQUE_CONTROL:
+        io.setVelocityTorque(velocityGoalRadiansPerSecond);
+      case VOLTAGE_CONTROL:
+        io.setVoltage(voltageGoalVolts);
+      case IDLE:
+        break;
     }
   }
 
-  public Command setGoal(double velocityGoalRadiansPerSecond) {
+  public Command setGoal(double velocityGoalRadiansPerSecond, boolean torqueControl) {
     return Commands.runOnce(
         () -> {
-          isClosedLoop = true;
+          currentState =
+              torqueControl
+                  ? GenericFlywheelState.VELOCITY_TORQUE_CONTROL
+                  : GenericFlywheelState.VELOCITY_VOLTAGE_CONTROL;
           this.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond;
         });
   }
@@ -52,9 +78,13 @@ public class GenericFlywheel {
   public Command setVoltage(double volts) {
     return Commands.runOnce(
         () -> {
-          isClosedLoop = false;
+          currentState = GenericFlywheelState.VOLTAGE_CONTROL;
           this.voltageGoalVolts = volts;
         });
+  }
+
+  public boolean atGoal() {
+    return io.atGoal();
   }
 
   public Command waitUntilAtGoal() {
@@ -70,18 +100,22 @@ public class GenericFlywheel {
   }
 
   public void setProfile(
-      double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {
-    io.setProfile(maxAccelerationRadiansPerSecondSquared, goalToleranceRadiansPerSecond);
+      double maxAccelerationRadiansPerSecondSquared,
+      double cruisingVelocity,
+      double goalToleranceRadiansPerSecond) {
+    io.setProfile(
+        maxAccelerationRadiansPerSecondSquared, cruisingVelocity, goalToleranceRadiansPerSecond);
   }
 
-  public SysIdRoutine getCharacterization(
-      double rampVoltage, double stepVoltage, double timeoutSeconds, Subsystem subsystem) {
-    return new SysIdRoutine(
-        new SysIdRoutine.Config(
-            Volts.of(rampVoltage).per(Second),
-            Volts.of(stepVoltage),
-            Seconds.of(timeoutSeconds),
-            (state) -> Logger.recordOutput(aKitTopic + "/SysID State", state.toString())),
-        new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
+  public Command sysIdRoutine() {
+    return Commands.sequence(
+        Commands.runOnce(() -> currentState = GenericFlywheelState.IDLE),
+        characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
   }
 }
