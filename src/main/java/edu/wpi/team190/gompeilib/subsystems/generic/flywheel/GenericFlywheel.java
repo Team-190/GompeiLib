@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.team190.gompeilib.subsystems.generic.flywheel.GenericFlywheelState.FlywheelState;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -21,8 +20,6 @@ public class GenericFlywheel {
   private double velocityGoalRadiansPerSecond;
   private double voltageGoalVolts;
 
-  private boolean isClosedLoop;
-
   public GenericFlywheel(GenericFlywheelIO io, Subsystem subsystem, String name) {
     this.io = io;
     inputs = new GenericFlywheelIOInputsAutoLogged();
@@ -32,7 +29,6 @@ public class GenericFlywheel {
     velocityGoalRadiansPerSecond = 0;
     voltageGoalVolts = 0;
 
-    isClosedLoop = true;
     currentState = FlywheelState.IDLE;                                                                                                               ;
   }
 
@@ -54,7 +50,6 @@ public class GenericFlywheel {
   public Command setGoal(double velocityGoalRadiansPerSecond) {
     return Commands.runOnce(
         () -> {
-          isClosedLoop = true;
           this.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond;
         });
   }
@@ -62,7 +57,6 @@ public class GenericFlywheel {
   public Command setVoltage(double volts) {
     return Commands.runOnce(
         () -> {
-          isClosedLoop = false;
           this.voltageGoalVolts = volts;
         });
   }
@@ -90,6 +84,7 @@ public class GenericFlywheel {
 
   public SysIdRoutine getCharacterization(
       double rampVoltage, double stepVoltage, double timeoutSeconds, Subsystem subsystem) {
+    currentState = FlywheelState.IDLE;     
     return new SysIdRoutine(
         new SysIdRoutine.Config(
             Volts.of(rampVoltage).per(Second),
@@ -98,4 +93,11 @@ public class GenericFlywheel {
             (state) -> Logger.recordOutput(aKitTopic + "/SysID State", state.toString())),
         new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
   }
+
+  public enum FlywheelState {
+        VELOCITY_VOLTAGE_CONTROL,
+        VELOCITY_TORQUE_CONTROL,
+        VOLTAGE_CONTROL,
+        IDLE
+    }
 }
