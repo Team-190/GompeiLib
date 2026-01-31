@@ -22,7 +22,6 @@ public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
   private double offset;
 
   private double motorVoltageDrive;
-
   private double motorVoltageSteer;
 
   public SwerveModuleIOTalonFXSim(

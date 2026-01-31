@@ -19,11 +19,8 @@ public class GenericFlywheelConstants {
 
   public final Gains GAINS;
   public final Constraints CONSTRAINTS;
-  public final double GEAR_RATIO;
 
   public final InvertedValue INVERSION;
-
-  public final int NUM_MOTORS = 2;
 
   public GenericFlywheelConstants(
       int[] CAN_IDS,
@@ -31,14 +28,11 @@ public class GenericFlywheelConstants {
       boolean ENABLE_FOC,
       double CURRENT_LIMIT,
       double MOMENT_OF_INERTIA,
-      double GEAR_RATIO,
-      DCMotor[] MOTOR_CONFIGS,
-
       Gains GAINS,
       DCMotor MOTOR_CONFIG,
       Constraints CONSTRAINTS,
-      double GEAR_RATIO,
-      InvertedValue INVERSION) {
+      InvertedValue INVERSION,
+      double GEAR_RATIO) {
     this.CAN_IDS = CAN_IDS;
     this.ON_CANIVORE = ON_CANIVORE;
     this.ENABLE_FOC = ENABLE_FOC;
@@ -47,7 +41,6 @@ public class GenericFlywheelConstants {
     this.GAINS = GAINS;
     this.MOTOR_CONFIG = MOTOR_CONFIG;
     this.CONSTRAINTS = CONSTRAINTS;
-    this.GEAR_RATIO = GEAR_RATIO;
     this.INVERSION = INVERSION;
     this.GEAR_RATIO = GEAR_RATIO;
   }

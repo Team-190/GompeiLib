@@ -35,8 +35,6 @@ public class SwerveDriveConstants {
   public final double ODOMETRY_FREQUENCY;
   public final double DRIVER_DEADBAND;
   public final double OPERATOR_DEADBAND;
-  public final double GEAR_RATIO;
-  private final DCMotor MOTOR_CONFIG;
 
   public SwerveDriveConstants(
       DriveConfig driveConfig,
@@ -58,8 +56,6 @@ public class SwerveDriveConstants {
     this.ODOMETRY_FREQUENCY = odometryFrequency;
     this.DRIVER_DEADBAND = driverDeadband;
     this.OPERATOR_DEADBAND = operatorDeadband;
-    this.MOTOR_CONFIG = DCMotor.getKrakenX60Foc(1);
-    this.GEAR_RATIO = 0.067;
   }
 
   public record DriveConfig(
