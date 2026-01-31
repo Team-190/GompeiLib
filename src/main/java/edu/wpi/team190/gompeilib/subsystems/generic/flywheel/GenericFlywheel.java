@@ -120,10 +120,10 @@ public class GenericFlywheel {
 
   public void setProfile(
       double maxAccelerationRadiansPerSecondSquared,
-      double cruisingVelocity,
+      double cruisingVelocityRadiansPerSecond,
       double goalToleranceRadiansPerSecond) {
     io.setProfile(
-        maxAccelerationRadiansPerSecondSquared, cruisingVelocity, goalToleranceRadiansPerSecond);
+        maxAccelerationRadiansPerSecondSquared, cruisingVelocityRadiansPerSecond, goalToleranceRadiansPerSecond);
   }
 
   public Command sysIdRoutine() {
