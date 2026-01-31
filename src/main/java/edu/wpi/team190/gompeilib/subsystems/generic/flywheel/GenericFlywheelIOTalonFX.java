@@ -7,11 +7,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -42,6 +38,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   private final NeutralOut neutralControlRequest;
   private final VoltageOut voltageControlRequest;
+  private final TorqueCurrentFOC torqueCurrentFOCRequest;
   private final VelocityVoltage velocityControlRequest;
   private final MotionMagicVelocityTorqueCurrentFOC velocityTorqueCurrentRequest;
 
@@ -140,6 +137,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
     neutralControlRequest = new NeutralOut();
     voltageControlRequest = new VoltageOut(0.0);
+    torqueCurrentFOCRequest = new TorqueCurrentFOC(0.0);
 
     velocityControlRequest = new VelocityVoltage(0);
     velocityTorqueCurrentRequest = new MotionMagicVelocityTorqueCurrentFOC(0.0);
@@ -175,6 +173,11 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   @Override
   public void setVoltage(double volts) {
     talonFX.setControl(voltageControlRequest.withOutput(volts).withEnableFOC(constants.ENABLE_FOC));
+  }
+
+  @Override
+  public void setAmps(double amps) {
+    talonFX.setControl(torqueCurrentFOCRequest.withOutput(amps));
   }
 
   @Override

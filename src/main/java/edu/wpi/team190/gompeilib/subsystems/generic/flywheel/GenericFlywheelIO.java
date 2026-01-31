@@ -26,6 +26,9 @@ public interface GenericFlywheelIO {
   public default void setVoltage(double volts) {}
   ;
 
+  public default void setAmps(double amps) {}
+  ;
+
   public default void setVelocity(double velocityRadiansPerSecond) {}
   ;
 
