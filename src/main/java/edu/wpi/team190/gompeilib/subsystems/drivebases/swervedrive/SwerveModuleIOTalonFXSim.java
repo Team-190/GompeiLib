@@ -1,23 +1,17 @@
 package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
-import edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive.SwerveDriveConstants;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
 
-public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX { 
+public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
 
   private final DCMotorSim steerMotorSim;
   private final DCMotorSim driveMotorSim;
@@ -31,7 +25,10 @@ public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
 
   private double motorVoltageSteer;
 
-  public SwerveModuleIOTalonFXSim(SwerveDriveConstants driveConstants, SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants) {
+  public SwerveModuleIOTalonFXSim(
+      SwerveDriveConstants driveConstants,
+      SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+          constants) {
     // steerMotorSim = motor.getSimState();
     super(driveConstants, constants);
     driveMotorSim =
@@ -67,8 +64,6 @@ public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
         driveMotorSim.getAngularVelocityRadPerSec() / (Math.PI * 2) * driveMotorSim.getGearing();
     driveController.setRawRotorPosition(rotorPositionRotationsDrive);
     driveController.setRotorVelocity(rotorVelocityRotationsPerSecondDrive);
-    
-
 
     steerController.setSupplyVoltage(RobotController.getBatteryVoltage());
     motorVoltageSteer = steerController.getMotorVoltage();
