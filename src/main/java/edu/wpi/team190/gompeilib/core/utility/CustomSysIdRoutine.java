@@ -34,51 +34,51 @@ public class CustomSysIdRoutine<U extends Unit> extends SysIdRoutineLog {
    */
   public CustomSysIdRoutine(
       Config<U> config, Mechanism<U> mechanism, MutableMeasure<U, ?, ?> initialMutable) {
-    super(mechanism.m_name);
+    super(mechanism.name);
     this.config = config;
     this.mechanism = mechanism;
     outputValue = initialMutable;
-    recordState = config.m_recordState != null ? config.m_recordState : this::recordState;
+    recordState = config.recordState != null ? config.recordState : this::recordState;
   }
 
   /**
-   * @param m_rampRate We use Measure<Unit> for ramp rate because it is U/Time.
+   * @param rampRate We use Measure<Unit> for ramp rate because it is U/Time.
    */
   public record Config<U extends Unit>(
-      Per<U, TimeUnit> m_rampRate,
-      Measure<U> m_stepOutput,
-      Measure<TimeUnit> m_timeout,
-      Consumer<State> m_recordState,
-      U m_outputUnit) {
+      Per<U, TimeUnit> rampRate,
+      Measure<U> stepOutput,
+      Measure<TimeUnit> timeout,
+      Consumer<State> recordState,
+      U outputUnit) {
     public Config(
-        Per<U, TimeUnit> m_rampRate,
-        Measure<U> m_stepOutput,
-        Measure<TimeUnit> m_timeout,
-        Consumer<State> m_recordState,
-        U m_outputUnit) {
-      this.m_rampRate = m_rampRate;
-      this.m_stepOutput = m_stepOutput;
-      this.m_timeout = m_timeout != null ? m_timeout : Seconds.of(10);
-      this.m_recordState = m_recordState;
-      this.m_outputUnit = m_outputUnit;
+        Per<U, TimeUnit> rampRate,
+        Measure<U> stepOutput,
+        Measure<TimeUnit> timeout,
+        Consumer<State> recordState,
+        U outputUnit) {
+      this.rampRate = rampRate;
+      this.stepOutput = stepOutput;
+      this.timeout = timeout != null ? timeout : Seconds.of(10);
+      this.recordState = recordState;
+      this.outputUnit = outputUnit;
     }
   }
 
   public static class Mechanism<U extends Unit> {
-    public final Consumer<Measure<U>> m_drive;
-    public final Consumer<SysIdRoutineLog> m_log;
-    public final Subsystem m_subsystem;
-    public final String m_name;
+    public final Consumer<Measure<U>> drive;
+    public final Consumer<SysIdRoutineLog> log;
+    public final Subsystem subsystem;
+    public final String name;
 
     public Mechanism(
         Consumer<Measure<U>> drive,
         Consumer<SysIdRoutineLog> log,
         Subsystem subsystem,
         String name) {
-      m_drive = drive;
-      m_log = log != null ? log : l -> {};
-      m_subsystem = subsystem;
-      m_name = name != null ? name : subsystem.getName();
+      this.drive = drive;
+      this.log = log != null ? log : l -> {};
+      this.subsystem = subsystem;
+      this.name = name != null ? name : subsystem.getName();
     }
 
     public Mechanism(Consumer<Measure<U>> drive, Subsystem subsystem) {
@@ -98,29 +98,29 @@ public class CustomSysIdRoutine<U extends Unit> extends SysIdRoutineLog {
     double outputSign = (direction == Direction.kForward) ? 1.0 : -1.0;
     Timer timer = new Timer();
 
-    double rampRateUnitsPerSec = config.m_rampRate.magnitude();
+    double rampRateUnitsPerSec = config.rampRate.magnitude();
 
     return mechanism
-        .m_subsystem
+        .subsystem
         .runOnce(timer::restart)
         .andThen(
-            mechanism.m_subsystem.run(
+            mechanism.subsystem.run(
                 () -> {
-                  mechanism.m_drive.accept(
+                  mechanism.drive.accept(
                       outputValue.mut_replace(
-                          outputSign * timer.get() * rampRateUnitsPerSec, config.m_outputUnit));
+                          outputSign * timer.get() * rampRateUnitsPerSec, config.outputUnit));
 
-                  mechanism.m_log.accept(this);
+                  mechanism.log.accept(this);
                   recordState.accept(state);
                 }))
         .finallyDo(
             () -> {
-              mechanism.m_drive.accept(outputValue.mut_replace(0, config.m_outputUnit));
+              mechanism.drive.accept(outputValue.mut_replace(0, config.outputUnit));
               recordState.accept(State.kNone);
               timer.stop();
             })
-        .withName("sysid-" + state + "-" + mechanism.m_name)
-        .withTimeout(config.m_timeout.in(Seconds));
+        .withName("sysid-" + state + "-" + mechanism.name)
+        .withTimeout(config.timeout.in(Seconds));
   }
 
   public Command dynamic(Direction direction) {
@@ -128,24 +128,24 @@ public class CustomSysIdRoutine<U extends Unit> extends SysIdRoutineLog {
     State state = (direction == Direction.kForward) ? State.kDynamicForward : State.kDynamicReverse;
 
     // OPTIMIZED: Pre-calculate step magnitude safely
-    double stepMagnitude = config.m_stepOutput.in(config.m_outputUnit);
+    double stepMagnitude = config.stepOutput.in(config.outputUnit);
 
     return mechanism
-        .m_subsystem
-        .runOnce(() -> outputValue.mut_replace(stepMagnitude * outputSign, config.m_outputUnit))
+        .subsystem
+        .runOnce(() -> outputValue.mut_replace(stepMagnitude * outputSign, config.outputUnit))
         .andThen(
-            mechanism.m_subsystem.run(
+            mechanism.subsystem.run(
                 () -> {
-                  mechanism.m_drive.accept(outputValue);
-                  mechanism.m_log.accept(this);
+                  mechanism.drive.accept(outputValue);
+                  mechanism.log.accept(this);
                   recordState.accept(state);
                 }))
         .finallyDo(
             () -> {
-              mechanism.m_drive.accept(outputValue.mut_replace(0, config.m_outputUnit));
+              mechanism.drive.accept(outputValue.mut_replace(0, config.outputUnit));
               recordState.accept(State.kNone);
             })
-        .withName("sysid-" + state.toString() + "-" + mechanism.m_name)
-        .withTimeout(config.m_timeout.in(Seconds));
+        .withName("sysid-" + state.toString() + "-" + mechanism.name)
+        .withTimeout(config.timeout.in(Seconds));
   }
 }
