@@ -1,7 +1,7 @@
 [versions]
 wpilib = "2026.2.1"
 phoenix6 = "26.1.1"
-choreo = "2026.0.0"
+choreo = "2026.0.1"
 aspectj = "1.9.21"
 advantagekit = "26.0.0"
 quickbuf = "1.4"
