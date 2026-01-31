@@ -3,6 +3,9 @@ package edu.wpi.team190.gompeilib.subsystems.elevator;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 
+import java.util.concurrent.locks.ReentrantLock;
+import com.ctre.phoenix6.hardware.TalonFX;
+
 public class ElevatorConstants {
   public final int ELEVATOR_CAN_ID;
   public final boolean ON_CANIVORE;
@@ -17,6 +20,11 @@ public class ElevatorConstants {
   public final Gains SLOT1_GAINS;
   public final Gains SLOT2_GAINS;
   public final Constraints CONSTRAINTS;
+  
+  public final int[] CLOCKWISE_CAN_IDS;
+  public final int[] COUNTERCLOCKWISE_CAN_IDS;
+    
+  public TalonFX talonFX;
 
   public ElevatorConstants(
       int ELEVATOR_CAN_ID,
@@ -29,7 +37,11 @@ public class ElevatorConstants {
       Gains SLOT0_GAINS,
       Gains SLOT1_GAINS,
       Gains SLOT2_GAINS,
-      Constraints CONSTRAINTS) {
+      Constraints CONSTRAINTS,
+      int[] CLOCKWISE_CAN_IDS,
+      int[] COUNTERCLOCKWISE_CAN_IDS) {
+    
+    this.lock = new ReentrantLock();
 
     this.ELEVATOR_CAN_ID = ELEVATOR_CAN_ID;
     this.ON_CANIVORE = ON_CANIVORE;
@@ -44,6 +56,9 @@ public class ElevatorConstants {
     this.SLOT1_GAINS = SLOT1_GAINS;
     this.SLOT2_GAINS = SLOT2_GAINS;
     this.CONSTRAINTS = CONSTRAINTS;
+
+    this.COUNTERCLOCKWISE_CAN_IDS = COUNTERCLOCKWISE_CAN_IDS;
+    this.CLOCKWISE_CAN_IDS = CLOCKWISE_CAN_IDS;
   }
 
   public record Gains(

@@ -28,7 +28,7 @@ public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
       SwerveDriveConstants driveConstants,
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
-
+    // steerMotorSim = motor.getSimState();
     super(driveConstants, constants);
     driveMotorSim =
         new DCMotorSim(
