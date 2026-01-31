@@ -28,7 +28,7 @@ public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
       SwerveDriveConstants driveConstants,
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
-    // steerMotorSim = motor.getSimState();
+
     super(driveConstants, constants);
     driveMotorSim =
         new DCMotorSim(
@@ -49,7 +49,6 @@ public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
   @Override
   @Trace
   public void updateInputs(ModuleIOInputs inputs) {
-
     driveController.setSupplyVoltage(RobotController.getBatteryVoltage());
     motorVoltageDrive = driveController.getMotorVoltage();
 

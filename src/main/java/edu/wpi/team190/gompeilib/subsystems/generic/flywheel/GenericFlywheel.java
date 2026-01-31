@@ -41,7 +41,6 @@ public class GenericFlywheel {
             new CustomSysIdRoutine.Mechanism<>((amps) -> io.setAmps(amps.in(Amp)), subsystem),
             Amp.mutable(0));
 
-    // Fix for Voltage
     voltageCharacterizationRoutine =
         new CustomSysIdRoutine<>(
             new CustomSysIdRoutine.Config<VoltageUnit>(
@@ -59,7 +58,6 @@ public class GenericFlywheel {
     voltageGoalVolts = 0;
 
     currentState = GenericFlywheelState.IDLE;
-    ;
   }
 
   public void periodic() {
@@ -123,7 +121,9 @@ public class GenericFlywheel {
       double cruisingVelocityRadiansPerSecond,
       double goalToleranceRadiansPerSecond) {
     io.setProfile(
-        maxAccelerationRadiansPerSecondSquared, cruisingVelocityRadiansPerSecond, goalToleranceRadiansPerSecond);
+        maxAccelerationRadiansPerSecondSquared,
+        cruisingVelocityRadiansPerSecond,
+        goalToleranceRadiansPerSecond);
   }
 
   public Command sysIdRoutine() {

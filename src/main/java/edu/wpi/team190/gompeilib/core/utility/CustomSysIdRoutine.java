@@ -6,7 +6,6 @@ package edu.wpi.team190.gompeilib.core.utility;
 
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
-import static java.util.Map.entry;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
@@ -16,7 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import java.util.Map;
+
 import java.util.function.Consumer;
 
 /**
@@ -25,12 +24,12 @@ import java.util.function.Consumer;
  * @param <U> The unit type for the output (e.g., VoltageUnit, CurrentUnit)
  */
 public class CustomSysIdRoutine<U extends Unit> extends SysIdRoutineLog {
-  private final Config<U> m_config;
-  private final Mechanism<U> m_mechanism;
-  private final MutableMeasure<U, ?, ?> m_outputValue;
-  private final Consumer<State> m_recordState;
+  private final Config<U> config;
+  private final Mechanism<U> mechanism;
+  private final MutableMeasure<U, ?, ?> outputValue;
+  private final Consumer<State> recordState;
 
-  private final Unit m_rampRateUnit;
+  private final Unit rampRateUnit;
 
   /**
    * Create a new SysId characterization routine. * @param config Configuration with strongly typed
@@ -42,12 +41,12 @@ public class CustomSysIdRoutine<U extends Unit> extends SysIdRoutineLog {
   public CustomSysIdRoutine(
       Config<U> config, Mechanism<U> mechanism, MutableMeasure<U, ?, ?> initialMutable) {
     super(mechanism.m_name);
-    m_config = config;
-    m_mechanism = mechanism;
-    m_outputValue = initialMutable;
-    m_recordState = config.m_recordState != null ? config.m_recordState : this::recordState;
+    this.config = config;
+    this.mechanism = mechanism;
+    outputValue = initialMutable;
+    recordState = config.m_recordState != null ? config.m_recordState : this::recordState;
 
-    m_rampRateUnit = config.m_outputUnit.per(Second);
+    rampRateUnit = config.m_outputUnit.per(Second);
   }
 
   /**
@@ -107,58 +106,56 @@ public class CustomSysIdRoutine<U extends Unit> extends SysIdRoutineLog {
     double outputSign = (direction == Direction.kForward) ? 1.0 : -1.0;
     Timer timer = new Timer();
 
-    double rampRateUnitsPerSec = m_config.m_rampRate.in(m_rampRateUnit);
+    double rampRateUnitsPerSec = config.m_rampRate.in(rampRateUnit);
 
-    return m_mechanism
+    return mechanism
         .m_subsystem
         .runOnce(timer::restart)
         .andThen(
-            m_mechanism.m_subsystem.run(
+            mechanism.m_subsystem.run(
                 () -> {
-                  m_mechanism.m_drive.accept(
-                      m_outputValue.mut_replace(
-                          outputSign * timer.get() * rampRateUnitsPerSec, m_config.m_outputUnit));
+                  mechanism.m_drive.accept(
+                      outputValue.mut_replace(
+                          outputSign * timer.get() * rampRateUnitsPerSec, config.m_outputUnit));
 
-                  m_mechanism.m_log.accept(this);
-                  m_recordState.accept(state);
+                  mechanism.m_log.accept(this);
+                  recordState.accept(state);
                 }))
         .finallyDo(
             () -> {
-              m_mechanism.m_drive.accept(m_outputValue.mut_replace(0, m_config.m_outputUnit));
-              m_recordState.accept(State.kNone);
+              mechanism.m_drive.accept(outputValue.mut_replace(0, config.m_outputUnit));
+              recordState.accept(State.kNone);
               timer.stop();
             })
-        .withName("sysid-" + state + "-" + m_mechanism.m_name)
-        .withTimeout(m_config.m_timeout.in(Seconds));
+        .withName("sysid-" + state + "-" + mechanism.m_name)
+        .withTimeout(config.m_timeout.in(Seconds));
   }
 
   public Command dynamic(Direction direction) {
     double outputSign = (direction == Direction.kForward) ? 1.0 : -1.0;
-    State state =
-        Map.ofEntries(
-                entry(Direction.kForward, State.kDynamicForward),
-                entry(Direction.kReverse, State.kDynamicReverse))
-            .get(direction);
+      State state =
+              (direction == Direction.kForward) ? State.kDynamicForward : State.kDynamicReverse;
 
-    // OPTIMIZED: Pre-calculate step magnitude safely
-    double stepMagnitude = m_config.m_stepOutput.in(m_config.m_outputUnit);
 
-    return m_mechanism
+      // OPTIMIZED: Pre-calculate step magnitude safely
+    double stepMagnitude = config.m_stepOutput.in(config.m_outputUnit);
+
+    return mechanism
         .m_subsystem
-        .runOnce(() -> m_outputValue.mut_replace(stepMagnitude * outputSign, m_config.m_outputUnit))
+        .runOnce(() -> outputValue.mut_replace(stepMagnitude * outputSign, config.m_outputUnit))
         .andThen(
-            m_mechanism.m_subsystem.run(
+            mechanism.m_subsystem.run(
                 () -> {
-                  m_mechanism.m_drive.accept(m_outputValue);
-                  m_mechanism.m_log.accept(this);
-                  m_recordState.accept(state);
+                  mechanism.m_drive.accept(outputValue);
+                  mechanism.m_log.accept(this);
+                  recordState.accept(state);
                 }))
         .finallyDo(
             () -> {
-              m_mechanism.m_drive.accept(m_outputValue.mut_replace(0, m_config.m_outputUnit));
-              m_recordState.accept(State.kNone);
+              mechanism.m_drive.accept(outputValue.mut_replace(0, config.m_outputUnit));
+              recordState.accept(State.kNone);
             })
-        .withName("sysid-" + state.toString() + "-" + m_mechanism.m_name)
-        .withTimeout(m_config.m_timeout.in(Seconds));
+        .withName("sysid-" + state.toString() + "-" + mechanism.m_name)
+        .withTimeout(config.m_timeout.in(Seconds));
   }
 }
