@@ -17,6 +17,7 @@ import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   private final TalonFX talonFX;
@@ -72,12 +73,13 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     talonFX.getConfigurator().apply(talonFXConfiguration);
     for (TalonFX follower : followerTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
-      follower.setControl(
-          new Follower(
-              talonFX.getDeviceID(),
-              (follower.getDeviceID() % 2 == 1)
-                  ? MotorAlignmentValue.Aligned
-                  : MotorAlignmentValue.Opposed));
+      for (int i = 0; i < constants.CAN_IDS.length; i++) {
+        if (Arrays.asList(constants.COUNTERCLOCKWISE_CAN_IDS).contains(follower.getDeviceID())) {
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
+        } else {
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
+        }
+      }
 
       talonFXConfiguration.MotionMagic =
           new MotionMagicConfigs()

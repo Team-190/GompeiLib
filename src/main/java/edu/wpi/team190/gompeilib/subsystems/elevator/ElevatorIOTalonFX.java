@@ -14,6 +14,7 @@ import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
 
@@ -106,12 +107,13 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
     for (TalonFX follower : followTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config));
-      follower.setControl(
-          new Follower(
-              talonFX.getDeviceID(),
-              (follower.getDeviceID() % 2 == 1)
-                  ? MotorAlignmentValue.Aligned
-                  : MotorAlignmentValue.Opposed));
+      for (int i = 0; i < constants.CAN_IDS.length; i++) {
+        if (Arrays.asList(constants.COUNTERCLOCKWISE_CAN_IDS).contains(follower.getDeviceID())) {
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
+        } else {
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
+        }
+      }
     }
 
     appliedVolts = new ArrayList<>();

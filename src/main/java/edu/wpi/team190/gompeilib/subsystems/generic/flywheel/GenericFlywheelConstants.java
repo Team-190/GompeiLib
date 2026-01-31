@@ -15,12 +15,15 @@ public class GenericFlywheelConstants {
   public final double MOMENT_OF_INERTIA;
   public final double GEAR_RATIO;
 
+  public final InvertedValue INVERSION;
+
   public final DCMotor MOTOR_CONFIG;
 
   public final Gains GAINS;
   public final Constraints CONSTRAINTS;
 
-  public final InvertedValue INVERSION;
+  public final int[] COUNTERCLOCKWISE_CAN_IDS;
+  public final int[] CLOCKWISE_CAN_IDS;
 
   public GenericFlywheelConstants(
       int[] CAN_IDS,
@@ -30,9 +33,12 @@ public class GenericFlywheelConstants {
       double MOMENT_OF_INERTIA,
       Gains GAINS,
       DCMotor MOTOR_CONFIG,
+      int[] CLOCKWISE_CAN_IDS,
+      int[] COUNTERCLOCKWISE_CAN_IDS,
       Constraints CONSTRAINTS,
-      InvertedValue INVERSION,
-      double GEAR_RATIO) {
+      double GEAR_RATIO,
+      InvertedValue INVERSION) {
+
     this.CAN_IDS = CAN_IDS;
     this.ON_CANIVORE = ON_CANIVORE;
     this.ENABLE_FOC = ENABLE_FOC;
@@ -41,8 +47,10 @@ public class GenericFlywheelConstants {
     this.GAINS = GAINS;
     this.MOTOR_CONFIG = MOTOR_CONFIG;
     this.CONSTRAINTS = CONSTRAINTS;
-    this.INVERSION = INVERSION;
+    this.COUNTERCLOCKWISE_CAN_IDS = COUNTERCLOCKWISE_CAN_IDS;
+    this.CLOCKWISE_CAN_IDS = CLOCKWISE_CAN_IDS;
     this.GEAR_RATIO = GEAR_RATIO;
+    this.INVERSION = INVERSION;
   }
 
   public record Gains(
