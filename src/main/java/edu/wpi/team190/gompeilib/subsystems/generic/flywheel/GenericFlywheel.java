@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.team190.gompeilib.core.utility.CustomSysIdRoutine;
+import edu.wpi.team190.gompeilib.core.utility.CustomUnits;
 import org.littletonrobotics.junction.Logger;
 
 public class GenericFlywheel {
@@ -31,8 +32,8 @@ public class GenericFlywheel {
     torqueCharacterizationRoutine =
         new CustomSysIdRoutine<>(
             new CustomSysIdRoutine.Config<CurrentUnit>(
-                (Measure) Amp.of(0.5).per(Second),
-                Amp.of(3.5),
+                CustomUnits.ampsPerSecond.ofNative(0.5),
+                Amps.of(3.5),
                 Seconds.of(10),
                 (state) ->
                     Logger.recordOutput(
@@ -44,7 +45,7 @@ public class GenericFlywheel {
     voltageCharacterizationRoutine =
         new CustomSysIdRoutine<>(
             new CustomSysIdRoutine.Config<VoltageUnit>(
-                (Measure) Volts.of(0.5).per(Second),
+                CustomUnits.voltsPerSecond.ofNative(0.5),
                 Volts.of(3.5),
                 Seconds.of(10),
                 (state) ->
