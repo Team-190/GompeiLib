@@ -15,13 +15,17 @@ public class GenericFlywheelConstants {
 
   public final Gains GAINS;
   public final Constraints CONSTRAINTS;
+  public final double GEAR_RATIO;
 
   public final InvertedValue INVERSION;
+
+  public final int NUM_MOTORS = 2;
 
   public GenericFlywheelConstants(
       int[] CAN_IDS,
       double CURRENT_LIMIT,
       double MOMENT_OF_INERTIA,
+      double GEAR_RATIO,
       DCMotor[] MOTOR_CONFIGS,
       Gains GAINS,
       Constraints CONSTRAINTS,
@@ -33,6 +37,7 @@ public class GenericFlywheelConstants {
     this.GAINS = GAINS;
     this.CONSTRAINTS = CONSTRAINTS;
     this.INVERSION = INVERSION;
+    this.GEAR_RATIO = GEAR_RATIO;
   }
 
   public record Gains(
