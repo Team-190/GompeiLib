@@ -1,39 +1,33 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
-import edu.wpi.team190.gompeilib.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
-import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
 
-public class Elevator extends SubsystemBase {
+public class Elevator {
   public final ElevatorIO io;
   public final ElevatorConstants elevatorConstants;
   public final ElevatorIOInputsAutoLogged inputs;
 
-  private boolean isClosedLoop;
-  private double position;
-  private double positionGoalMeters;
+  private final String aKitTopic;
 
-  public Elevator(ElevatorConstants elevatorConstants, ElevatorIO io) {
+  public Elevator(
+      ElevatorConstants elevatorConstants, Subsystem subsystem, int index, ElevatorIO io) {
     this.io = io;
     this.elevatorConstants = elevatorConstants;
     this.inputs = new ElevatorIOInputsAutoLogged();
+
+    aKitTopic = subsystem.getName() + "/Elevators" + index;
   }
 
   @Trace
   public void periodic() {
-    elevatorConstants.lock.lock();
     io.updateInputs(inputs);
-    elevatorConstants.lock.unlock();
-
-    Logger.processInputs("Elevator", inputs);
-    Logger.recordOutput("Elevator/Position", position);
-
-    if (isClosedLoop) {
-      io.setPositionGoal(positionGoalMeters);
-    }
+    Logger.processInputs(aKitTopic, inputs);
   }
 
   public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG) {
@@ -49,26 +43,30 @@ public class Elevator extends SubsystemBase {
     io.updateConstraints(maxAcceleration, cruisingVelocity);
   }
 
-  public void updateInputs(ElevatorIOInputs inputs) {
-    io.updateInputs(inputs);
-    Logger.processInputs("Elevator", this.inputs);
-  }
-
   public void setPosition(double positionMeters) {
-    inputs.positionMeters = positionMeters;
+    io.setPosition(positionMeters);
   }
 
   public void setPositionGoal(double positionMeters) {
-    inputs.positionMeters = positionMeters;
-    isClosedLoop = true;
+    io.setPositionGoal(positionMeters);
   }
 
   public void setVoltage(double volts) {
-    Arrays.fill(inputs.appliedVolts, volts);
-    isClosedLoop = false;
+    io.setVoltage(volts);
   }
 
   public double getPositionMeters() {
     return inputs.positionMeters;
+  }
+
+  public SysIdRoutine getCharacterization(
+      double rampVoltage, double stepVoltage, double timeoutSeconds, Subsystem subsystem) {
+    return new SysIdRoutine(
+        new SysIdRoutine.Config(
+            Volts.of(rampVoltage).per(Second),
+            Volts.of(stepVoltage),
+            Seconds.of(timeoutSeconds),
+            (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
+        new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
   }
 }

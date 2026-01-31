@@ -6,8 +6,15 @@ plugins {
     id "io.freefair.aspectj.post-compile-weaving" version "8.4"
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+
 group = 'edu.wpi.team190'
-version = '2026.1.1'
+version = project.hasProperty("releaseVersion") ? project.property("releaseVersion") : "0.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -41,28 +48,33 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-if (System.getenv("CI") == "true") {
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                from components.java
-            }
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId = group
+            artifactId = "gompeilib" // or whatever you want the artifact name to be
+            version = version
         }
-        repositories {
+    }
+
+    repositories {
+        // GitHub Packages ONLY in CI
+        if (System.getenv("CI") == "true") {
             maven {
                 name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/Team-190/GompeiLib") // Assuming this is your URL
+                url = uri("https://maven.pkg.github.com/Team-190/GompeiLib")
                 credentials {
-                    // This uses findProperty, which safely returns null if the property
-                    // isn't found, preventing the "Could not get unknown property" error
-                    // during local builds without credentials.
                     username = System.getenv("GPR_USER") ?: project.findProperty("gpr.user")
                     password = System.getenv("GPR_KEY") ?: project.findProperty("gpr.key")
                 }
             }
         }
+        // NOTE: DO NOT add mavenLocal() here
+        // Gradle already provides publishToMavenLocal automatically
     }
 }
+
 
 
 test {
@@ -109,4 +121,8 @@ spotless {
         indentWithSpaces(2)
         endWithNewline()
     }
+}
+
+tasks.named("build") {
+    dependsOn(gradle.includedBuild("swerve").task(":build"))
 }

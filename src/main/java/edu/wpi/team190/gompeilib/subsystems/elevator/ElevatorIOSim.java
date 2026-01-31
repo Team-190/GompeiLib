@@ -18,7 +18,7 @@ public class ElevatorIOSim implements ElevatorIO {
   private double appliedVolts;
   private boolean isClosedLoop;
 
-  private final int numMotors;
+  private final ElevatorConstants constants;
 
   public ElevatorIOSim(ElevatorConstants constants) {
     sim =
@@ -53,7 +53,7 @@ public class ElevatorIOSim implements ElevatorIO {
     appliedVolts = 0;
     isClosedLoop = true;
 
-    numMotors = constants.ELEVATOR_PARAMETERS.NUM_MOTORS();
+    this.constants = constants;
   }
 
   @Override
@@ -73,6 +73,11 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.velocityMetersPerSecond = sim.getVelocityMetersPerSecond();
     inputs.accelerationMetersPerSecondSquared =
         -1; // TODO: Replace with calculation based on velocity
+
+    inputs.appliedVolts = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
+    inputs.supplyCurrentAmps = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
+    inputs.torqueCurrentAmps = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
+    inputs.temperatureCelsius = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
 
     Arrays.fill(inputs.appliedVolts, appliedVolts);
     Arrays.fill(inputs.supplyCurrentAmps, sim.getCurrentDrawAmps());
@@ -98,6 +103,21 @@ public class ElevatorIOSim implements ElevatorIO {
   @Override
   public void setPositionGoal(double positionMeters, GainSlot slot) {
     setPositionGoal(positionMeters);
+  }
+
+  @Override
+  public void setSlot(GainSlot slot) {
+    switch (slot) {
+      case ZERO:
+        feedback.setPID(constants.SLOT0_GAINS.kP().get(), 0.0, constants.SLOT0_GAINS.kD().get());
+        break;
+      case ONE:
+        feedback.setPID(constants.SLOT1_GAINS.kP().get(), 0.0, constants.SLOT1_GAINS.kD().get());
+        break;
+      case TWO:
+        feedback.setPID(constants.SLOT2_GAINS.kP().get(), 0.0, constants.SLOT2_GAINS.kD().get());
+        break;
+    }
   }
 
   @Override
