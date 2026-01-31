@@ -14,9 +14,11 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
 
   private final FlywheelSim motorSim;
 
+  private FlywheelSim sim;
+
   private final PIDController feedback;
-  private final LinearProfile profile;
   private SimpleMotorFeedforward feedforward;
+  private final LinearProfile profile;
 
   private double appliedVolts;
 
