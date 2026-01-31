@@ -1,10 +1,9 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
-
 import java.util.concurrent.locks.ReentrantLock;
-import com.ctre.phoenix6.hardware.TalonFX;
 
 public class ElevatorConstants {
   public final int ELEVATOR_CAN_ID;
@@ -20,10 +19,12 @@ public class ElevatorConstants {
   public final Gains SLOT1_GAINS;
   public final Gains SLOT2_GAINS;
   public final Constraints CONSTRAINTS;
-  
+
   public final int[] CLOCKWISE_CAN_IDS;
   public final int[] COUNTERCLOCKWISE_CAN_IDS;
-    
+
+  public final ReentrantLock lock;
+
   public TalonFX talonFX;
 
   public ElevatorConstants(
@@ -40,7 +41,7 @@ public class ElevatorConstants {
       Constraints CONSTRAINTS,
       int[] CLOCKWISE_CAN_IDS,
       int[] COUNTERCLOCKWISE_CAN_IDS) {
-    
+
     this.lock = new ReentrantLock();
 
     this.ELEVATOR_CAN_ID = ELEVATOR_CAN_ID;

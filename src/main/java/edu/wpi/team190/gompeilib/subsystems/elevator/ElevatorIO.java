@@ -51,11 +51,6 @@ public interface ElevatorIO {
   public void setPositionGoal(double positionMeters, GainSlot slot);
 
   /**
-   * @param slot The slot to set the elevator to.
-   */
-  public void setSlot(GainSlot slot);
-
-  /**
    * Sets the voltage for the elevator.
    *
    * @param volts The voltage of the elevator in volts.
@@ -73,7 +68,6 @@ public interface ElevatorIO {
    * @param kG the gravity gain.
    */
   public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG);
-
   /**
    * Sets the gains for the elevator.
    *

@@ -1,11 +1,7 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.NeutralOut;
@@ -14,12 +10,10 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
+import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
-import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 
 public class GenericFlywheelIOTalonFX {
   private final TalonFX talonFX;
@@ -71,17 +65,11 @@ public class GenericFlywheelIOTalonFX {
     }
     for (TalonFX follower : followerTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
-      for (int i = 0; i < constants.MOTOR_CONFIGS.length; i++){
+      for (int i = 0; i < constants.CAN_IDS.length; i++) {
         if (Arrays.asList(constants.COUNTERCLOCKWISE_CAN_IDS).contains(follower.getDeviceID())) {
-          follower.setControl(
-            new Follower(
-              talonFX.getDeviceID(),
-              MotorAlignmentValue.Opposed));
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
         } else {
-          follower.setControl(
-            new Follower(
-              talonFX.getDeviceID(),
-              MotorAlignmentValue.Aligned));
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
         }
       }
     }

@@ -50,7 +50,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
     // Create lead motor
     talonFX = new TalonFX(constants.ELEVATOR_CAN_ID);
-    
+
     // Create follower motor array (define length)
     followTalonFX = new TalonFX[constants.ELEVATOR_PARAMETERS.NUM_MOTORS() - 1];
 
@@ -107,17 +107,11 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
     for (TalonFX follower : followTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config));
-      for (int i = 0; i < constants.ELEVATOR_PARAMETERS.NUM_MOTORS(); i++){
+      for (int i = 0; i < constants.ELEVATOR_PARAMETERS.NUM_MOTORS(); i++) {
         if (Arrays.asList(constants.COUNTERCLOCKWISE_CAN_IDS).contains(follower.getDeviceID())) {
-          follower.setControl(
-            new Follower(
-              talonFX.getDeviceID(),
-              MotorAlignmentValue.Opposed));
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
         } else {
-          follower.setControl(
-            new Follower(
-              talonFX.getDeviceID(),
-              MotorAlignmentValue.Aligned));
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
         }
       }
     }

@@ -21,10 +21,9 @@ public class GenericFlywheelConstants {
   public final Constraints CONSTRAINTS;
 
   public final InvertedValue INVERSION;
-  
+
   public final int[] COUNTERCLOCKWISE_CAN_IDS;
   public final int[] CLOCKWISE_CAN_IDS;
-
 
   public GenericFlywheelConstants(
       int[] CAN_IDS,
@@ -35,14 +34,11 @@ public class GenericFlywheelConstants {
       Gains GAINS,
       DCMotor MOTOR_CONFIG,
       Constraints CONSTRAINTS,
+      double GEAR_RATIO,
       InvertedValue INVERSION,
-<<<<<<< Updated upstream
-      double GEAR_RATIO) {
-=======
       int[] COUNTERCLOCKWISE_CAN_IDS,
       int[] CLOCKWISE_CAN_IDS) {
 
->>>>>>> Stashed changes
     this.CAN_IDS = CAN_IDS;
     this.ON_CANIVORE = ON_CANIVORE;
     this.ENABLE_FOC = ENABLE_FOC;
@@ -52,12 +48,9 @@ public class GenericFlywheelConstants {
     this.MOTOR_CONFIG = MOTOR_CONFIG;
     this.CONSTRAINTS = CONSTRAINTS;
     this.INVERSION = INVERSION;
-<<<<<<< Updated upstream
-    this.GEAR_RATIO = GEAR_RATIO;
-=======
     this.COUNTERCLOCKWISE_CAN_IDS = COUNTERCLOCKWISE_CAN_IDS;
     this.CLOCKWISE_CAN_IDS = CLOCKWISE_CAN_IDS;
->>>>>>> Stashed changes
+    this.GEAR_RATIO = GEAR_RATIO;
   }
 
   public record Gains(
@@ -71,5 +64,4 @@ public class GenericFlywheelConstants {
       LoggedTunableNumber maxAccelerationRadiansPerSecondSquared,
       LoggedTunableNumber cruisingVelocityRadiansPerSecond,
       LoggedTunableNumber goalToleranceRadiansPerSecond) {}
-
 }
