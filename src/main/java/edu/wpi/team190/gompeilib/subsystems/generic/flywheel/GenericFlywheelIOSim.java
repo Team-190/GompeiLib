@@ -14,9 +14,11 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
 
   private final FlywheelSim motorSim;
 
+  private FlywheelSim sim;
+
   private final PIDController feedback;
-  private final LinearProfile profile;
   private SimpleMotorFeedforward feedforward;
+  private final LinearProfile profile;
 
   private double appliedVolts;
 
@@ -85,7 +87,9 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
 
   @Override
   public void setProfile(
-      double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {
+      double maxAccelerationRadiansPerSecondSquared,
+      double cruisingVelocity,
+      double goalToleranceRadiansPerSecond) {
     profile.setMaxAcceleration(maxAccelerationRadiansPerSecondSquared);
     feedback.setTolerance(goalToleranceRadiansPerSecond);
   }

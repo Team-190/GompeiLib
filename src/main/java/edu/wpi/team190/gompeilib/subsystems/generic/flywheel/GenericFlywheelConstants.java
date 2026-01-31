@@ -19,6 +19,7 @@ public class GenericFlywheelConstants {
 
   public final Gains GAINS;
   public final Constraints CONSTRAINTS;
+
   public final InvertedValue INVERSION;
 
   public GenericFlywheelConstants(
@@ -30,8 +31,8 @@ public class GenericFlywheelConstants {
       Gains GAINS,
       DCMotor MOTOR_CONFIG,
       Constraints CONSTRAINTS,
-      double GEAR_RATIO,
-      InvertedValue INVERSION) {
+      InvertedValue INVERSION,
+      double GEAR_RATIO) {
     this.CAN_IDS = CAN_IDS;
     this.ON_CANIVORE = ON_CANIVORE;
     this.ENABLE_FOC = ENABLE_FOC;
@@ -40,8 +41,8 @@ public class GenericFlywheelConstants {
     this.GAINS = GAINS;
     this.MOTOR_CONFIG = MOTOR_CONFIG;
     this.CONSTRAINTS = CONSTRAINTS;
-    this.GEAR_RATIO = GEAR_RATIO;
     this.INVERSION = INVERSION;
+    this.GEAR_RATIO = GEAR_RATIO;
   }
 
   public record Gains(
