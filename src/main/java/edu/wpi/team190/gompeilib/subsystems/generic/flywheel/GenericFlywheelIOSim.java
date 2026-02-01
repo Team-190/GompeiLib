@@ -14,9 +14,11 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
 
   private final FlywheelSim motorSim;
 
+  private FlywheelSim sim;
+
   private final PIDController feedback;
-  private final LinearProfile profile;
   private SimpleMotorFeedforward feedforward;
+  private final LinearProfile profile;
 
   private double appliedVolts;
 
@@ -74,6 +76,41 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
   }
 
   @Override
+  public void setAmps(double amps) {
+    double omega = motorSim.getAngularVelocityRadPerSec();
+
+    var motor = motorSim.getGearbox();
+
+    double Kv = motor.KvRadPerSecPerVolt;
+    double R = motor.rOhms;
+
+    appliedVolts = omega / Kv + amps * R;
+  }
+
+  @Override
+  public void setVelocityTorque(double velocityRadiansPerSecond) {
+    // Motion profile stays the same
+    profile.setGoal(velocityRadiansPerSecond, motorSim.getAngularVelocityRadPerSec());
+
+    double omega = motorSim.getAngularVelocityRadPerSec();
+    double setpoint = profile.calculateSetpoint();
+
+    // Velocity PID → amps (torque)
+    double amps = feedback.calculate(omega, setpoint);
+
+    // Optional current limit
+    amps = MathUtil.clamp(amps, -constants.CURRENT_LIMIT, constants.CURRENT_LIMIT);
+
+    // Amps → volts using motor physics
+    var motor = motorSim.getGearbox();
+
+    double Kv = motor.KvRadPerSecPerVolt;
+    double R = motor.rOhms;
+
+    appliedVolts = omega / Kv + amps * R;
+  }
+
+  @Override
   public void setPID(double kP, double kI, double kD) {
     feedback.setPID(kP, kI, kD);
   }
@@ -85,7 +122,9 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
 
   @Override
   public void setProfile(
-      double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {
+      double maxAccelerationRadiansPerSecondSquared,
+      double cruisingVelocity,
+      double goalToleranceRadiansPerSecond) {
     profile.setMaxAcceleration(maxAccelerationRadiansPerSecondSquared);
     feedback.setTolerance(goalToleranceRadiansPerSecond);
   }

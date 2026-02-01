@@ -26,7 +26,13 @@ public interface GenericFlywheelIO {
   public default void setVoltage(double volts) {}
   ;
 
+  public default void setAmps(double amps) {}
+  ;
+
   public default void setVelocity(double velocityRadiansPerSecond) {}
+  ;
+
+  public default void setVelocityTorque(double velocityRadiansPerSecond) {}
   ;
 
   public default void setPID(double kP, double kI, double kD) {}
@@ -36,7 +42,9 @@ public interface GenericFlywheelIO {
   ;
 
   public default void setProfile(
-      double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {}
+      double maxAccelerationRadiansPerSecondSquared,
+      double cruisingVelocity,
+      double goalToleranceRadiansPerSecond) {}
   ;
 
   public default boolean atGoal() {

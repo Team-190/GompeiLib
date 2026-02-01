@@ -18,6 +18,9 @@ public class ElevatorConstants {
   public final Gains SLOT2_GAINS;
   public final Constraints CONSTRAINTS;
 
+  public final int[] CLOCKWISE_CAN_IDS;
+  public final int[] COUNTERCLOCKWISE_CAN_IDS;
+
   public ElevatorConstants(
       int ELEVATOR_CAN_ID,
       boolean ON_CANIVORE,
@@ -29,7 +32,9 @@ public class ElevatorConstants {
       Gains SLOT0_GAINS,
       Gains SLOT1_GAINS,
       Gains SLOT2_GAINS,
-      Constraints CONSTRAINTS) {
+      Constraints CONSTRAINTS,
+      int[] CLOCKWISE_CAN_IDS,
+      int[] COUNTERCLOCKWISE_CAN_IDS) {
 
     this.ELEVATOR_CAN_ID = ELEVATOR_CAN_ID;
     this.ON_CANIVORE = ON_CANIVORE;
@@ -44,6 +49,9 @@ public class ElevatorConstants {
     this.SLOT1_GAINS = SLOT1_GAINS;
     this.SLOT2_GAINS = SLOT2_GAINS;
     this.CONSTRAINTS = CONSTRAINTS;
+
+    this.CLOCKWISE_CAN_IDS = CLOCKWISE_CAN_IDS;
+    this.COUNTERCLOCKWISE_CAN_IDS = COUNTERCLOCKWISE_CAN_IDS;
   }
 
   public record Gains(

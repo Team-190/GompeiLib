@@ -2,10 +2,12 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.team190.gompeilib.core.utility.CustomSysIdRoutine;
+import edu.wpi.team190.gompeilib.core.utility.CustomUnits;
 import org.littletonrobotics.junction.Logger;
 
 public class GenericFlywheel {
@@ -13,38 +15,80 @@ public class GenericFlywheel {
   private final GenericFlywheelIOInputsAutoLogged inputs;
 
   private final String aKitTopic;
+  private final CustomSysIdRoutine<CurrentUnit> torqueCharacterizationRoutine;
+  private final CustomSysIdRoutine<VoltageUnit> voltageCharacterizationRoutine;
+
+  private GenericFlywheelState currentState;
 
   private double velocityGoalRadiansPerSecond;
   private double voltageGoalVolts;
-
-  private boolean isClosedLoop;
 
   public GenericFlywheel(GenericFlywheelIO io, Subsystem subsystem, String name) {
     this.io = io;
     inputs = new GenericFlywheelIOInputsAutoLogged();
 
-    aKitTopic = subsystem.getName() + "/" + name + " Flywheel";
+    aKitTopic = subsystem.getName() + "/" + " Flywheel" + name;
+
+    torqueCharacterizationRoutine =
+        new CustomSysIdRoutine<>(
+            new CustomSysIdRoutine.Config<CurrentUnit>(
+                CustomUnits.ampsPerSecond.ofNative(0.5),
+                Amps.of(3.5),
+                Seconds.of(10),
+                (state) ->
+                    Logger.recordOutput(
+                        aKitTopic + "/Torque Current SysID State", state.toString()),
+                Amp),
+            new CustomSysIdRoutine.Mechanism<>((amps) -> io.setAmps(amps.in(Amp)), subsystem),
+            Amp.mutable(0));
+
+    voltageCharacterizationRoutine =
+        new CustomSysIdRoutine<>(
+            new CustomSysIdRoutine.Config<VoltageUnit>(
+                CustomUnits.voltsPerSecond.ofNative(0.5),
+                Volts.of(3.5),
+                Seconds.of(10),
+                (state) ->
+                    Logger.recordOutput(aKitTopic + "/Voltage SysID State", state.toString()),
+                Volts),
+            new CustomSysIdRoutine.Mechanism<>(
+                (volts) -> io.setVoltage(volts.in(Volts)), subsystem),
+            Volts.mutable(0));
 
     velocityGoalRadiansPerSecond = 0;
     voltageGoalVolts = 0;
 
-    isClosedLoop = true;
+    currentState = GenericFlywheelState.IDLE;
   }
 
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(aKitTopic, inputs);
-    if (isClosedLoop) {
-      io.setVelocity(velocityGoalRadiansPerSecond);
-    } else {
-      io.setVoltage(voltageGoalVolts);
+
+    Logger.recordOutput(aKitTopic + "/Velocity Goal", velocityGoalRadiansPerSecond);
+    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts);
+    Logger.recordOutput(aKitTopic + "/Current State", currentState.name());
+    Logger.recordOutput(aKitTopic + "/At Goal", io.atGoal());
+
+    switch (currentState) {
+      case VELOCITY_VOLTAGE_CONTROL:
+        io.setVelocity(velocityGoalRadiansPerSecond);
+      case VELOCITY_TORQUE_CONTROL:
+        io.setVelocityTorque(velocityGoalRadiansPerSecond);
+      case VOLTAGE_CONTROL:
+        io.setVoltage(voltageGoalVolts);
+      case IDLE:
+        break;
     }
   }
 
-  public Command setGoal(double velocityGoalRadiansPerSecond) {
+  public Command setGoal(double velocityGoalRadiansPerSecond, boolean torqueControl) {
     return Commands.runOnce(
         () -> {
-          isClosedLoop = true;
+          currentState =
+              torqueControl
+                  ? GenericFlywheelState.VELOCITY_TORQUE_CONTROL
+                  : GenericFlywheelState.VELOCITY_VOLTAGE_CONTROL;
           this.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond;
         });
   }
@@ -52,9 +96,13 @@ public class GenericFlywheel {
   public Command setVoltage(double volts) {
     return Commands.runOnce(
         () -> {
-          isClosedLoop = false;
+          currentState = GenericFlywheelState.VOLTAGE_CONTROL;
           this.voltageGoalVolts = volts;
         });
+  }
+
+  public boolean atGoal() {
+    return io.atGoal();
   }
 
   public Command waitUntilAtGoal() {
@@ -70,18 +118,32 @@ public class GenericFlywheel {
   }
 
   public void setProfile(
-      double maxAccelerationRadiansPerSecondSquared, double goalToleranceRadiansPerSecond) {
-    io.setProfile(maxAccelerationRadiansPerSecondSquared, goalToleranceRadiansPerSecond);
+      double maxAccelerationRadiansPerSecondSquared,
+      double cruisingVelocityRadiansPerSecond,
+      double goalToleranceRadiansPerSecond) {
+    io.setProfile(
+        maxAccelerationRadiansPerSecondSquared,
+        cruisingVelocityRadiansPerSecond,
+        goalToleranceRadiansPerSecond);
   }
 
-  public SysIdRoutine getCharacterization(
-      double rampVoltage, double stepVoltage, double timeoutSeconds, Subsystem subsystem) {
-    return new SysIdRoutine(
-        new SysIdRoutine.Config(
-            Volts.of(rampVoltage).per(Second),
-            Volts.of(stepVoltage),
-            Seconds.of(timeoutSeconds),
-            (state) -> Logger.recordOutput(aKitTopic + "/SysID State", state.toString())),
-        new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
+  public Command sysIdRoutine() {
+    return Commands.sequence(
+        Commands.runOnce(() -> currentState = GenericFlywheelState.IDLE),
+        torqueCharacterizationRoutine.dynamic(CustomSysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        torqueCharacterizationRoutine.dynamic(CustomSysIdRoutine.Direction.kReverse),
+        Commands.waitSeconds(1.0),
+        torqueCharacterizationRoutine.quasistatic(CustomSysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        torqueCharacterizationRoutine.quasistatic(CustomSysIdRoutine.Direction.kReverse),
+        Commands.waitSeconds(3.0),
+        voltageCharacterizationRoutine.dynamic(CustomSysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        voltageCharacterizationRoutine.dynamic(CustomSysIdRoutine.Direction.kReverse),
+        Commands.waitSeconds(1.0),
+        voltageCharacterizationRoutine.quasistatic(CustomSysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        voltageCharacterizationRoutine.quasistatic(CustomSysIdRoutine.Direction.kReverse));
   }
 }
