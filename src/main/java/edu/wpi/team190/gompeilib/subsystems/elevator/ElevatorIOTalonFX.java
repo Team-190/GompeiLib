@@ -15,8 +15,6 @@ import edu.wpi.team190.gompeilib.core.utility.GainSlot;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.IntPredicate;
-import java.util.stream.IntStream;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
 
@@ -46,7 +44,6 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   private VoltageOut voltageRequest;
 
   public ElevatorIOTalonFX(ElevatorConstants constants) {
-
 
     // Create lead motor
     talonFX = new TalonFX(constants.ELEVATOR_CAN_ID);
@@ -102,32 +99,28 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
     final int[] indexHolder = {0}; // mutable index for array insertion
 
-// CCW followers
+    // CCW followers
     Arrays.stream(constants.COUNTERCLOCKWISE_CAN_IDS)
-            .forEach(id -> {
+        .forEach(
+            id -> {
               TalonFX follower = new TalonFX(id, talonFX.getNetwork());
               followTalonFX[indexHolder[0]++] = follower;
 
               PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config, 0.25));
 
-              follower.setControl(new Follower(
-                      talonFX.getDeviceID(),
-                      MotorAlignmentValue.Aligned
-              ));
+              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
             });
 
-// CW followers
+    // CW followers
     Arrays.stream(constants.CLOCKWISE_CAN_IDS)
-            .forEach(id -> {
+        .forEach(
+            id -> {
               TalonFX follower = new TalonFX(id, talonFX.getNetwork());
               followTalonFX[indexHolder[0]++] = follower;
 
               PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config, 0.25));
 
-              follower.setControl(new Follower(
-                      talonFX.getDeviceID(),
-                      MotorAlignmentValue.Opposed
-              ));
+              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
             });
 
     appliedVolts = new ArrayList<>();

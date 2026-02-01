@@ -18,8 +18,6 @@ import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.IntPredicate;
-import java.util.stream.IntStream;
 
 public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   private final TalonFX talonFX;
@@ -51,7 +49,6 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     talonFX = new TalonFX(constants.CAN_ID);
     followerTalonFX = new TalonFX[constants.NUM_MOTORS - 1];
 
-
     talonFXConfiguration = new TalonFXConfiguration();
 
     talonFXConfiguration
@@ -70,50 +67,46 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
     talonFXConfiguration.Feedback.SensorToMechanismRatio = constants.GEAR_RATIO;
 
-      talonFXConfiguration.MotionMagic =
-          new MotionMagicConfigs()
-              .withMotionMagicAcceleration(
-                  AngularAcceleration.ofRelativeUnits(
-                      constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get(),
-                      RotationsPerSecondPerSecond))
-              .withMotionMagicCruiseVelocity(
-                  AngularVelocity.ofRelativeUnits(
-                      constants.CONSTRAINTS.cruisingVelocityRadiansPerSecond().get(),
-                      RotationsPerSecond));
+    talonFXConfiguration.MotionMagic =
+        new MotionMagicConfigs()
+            .withMotionMagicAcceleration(
+                AngularAcceleration.ofRelativeUnits(
+                    constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get(),
+                    RotationsPerSecondPerSecond))
+            .withMotionMagicCruiseVelocity(
+                AngularVelocity.ofRelativeUnits(
+                    constants.CONSTRAINTS.cruisingVelocityRadiansPerSecond().get(),
+                    RotationsPerSecond));
 
-      PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
+    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
 
     final int[] indexHolder = {0}; // mutable index for array insertion
 
-// CCW followers
+    // CCW followers
     Arrays.stream(constants.COUNTERCLOCKWISE_CAN_IDS)
-            .forEach(id -> {
+        .forEach(
+            id -> {
               TalonFX follower = new TalonFX(id, talonFX.getNetwork());
               followerTalonFX[indexHolder[0]++] = follower;
 
-              PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
+              PhoenixUtil.tryUntilOk(
+                  5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
 
-              follower.setControl(new Follower(
-                      talonFX.getDeviceID(),
-                      MotorAlignmentValue.Aligned
-              ));
+              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
             });
 
-// CW followers
+    // CW followers
     Arrays.stream(constants.CLOCKWISE_CAN_IDS)
-            .forEach(id -> {
+        .forEach(
+            id -> {
               TalonFX follower = new TalonFX(id, talonFX.getNetwork());
               followerTalonFX[indexHolder[0]++] = follower;
 
-              PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
+              PhoenixUtil.tryUntilOk(
+                  5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
 
-              follower.setControl(new Follower(
-                      talonFX.getDeviceID(),
-                      MotorAlignmentValue.Opposed
-              ));
+              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
             });
-
-
 
     positionRotations = talonFX.getPosition();
     velocityRotationsPerSecond = talonFX.getVelocity();

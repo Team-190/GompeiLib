@@ -9,7 +9,6 @@ public class ElevatorConstants {
   public final double ELEVATOR_GEAR_RATIO;
   public final double DRUM_RADIUS;
 
-
   public final double ELEVATOR_SUPPLY_CURRENT_LIMIT;
   public final double ELEVATOR_STATOR_CURRENT_LIMIT;
 
