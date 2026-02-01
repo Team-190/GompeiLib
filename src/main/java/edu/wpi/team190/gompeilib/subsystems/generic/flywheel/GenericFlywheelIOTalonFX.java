@@ -17,6 +17,7 @@ import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   private final TalonFX talonFX;
@@ -45,11 +46,8 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   GenericFlywheelConstants constants;
 
   public GenericFlywheelIOTalonFX(GenericFlywheelConstants constants) {
-    talonFX = new TalonFX(constants.CAN_IDS[0]);
-    followerTalonFX = new TalonFX[constants.CAN_IDS.length - 1];
-    for (int i = 1; i < constants.CAN_IDS.length; i++) {
-      followerTalonFX[i - 1] = new TalonFX(constants.CAN_IDS[i], talonFX.getNetwork());
-    }
+    talonFX = new TalonFX(constants.CAN_ID);
+    followerTalonFX = new TalonFX[constants.NUM_MOTORS - 1];
 
     talonFXConfiguration = new TalonFXConfiguration();
 
@@ -57,7 +55,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
         .CurrentLimits
         .withSupplyCurrentLimit(constants.CURRENT_LIMIT)
         .withSupplyCurrentLimitEnable(true);
-    talonFXConfiguration.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
+    talonFXConfiguration.MotorOutput.withNeutralMode(NeutralModeValue.Coast);
     talonFXConfiguration
         .Slot0
         .withKP(constants.GAINS.kP().getAsDouble())
@@ -69,29 +67,46 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
     talonFXConfiguration.Feedback.SensorToMechanismRatio = constants.GEAR_RATIO;
 
-    talonFX.getConfigurator().apply(talonFXConfiguration);
-    for (TalonFX follower : followerTalonFX) {
-      PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
-      follower.setControl(
-          new Follower(
-              talonFX.getDeviceID(),
-              (follower.getDeviceID() % 2 == 1)
-                  ? MotorAlignmentValue.Aligned
-                  : MotorAlignmentValue.Opposed));
+    talonFXConfiguration.MotionMagic =
+        new MotionMagicConfigs()
+            .withMotionMagicAcceleration(
+                AngularAcceleration.ofRelativeUnits(
+                    constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get(),
+                    RotationsPerSecondPerSecond))
+            .withMotionMagicCruiseVelocity(
+                AngularVelocity.ofRelativeUnits(
+                    constants.CONSTRAINTS.cruisingVelocityRadiansPerSecond().get(),
+                    RotationsPerSecond));
 
-      talonFXConfiguration.MotionMagic =
-          new MotionMagicConfigs()
-              .withMotionMagicAcceleration(
-                  AngularAcceleration.ofRelativeUnits(
-                      constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get(),
-                      RotationsPerSecondPerSecond))
-              .withMotionMagicCruiseVelocity(
-                  AngularVelocity.ofRelativeUnits(
-                      constants.CONSTRAINTS.cruisingVelocityRadiansPerSecond().get(),
-                      RotationsPerSecond));
+    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
 
-      PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
-    }
+    final int[] indexHolder = {0}; // mutable index for array insertion
+
+    // CCW followers
+    Arrays.stream(constants.COUNTERCLOCKWISE_CAN_IDS)
+        .forEach(
+            id -> {
+              TalonFX follower = new TalonFX(id, talonFX.getNetwork());
+              followerTalonFX[indexHolder[0]++] = follower;
+
+              PhoenixUtil.tryUntilOk(
+                  5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
+
+              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
+            });
+
+    // CW followers
+    Arrays.stream(constants.CLOCKWISE_CAN_IDS)
+        .forEach(
+            id -> {
+              TalonFX follower = new TalonFX(id, talonFX.getNetwork());
+              followerTalonFX[indexHolder[0]++] = follower;
+
+              PhoenixUtil.tryUntilOk(
+                  5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
+
+              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
+            });
 
     positionRotations = talonFX.getPosition();
     velocityRotationsPerSecond = talonFX.getVelocity();
@@ -105,6 +120,13 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     supplyCurrentAmps.add(talonFX.getSupplyCurrent());
     torqueCurrentAmps.add(talonFX.getTorqueCurrent());
     temperatureCelsius.add(talonFX.getDeviceTemp());
+
+    for (TalonFX follower : followerTalonFX) {
+      appliedVolts.add(follower.getMotorVoltage());
+      supplyCurrentAmps.add(follower.getSupplyCurrent());
+      torqueCurrentAmps.add(follower.getTorqueCurrent());
+      temperatureCelsius.add(follower.getDeviceTemp());
+    }
 
     velocityGoalRadiansPerSecond = 0.0;
 
@@ -151,12 +173,12 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     inputs.velocityRadiansPerSecond =
         Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());
 
-    inputs.appliedVolts = new double[constants.CAN_IDS.length];
-    inputs.supplyCurrentAmps = new double[constants.CAN_IDS.length];
-    inputs.torqueCurrentAmps = new double[constants.CAN_IDS.length];
-    inputs.temperatureCelsius = new double[constants.CAN_IDS.length];
+    inputs.appliedVolts = new double[appliedVolts.size()];
+    inputs.supplyCurrentAmps = new double[supplyCurrentAmps.size()];
+    inputs.torqueCurrentAmps = new double[torqueCurrentAmps.size()];
+    inputs.temperatureCelsius = new double[temperatureCelsius.size()];
 
-    for (int i = 0; i < constants.CAN_IDS.length; i++) {
+    for (int i = 0; i <= followerTalonFX.length; i++) {
       inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
       inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
       inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValueAsDouble();

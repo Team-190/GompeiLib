@@ -14,6 +14,7 @@ import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
 
@@ -23,7 +24,6 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   // Configuration
   public final TalonFXConfiguration config;
-  public final ElevatorConstants constants;
 
   // Sensor inputs
   private StatusSignal<Angle> positionRotations;
@@ -45,18 +45,11 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   public ElevatorIOTalonFX(ElevatorConstants constants) {
 
-    this.constants = constants;
-
     // Create lead motor
     talonFX = new TalonFX(constants.ELEVATOR_CAN_ID);
 
     // Create follower motor array (define length)
     followTalonFX = new TalonFX[constants.ELEVATOR_PARAMETERS.NUM_MOTORS() - 1];
-
-    // Create follower motors (populate array)
-    for (int i = 0; i < constants.ELEVATOR_PARAMETERS.NUM_MOTORS() - 1; i++) {
-      followTalonFX[i] = new TalonFX(constants.ELEVATOR_CAN_ID + i + 1);
-    }
 
     config = new TalonFXConfiguration();
     config.Slot0.withKP(constants.SLOT0_GAINS.kP().get())
@@ -104,15 +97,31 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config));
 
-    for (TalonFX follower : followTalonFX) {
-      PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config));
-      follower.setControl(
-          new Follower(
-              talonFX.getDeviceID(),
-              (follower.getDeviceID() % 2 == 1)
-                  ? MotorAlignmentValue.Aligned
-                  : MotorAlignmentValue.Opposed));
-    }
+    final int[] indexHolder = {0}; // mutable index for array insertion
+
+    // CCW followers
+    Arrays.stream(constants.COUNTERCLOCKWISE_CAN_IDS)
+        .forEach(
+            id -> {
+              TalonFX follower = new TalonFX(id, talonFX.getNetwork());
+              followTalonFX[indexHolder[0]++] = follower;
+
+              PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config, 0.25));
+
+              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
+            });
+
+    // CW followers
+    Arrays.stream(constants.CLOCKWISE_CAN_IDS)
+        .forEach(
+            id -> {
+              TalonFX follower = new TalonFX(id, talonFX.getNetwork());
+              followTalonFX[indexHolder[0]++] = follower;
+
+              PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config, 0.25));
+
+              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
+            });
 
     appliedVolts = new ArrayList<>();
     supplyCurrentAmps = new ArrayList<>();
@@ -129,11 +138,11 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     positionSetpointRotations = talonFX.getClosedLoopReference();
     positionErrorRotations = talonFX.getClosedLoopError();
 
-    for (int i = 0; i < constants.ELEVATOR_PARAMETERS.NUM_MOTORS() - 1; i++) {
-      appliedVolts.add(followTalonFX[i].getMotorVoltage());
-      supplyCurrentAmps.add(followTalonFX[i].getSupplyCurrent());
-      torqueCurrentAmps.add(followTalonFX[i].getTorqueCurrent());
-      temperatureCelsius.add(followTalonFX[i].getDeviceTemp());
+    for (TalonFX follower : followTalonFX) {
+      appliedVolts.add(follower.getMotorVoltage());
+      supplyCurrentAmps.add(follower.getSupplyCurrent());
+      torqueCurrentAmps.add(follower.getTorqueCurrent());
+      temperatureCelsius.add(follower.getDeviceTemp());
     }
 
     var signalsList = new ArrayList<StatusSignal<?>>();
@@ -171,12 +180,12 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
     inputs.positionMeters = positionRotations.getValueAsDouble();
     inputs.velocityMetersPerSecond = velocityRotationsPerSecond.getValueAsDouble();
-    inputs.appliedVolts = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
-    inputs.supplyCurrentAmps = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
-    inputs.torqueCurrentAmps = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
-    inputs.temperatureCelsius = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
+    inputs.appliedVolts = new double[appliedVolts.size()];
+    inputs.supplyCurrentAmps = new double[supplyCurrentAmps.size()];
+    inputs.torqueCurrentAmps = new double[torqueCurrentAmps.size()];
+    inputs.temperatureCelsius = new double[temperatureCelsius.size()];
 
-    for (int i = 0; i < constants.ELEVATOR_PARAMETERS.NUM_MOTORS(); i++) {
+    for (int i = 0; i <= followTalonFX.length; i++) {
       inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
       inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
       inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValueAsDouble();
