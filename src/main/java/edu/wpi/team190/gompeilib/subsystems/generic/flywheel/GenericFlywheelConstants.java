@@ -2,11 +2,13 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 
 public class GenericFlywheelConstants {
 
-  public final int[] CAN_IDS;
+  public final int CAN_ID;
+  public final int NUM_MOTORS;
 
   public final boolean ON_CANIVORE;
   public final boolean ENABLE_FOC;
@@ -26,7 +28,8 @@ public class GenericFlywheelConstants {
   public final int[] CLOCKWISE_CAN_IDS;
 
   public GenericFlywheelConstants(
-      int[] CAN_IDS,
+          int CAN_ID,
+      int NUM_MOTORS,
       boolean ON_CANIVORE,
       boolean ENABLE_FOC,
       double CURRENT_LIMIT,
@@ -38,8 +41,8 @@ public class GenericFlywheelConstants {
       Constraints CONSTRAINTS,
       double GEAR_RATIO,
       InvertedValue INVERSION) {
-
-    this.CAN_IDS = CAN_IDS;
+    this.CAN_ID= CAN_ID;
+    this.NUM_MOTORS = NUM_MOTORS;
     this.ON_CANIVORE = ON_CANIVORE;
     this.ENABLE_FOC = ENABLE_FOC;
     this.CURRENT_LIMIT = CURRENT_LIMIT;

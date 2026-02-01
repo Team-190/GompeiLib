@@ -9,7 +9,6 @@ public class ElevatorConstants {
   public final double ELEVATOR_GEAR_RATIO;
   public final double DRUM_RADIUS;
 
-  public final int[] CAN_IDS;
 
   public final double ELEVATOR_SUPPLY_CURRENT_LIMIT;
   public final double ELEVATOR_STATOR_CURRENT_LIMIT;
@@ -36,8 +35,7 @@ public class ElevatorConstants {
       Gains SLOT2_GAINS,
       Constraints CONSTRAINTS,
       int[] CLOCKWISE_CAN_IDS,
-      int[] COUNTERCLOCKWISE_CAN_IDS,
-      int[] CAN_IDS) {
+      int[] COUNTERCLOCKWISE_CAN_IDS) {
 
     this.ELEVATOR_CAN_ID = ELEVATOR_CAN_ID;
     this.ON_CANIVORE = ON_CANIVORE;
@@ -55,8 +53,6 @@ public class ElevatorConstants {
 
     this.CLOCKWISE_CAN_IDS = CLOCKWISE_CAN_IDS;
     this.COUNTERCLOCKWISE_CAN_IDS = COUNTERCLOCKWISE_CAN_IDS;
-
-    this.CAN_IDS = CAN_IDS;
   }
 
   public record Gains(
