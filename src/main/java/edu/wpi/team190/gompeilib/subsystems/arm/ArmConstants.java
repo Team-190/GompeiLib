@@ -47,9 +47,7 @@ public class ArmConstants {
       Rotation2d MAX_ANGLE,
       int NUM_MOTORS,
       double GEAR_RATIO,
-      double LENGTH_METERS,
-      double MASS_KG,
-      double MOMENT_OF_INERTIA_KG_M_SQUARED) {}
+      double LENGTH_METERS) {}
 
   public record Gains(
       LoggedTunableNumber kP,
