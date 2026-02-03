@@ -12,6 +12,7 @@ jackson = "2.17.2"
 wpilib-wpilibj = { group = "edu.wpi.first.wpilibj", name = "wpilibj-java", version.ref = "wpilib" }
 wpilib-wpimath = { group = "edu.wpi.first.wpimath", name = "wpimath-java", version.ref = "wpilib" }
 wpilib-ntcore = { group = "edu.wpi.first.ntcore", name = "ntcore-java", version.ref = "wpilib" }
+wpilib-wpinet = { group = "edu.wpi.first.wpinet", name = "wpinet-java", version.ref = "wpilib" }
 wpilib-cscore = { group = "edu.wpi.first.cscore", name = "cscore-java", version.ref = "wpilib" }
 wpilib-cameraserver = { group = "edu.wpi.first.cameraserver", name = "cameraserver-java", version.ref = "wpilib" }
 wpilib-wpiutil = { group = "edu.wpi.first.wpiutil", name = "wpiutil-java", version.ref = "wpilib" }
@@ -45,6 +46,7 @@ wpilib = [
     "wpilib-wpilibj",
     "wpilib-wpimath",
     "wpilib-ntcore",
+    "wpilib-wpinet",
     "wpilib-cscore",
     "wpilib-cameraserver",
     "wpilib-wpiutil",
