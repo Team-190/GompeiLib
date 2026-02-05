@@ -6,7 +6,8 @@ import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 
 public class GenericFlywheelConstants {
 
-  public final int[] CAN_IDS;
+  public final int CAN_ID;
+  public final int NUM_MOTORS;
 
   public final boolean ON_CANIVORE;
   public final boolean ENABLE_FOC;
@@ -15,25 +16,32 @@ public class GenericFlywheelConstants {
   public final double MOMENT_OF_INERTIA;
   public final double GEAR_RATIO;
 
+  public final InvertedValue INVERSION;
+
   public final DCMotor MOTOR_CONFIG;
 
   public final Gains GAINS;
   public final Constraints CONSTRAINTS;
 
-  public final InvertedValue INVERSION;
+  public final int[] COUNTERCLOCKWISE_CAN_IDS;
+  public final int[] CLOCKWISE_CAN_IDS;
 
   public GenericFlywheelConstants(
-      int[] CAN_IDS,
+      int CAN_ID,
+      int NUM_MOTORS,
       boolean ON_CANIVORE,
       boolean ENABLE_FOC,
       double CURRENT_LIMIT,
       double MOMENT_OF_INERTIA,
       Gains GAINS,
       DCMotor MOTOR_CONFIG,
+      int[] CLOCKWISE_CAN_IDS,
+      int[] COUNTERCLOCKWISE_CAN_IDS,
       Constraints CONSTRAINTS,
-      InvertedValue INVERSION,
-      double GEAR_RATIO) {
-    this.CAN_IDS = CAN_IDS;
+      double GEAR_RATIO,
+      InvertedValue INVERSION) {
+    this.CAN_ID = CAN_ID;
+    this.NUM_MOTORS = NUM_MOTORS;
     this.ON_CANIVORE = ON_CANIVORE;
     this.ENABLE_FOC = ENABLE_FOC;
     this.CURRENT_LIMIT = CURRENT_LIMIT;
@@ -41,8 +49,10 @@ public class GenericFlywheelConstants {
     this.GAINS = GAINS;
     this.MOTOR_CONFIG = MOTOR_CONFIG;
     this.CONSTRAINTS = CONSTRAINTS;
-    this.INVERSION = INVERSION;
+    this.COUNTERCLOCKWISE_CAN_IDS = COUNTERCLOCKWISE_CAN_IDS;
+    this.CLOCKWISE_CAN_IDS = CLOCKWISE_CAN_IDS;
     this.GEAR_RATIO = GEAR_RATIO;
+    this.INVERSION = INVERSION;
   }
 
   public record Gains(

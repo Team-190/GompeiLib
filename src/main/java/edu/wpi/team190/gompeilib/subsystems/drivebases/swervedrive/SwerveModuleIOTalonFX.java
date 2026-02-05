@@ -112,7 +112,7 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
         };
     turnConfig.Feedback.RotorToSensorRatio = constants.SteerMotorGearRatio;
     turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
-    turnConfig.TorqueCurrent.PeakReverseTorqueCurrent = 40.0;
+    turnConfig.TorqueCurrent.PeakReverseTorqueCurrent = -40.0;
     turnConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = GompeiLib.getLoopPeriod();
     turnConfig.CurrentLimits.StatorCurrentLimit = 40.0;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
