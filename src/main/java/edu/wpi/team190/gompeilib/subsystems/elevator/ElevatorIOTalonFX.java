@@ -46,6 +46,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   public ElevatorIOTalonFX(ElevatorConstants constants) {
 
+    this.constants = constants;
+
     // Create lead motor
     talonFX = new TalonFX(constants.ELEVATOR_CAN_ID);
 
