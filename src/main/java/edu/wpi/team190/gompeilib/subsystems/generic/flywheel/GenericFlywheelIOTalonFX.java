@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
-  private final TalonFX talonFX;
+  protected final TalonFX talonFX;
   private final TalonFX[] followerTalonFX;
 
   private final StatusSignal<Angle> positionRotations;
@@ -46,10 +46,14 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   protected GenericFlywheelConstants constants;
 
   public GenericFlywheelIOTalonFX(GenericFlywheelConstants constants) {
-    talonFX = new TalonFX(constants.CAN_ID);
-    followerTalonFX = new TalonFX[constants.NUM_MOTORS - 1];
+    talonFX = new TalonFX(constants.LEADER_CAN_ID);
+    followerTalonFX =
+        new TalonFX
+            [constants.ALIGNED_FOLLOWER_CAN_IDS.length + constants.OPPOSED_FOLLOWER_CAN_IDS.length];
 
     talonFXConfiguration = new TalonFXConfiguration();
+
+    talonFXConfiguration.MotorOutput.withInverted(constants.LEADER_INVERSION);
 
     talonFXConfiguration
         .CurrentLimits
@@ -63,7 +67,6 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
         .withKS(constants.GAINS.kS().getAsDouble())
         .withKV(constants.GAINS.kV().getAsDouble())
         .withKA(constants.GAINS.kA().getAsDouble());
-    talonFXConfiguration.MotorOutput.withInverted(constants.INVERSION);
 
     talonFXConfiguration.Feedback.SensorToMechanismRatio = constants.GEAR_RATIO;
 
@@ -83,7 +86,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     final int[] indexHolder = {0}; // mutable index for array insertion
 
     // CCW followers
-    Arrays.stream(constants.COUNTERCLOCKWISE_CAN_IDS)
+    Arrays.stream(constants.ALIGNED_FOLLOWER_CAN_IDS)
         .forEach(
             id -> {
               TalonFX follower = new TalonFX(id, talonFX.getNetwork());
@@ -96,7 +99,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
             });
 
     // CW followers
-    Arrays.stream(constants.CLOCKWISE_CAN_IDS)
+    Arrays.stream(constants.OPPOSED_FOLLOWER_CAN_IDS)
         .forEach(
             id -> {
               TalonFX follower = new TalonFX(id, talonFX.getNetwork());

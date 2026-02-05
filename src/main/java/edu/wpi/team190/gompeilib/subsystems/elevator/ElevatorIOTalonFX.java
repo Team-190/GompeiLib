@@ -19,7 +19,7 @@ import java.util.Arrays;
 public class ElevatorIOTalonFX implements ElevatorIO {
 
   // Core hardware components
-  public final TalonFX talonFX;
+  protected final TalonFX talonFX;
   public final TalonFX[] followTalonFX;
 
   // Configuration

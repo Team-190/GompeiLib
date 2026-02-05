@@ -16,7 +16,7 @@ import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 
 public class GenericRollerIOTalonFX implements GenericRollerIO {
-  private final TalonFX talonFX;
+  protected final TalonFX talonFX;
 
   private final TalonFXConfiguration config;
 

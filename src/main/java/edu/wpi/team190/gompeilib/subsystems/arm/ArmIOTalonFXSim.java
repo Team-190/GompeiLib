@@ -15,7 +15,7 @@ import edu.wpi.team190.gompeilib.core.logging.Trace;
 public class ArmIOTalonFXSim extends ArmIOTalonFX {
   private final SingleJointedArmSim armSim;
 
-  private TalonFXSimState armController;
+  private final TalonFXSimState armController;
 
   public ArmIOTalonFXSim(ArmConstants constants) {
     super(constants);
@@ -23,7 +23,7 @@ public class ArmIOTalonFXSim extends ArmIOTalonFX {
         new SingleJointedArmSim(
             LinearSystemId.createSingleJointedArmSystem(
                 constants.ARM_PARAMETERS.MOTOR_CONFIG(),
-                constants.MOMENT_OF_INERTIA,
+                constants.ARM_PARAMETERS.MOMENT_OF_INERTIA(),
                 constants.ARM_PARAMETERS.GEAR_RATIO()),
             constants.ARM_PARAMETERS.MOTOR_CONFIG(),
             constants.ARM_PARAMETERS.GEAR_RATIO(),
@@ -32,6 +32,8 @@ public class ArmIOTalonFXSim extends ArmIOTalonFX {
             constants.ARM_PARAMETERS.MAX_ANGLE().getRadians(),
             true,
             constants.ARM_PARAMETERS.MIN_ANGLE().getRadians());
+
+    armController = super.talonFX.getSimState();
   }
 
   @Override
