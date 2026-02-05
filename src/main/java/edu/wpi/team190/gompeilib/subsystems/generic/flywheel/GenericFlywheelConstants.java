@@ -33,8 +33,8 @@ public class GenericFlywheelConstants {
       double MOMENT_OF_INERTIA,
       Gains GAINS,
       DCMotor MOTOR_CONFIG,
-      int[] CLOCKWISE_CAN_IDS,
       int[] ALIGNED_FOLLOWER_CAN_IDS,
+      int[] OPPOSED_FOLLOWER_CAN_IDS,
       Constraints CONSTRAINTS,
       double GEAR_RATIO) {
     this.LEADER_CAN_ID = LEADER_CAN_ID;
@@ -47,7 +47,7 @@ public class GenericFlywheelConstants {
     this.MOTOR_CONFIG = MOTOR_CONFIG;
     this.CONSTRAINTS = CONSTRAINTS;
     this.ALIGNED_FOLLOWER_CAN_IDS = ALIGNED_FOLLOWER_CAN_IDS;
-    this.OPPOSED_FOLLOWER_CAN_IDS = CLOCKWISE_CAN_IDS;
+    this.OPPOSED_FOLLOWER_CAN_IDS = OPPOSED_FOLLOWER_CAN_IDS;
     this.GEAR_RATIO = GEAR_RATIO;
   }
 
