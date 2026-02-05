@@ -21,9 +21,6 @@ public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
   private CANcoderSimState encoderController;
   private double offset;
 
-  private double motorVoltageDrive;
-  private double motorVoltageSteer;
-
   public SwerveModuleIOTalonFXSim(
       SwerveDriveConstants driveConstants,
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
@@ -50,7 +47,7 @@ public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
   @Trace
   public void updateInputs(ModuleIOInputs inputs) {
     driveController.setSupplyVoltage(RobotController.getBatteryVoltage());
-    motorVoltageDrive = driveController.getMotorVoltage();
+    double motorVoltageDrive = driveController.getMotorVoltage();
 
     driveMotorSim.setInputVoltage(motorVoltageDrive);
 
@@ -64,7 +61,7 @@ public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
     driveController.setRotorVelocity(rotorVelocityRotationsPerSecondDrive);
 
     steerController.setSupplyVoltage(RobotController.getBatteryVoltage());
-    motorVoltageSteer = steerController.getMotorVoltage();
+    double motorVoltageSteer = steerController.getMotorVoltage();
 
     steerMotorSim.setInputVoltage(motorVoltageSteer);
 
