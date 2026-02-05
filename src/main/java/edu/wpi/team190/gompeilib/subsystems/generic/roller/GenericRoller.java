@@ -8,14 +8,14 @@ import org.littletonrobotics.junction.Logger;
 
 public class GenericRoller {
   private final GenericRollerIO io;
-  private final RollerIOInputsAutoLogged inputs;
+  private final GenericRollerIOInputsAutoLogged inputs;
   private final String aKitTopic;
 
   private double voltageGoalVolts;
 
   public GenericRoller(GenericRollerIO io, Subsystem subsystem, String name) {
     this.io = io;
-    inputs = new RollerIOInputsAutoLogged();
+    inputs = new GenericRollerIOInputsAutoLogged();
     aKitTopic = subsystem.getName() + "/" + name + " Rollers";
   }
 
