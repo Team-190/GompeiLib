@@ -43,31 +43,17 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   private final VelocityVoltage velocityControlRequest;
   private final MotionMagicVelocityTorqueCurrentFOC velocityTorqueCurrentRequest;
 
-    GenericFlywheelConstants constants;
+  GenericFlywheelConstants constants;
 
   public GenericFlywheelIOTalonFX(GenericFlywheelConstants constants) {
-    followerTalonFX = new TalonFX[constants.NUM_MOTORS - 1];
-
-    int leaderCANID;
-    int loopStart;
-
-      if (constants.CLOCKWISE_CAN_IDS.length > 1) {
-      leaderCANID = constants.CLOCKWISE_CAN_IDS[0];
-      loopStart = 1;
-    }
-    else if (constants.COUNTERCLOCKWISE_CAN_IDS.length > 1) {
-      leaderCANID = constants.COUNTERCLOCKWISE_CAN_IDS[0];
-      loopStart = 1;
-    }
-    else {
-        leaderCANID = -1;
-        loopStart = 0;
-    }
-
-    talonFX = new TalonFX(leaderCANID);
-
+    talonFX = new TalonFX(constants.LEADER_CAN_ID);
+    followerTalonFX =
+        new TalonFX
+            [constants.ALIGNED_FOLLOWER_CAN_IDS.length + constants.OPPOSED_FOLLOWER_CAN_IDS.length];
 
     talonFXConfiguration = new TalonFXConfiguration();
+
+    talonFXConfiguration.MotorOutput.withInverted(constants.LEADER_INVERSION);
 
     talonFXConfiguration
         .CurrentLimits
@@ -99,27 +85,31 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
     final int[] indexHolder = {0}; // mutable index for array insertion
 
-    for (int i = loopStart; i < constants.COUNTERCLOCKWISE_CAN_IDS.length; i++) {
-        TalonFX follower = new TalonFX(constants.COUNTERCLOCKWISE_CAN_IDS[i], talonFX.getNetwork());
+    // CCW followers
+    Arrays.stream(constants.ALIGNED_FOLLOWER_CAN_IDS)
+        .forEach(
+            id -> {
+              TalonFX follower = new TalonFX(id, talonFX.getNetwork());
+              followerTalonFX[indexHolder[0]++] = follower;
 
-    followerTalonFX[indexHolder[0]++] = follower;
+              PhoenixUtil.tryUntilOk(
+                  5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
 
-    PhoenixUtil.tryUntilOk(
-            5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
+              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
+            });
 
-    follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
-    }
+    // CW followers
+    Arrays.stream(constants.OPPOSED_FOLLOWER_CAN_IDS)
+        .forEach(
+            id -> {
+              TalonFX follower = new TalonFX(id, talonFX.getNetwork());
+              followerTalonFX[indexHolder[0]++] = follower;
 
-    for (int i = loopStart; i < constants.CLOCKWISE_CAN_IDS.length; i++) {
-      TalonFX follower = new TalonFX(constants.CLOCKWISE_CAN_IDS[i], talonFX.getNetwork());
+              PhoenixUtil.tryUntilOk(
+                  5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
 
-      followerTalonFX[indexHolder[0]++] = follower;
-
-      PhoenixUtil.tryUntilOk(
-              5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
-
-      follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
-    }
+              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
+            });
 
     positionRotations = talonFX.getPosition();
     velocityRotationsPerSecond = talonFX.getVelocity();
