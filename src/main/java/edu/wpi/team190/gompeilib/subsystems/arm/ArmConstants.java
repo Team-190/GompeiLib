@@ -6,7 +6,6 @@ import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 
 public class ArmConstants {
   public final int ARM_CAN_ID;
-  public boolean ON_CANIVORE;
   public final ArmParameters ARM_PARAMETERS;
   public final Gains SLOT0_GAINS;
   public final Gains SLOT1_GAINS;
@@ -15,8 +14,6 @@ public class ArmConstants {
   public final Constraints CONSTRAINTS;
 
   public final CurrentLimits CURRENT_LIMITS;
-
-  public final double MOMENT_OF_INERTIA;
 
   public final boolean ENABLE_FOC;
 
@@ -37,7 +34,6 @@ public class ArmConstants {
     this.SLOT2_GAINS = SLOT2_GAINS;
     this.CONSTRAINTS = CONSTRAINTS;
     this.CURRENT_LIMITS = CURRENT_LIMITS;
-    this.MOMENT_OF_INERTIA = MOMENT_OF_INERTIA;
     this.ENABLE_FOC = ENABLE_FOC;
   }
 
@@ -47,7 +43,8 @@ public class ArmConstants {
       Rotation2d MAX_ANGLE,
       int NUM_MOTORS,
       double GEAR_RATIO,
-      double LENGTH_METERS) {}
+      double LENGTH_METERS,
+      double MOMENT_OF_INERTIA) {}
 
   public record Gains(
       LoggedTunableNumber kP,
