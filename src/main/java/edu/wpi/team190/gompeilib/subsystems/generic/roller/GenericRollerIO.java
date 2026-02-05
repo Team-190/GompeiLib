@@ -11,7 +11,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface GenericRollerIO {
   @AutoLog
-  public static class RollerIOInputs {
+  public static class GenericRollerIOInputs {
     public Rotation2d position = new Rotation2d();
     public AngularVelocity velocity = RadiansPerSecond.zero();
     public Voltage appliedVolts = Volts.zero();
@@ -20,7 +20,7 @@ public interface GenericRollerIO {
     public Temperature temperature = Celsius.zero();
   }
 
-  public default void updateInputs(RollerIOInputs inputs) {}
+  public default void updateInputs(GenericRollerIOInputs inputs) {}
 
   public default void setVoltage(double volts) {}
 }

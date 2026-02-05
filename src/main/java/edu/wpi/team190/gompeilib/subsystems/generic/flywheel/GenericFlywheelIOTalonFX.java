@@ -42,7 +42,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   private final VelocityVoltage velocityControlRequest;
   private final MotionMagicVelocityTorqueCurrentFOC velocityTorqueCurrentRequest;
 
-  GenericFlywheelConstants constants;
+  protected GenericFlywheelConstants constants;
 
   public GenericFlywheelIOTalonFX(GenericFlywheelConstants constants) {
     talonFX = new TalonFX(constants.CAN_IDS[0]);

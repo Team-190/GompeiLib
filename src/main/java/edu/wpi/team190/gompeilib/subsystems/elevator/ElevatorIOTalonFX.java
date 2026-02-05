@@ -23,7 +23,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   // Configuration
   public final TalonFXConfiguration config;
-  public final ElevatorConstants constants;
+  protected final ElevatorConstants constants;
 
   // Sensor inputs
   private StatusSignal<Angle> positionRotations;
