@@ -24,18 +24,18 @@ public interface ArmIO {
     public GainSlot slot;
   }
 
-  public void updateInputs(ArmIOInputs inputs);
+  public default void updateInputs(ArmIOInputs inputs) {}
 
-  public void setVoltage(double volts);
+  public default void setVoltage(double volts) {}
 
-  public void setSlot(GainSlot slot);
+  public default void setSlot(GainSlot slot) {}
 
-  public void setPosition(Rotation2d position);
+  public default void setPosition(Rotation2d position) {}
 
-  public void setPositionGoal(Rotation2d positionGoal);
+  public default void setPositionGoal(Rotation2d positionGoal) {}
 
-  public void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot);
+  public default void updateGains(
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {}
 
-  public void updateConstraints(double maxAcceleration, double cruisingVelocity);
+  public default void updateConstraints(double maxAcceleration, double cruisingVelocity) {}
 }
