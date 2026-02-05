@@ -15,7 +15,7 @@ import edu.wpi.team190.gompeilib.core.logging.Trace;
 public class ElevatorIOTalonFXSim extends ElevatorIOTalonFX {
   private final ElevatorSim elevatorSim;
 
-  private TalonFXSimState elevatorController;
+  private final TalonFXSimState elevatorController;
 
   public ElevatorIOTalonFXSim(ElevatorConstants constants) {
     super(constants);
@@ -31,6 +31,8 @@ public class ElevatorIOTalonFXSim extends ElevatorIOTalonFX {
             constants.ELEVATOR_PARAMETERS.MAX_HEIGHT_METERS(),
             true,
             constants.ELEVATOR_PARAMETERS.MIN_HEIGHT_METERS());
+
+    elevatorController = super.talonFX.getSimState();
   }
 
   @Override

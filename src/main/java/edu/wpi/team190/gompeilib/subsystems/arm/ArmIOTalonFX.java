@@ -29,7 +29,7 @@ import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
 
 public class ArmIOTalonFX implements ArmIO {
-  private final TalonFX talonFX;
+  protected final TalonFX talonFX;
   private final TalonFX[] followTalonFX;
 
   private final StatusSignal<Angle> positionRotations;

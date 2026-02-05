@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
-  private final TalonFX talonFX;
+  protected final TalonFX talonFX;
   private final TalonFX[] followerTalonFX;
 
   private final StatusSignal<Angle> positionRotations;

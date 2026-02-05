@@ -33,9 +33,9 @@ import java.util.Queue;
  * <p>Device configuration and other behaviors not exposed by TunerConstants can be customized here.
  */
 public class SwerveModuleIOTalonFX implements SwerveModuleIO {
-  private final TalonFX driveTalonFX;
-  private final TalonFX turnTalonFX;
-  private final CANcoder cancoder;
+  protected final TalonFX driveTalonFX;
+  protected final TalonFX turnTalonFX;
+  protected final CANcoder cancoder;
 
   private final TalonFXConfiguration driveConfig;
   private final TalonFXConfiguration turnConfig;

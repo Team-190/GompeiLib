@@ -15,7 +15,7 @@ import edu.wpi.team190.gompeilib.core.logging.Trace;
 public class GenericRollerIOTalonFXSim extends GenericRollerIOTalonFX {
   private final DCMotorSim rollerSim;
 
-  private TalonFXSimState rollerController;
+  private final TalonFXSimState rollerController;
 
   public GenericRollerIOTalonFXSim(GenericRollerConstants constants) {
     super(constants);
@@ -26,6 +26,8 @@ public class GenericRollerIOTalonFXSim extends GenericRollerIOTalonFX {
                 constants.MOMENT_OF_INERTIA.baseUnitMagnitude(),
                 constants.ROLLER_MOTOR_GEAR_RATIO),
             constants.ROLLER_GEARBOX);
+
+    rollerController = super.talonFX.getSimState();
   }
 
   @Override

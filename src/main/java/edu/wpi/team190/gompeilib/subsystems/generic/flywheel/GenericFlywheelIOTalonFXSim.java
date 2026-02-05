@@ -15,7 +15,7 @@ import edu.wpi.team190.gompeilib.core.logging.Trace;
 public class GenericFlywheelIOTalonFXSim extends GenericFlywheelIOTalonFX {
   private final FlywheelSim flywheelSim;
 
-  private TalonFXSimState flywheelController;
+  private final TalonFXSimState flywheelController;
 
   public GenericFlywheelIOTalonFXSim(GenericFlywheelConstants constants) {
     super(constants);
@@ -24,6 +24,8 @@ public class GenericFlywheelIOTalonFXSim extends GenericFlywheelIOTalonFX {
             LinearSystemId.createFlywheelSystem(
                 constants.MOTOR_CONFIG, constants.MOMENT_OF_INERTIA, constants.GEAR_RATIO),
             constants.MOTOR_CONFIG);
+
+    flywheelController = super.talonFX.getSimState();
   }
 
   @Override
