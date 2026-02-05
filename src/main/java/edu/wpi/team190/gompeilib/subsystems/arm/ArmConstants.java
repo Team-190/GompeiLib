@@ -6,6 +6,7 @@ import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 
 public class ArmConstants {
   public final int ARM_CAN_ID;
+  public final boolean ON_CANIVORE;
   public final ArmParameters ARM_PARAMETERS;
   public final Gains SLOT0_GAINS;
   public final Gains SLOT1_GAINS;
@@ -19,6 +20,7 @@ public class ArmConstants {
 
   public ArmConstants(
       int ARM_CAN_ID,
+      boolean ON_CANIVORE,
       ArmParameters ARM_PARAMETERS,
       Gains SLOT0_GAINS,
       Gains SLOT1_GAINS,
@@ -28,6 +30,7 @@ public class ArmConstants {
       double MOMENT_OF_INERTIA,
       boolean ENABLE_FOC) {
     this.ARM_CAN_ID = ARM_CAN_ID;
+    this.ON_CANIVORE = ON_CANIVORE;
     this.ARM_PARAMETERS = ARM_PARAMETERS;
     this.SLOT0_GAINS = SLOT0_GAINS;
     this.SLOT1_GAINS = SLOT1_GAINS;
