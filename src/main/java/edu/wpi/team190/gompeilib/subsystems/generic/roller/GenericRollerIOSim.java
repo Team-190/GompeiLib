@@ -26,7 +26,7 @@ public class GenericRollerIOSim implements GenericRollerIO {
   }
 
   @Override
-  public void updateInputs(RollerIOInputs inputs) {
+  public void updateInputs(GenericRollerIOInputs inputs) {
     appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
 
     sim.setInputVoltage(appliedVolts);

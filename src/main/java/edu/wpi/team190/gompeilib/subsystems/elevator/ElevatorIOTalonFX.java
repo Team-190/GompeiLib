@@ -24,6 +24,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   // Configuration
   public final TalonFXConfiguration config;
+  protected final ElevatorConstants constants;
 
   // Sensor inputs
   private StatusSignal<Angle> positionRotations;
@@ -44,6 +45,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   private VoltageOut voltageRequest;
 
   public ElevatorIOTalonFX(ElevatorConstants constants) {
+
+    this.constants = constants;
 
     // Create lead motor
     talonFX = new TalonFX(constants.ELEVATOR_CAN_ID);

@@ -48,7 +48,7 @@ public class ArmIOTalonFX implements ArmIO {
 
   private final TalonFXConfiguration config;
 
-  private final ArmConstants constants;
+  protected final ArmConstants constants;
 
   public ArmIOTalonFX(ArmConstants constants) {
     talonFX = new TalonFX(constants.ARM_CAN_ID);
