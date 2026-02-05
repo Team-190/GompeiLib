@@ -23,7 +23,7 @@ public class ArmIOTalonFXSim extends ArmIOTalonFX {
         new SingleJointedArmSim(
             LinearSystemId.createSingleJointedArmSystem(
                 constants.ARM_PARAMETERS.MOTOR_CONFIG(),
-                constants.MOMENT_OF_INERTIA,
+                constants.ARM_PARAMETERS.MOMENT_OF_INERTIA(),
                 constants.ARM_PARAMETERS.GEAR_RATIO()),
             constants.ARM_PARAMETERS.MOTOR_CONFIG(),
             constants.ARM_PARAMETERS.GEAR_RATIO(),
