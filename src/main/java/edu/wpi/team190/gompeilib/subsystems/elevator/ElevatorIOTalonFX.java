@@ -175,7 +175,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     positionVoltageRequest = new MotionMagicVoltage(0.0);
     voltageRequest = new VoltageOut(0.0);
 
-    PhoenixUtil.registerSignals(constants.ON_CANIVORE, statusSignals);
+    PhoenixUtil.registerSignals(constants.CAN_LOOP, statusSignals);
   }
 
   @Override

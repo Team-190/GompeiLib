@@ -62,7 +62,7 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
     talonFX.optimizeBusUtilization();
 
     PhoenixUtil.registerSignals(
-        constants.ON_CANIVORE,
+        constants.CAN_LOOP.isNetworkFD(),
         positionRotations,
         velocity,
         appliedVoltage,

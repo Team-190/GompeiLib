@@ -1,5 +1,6 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
@@ -9,7 +10,7 @@ public class GenericFlywheelConstants {
   public final int LEADER_CAN_ID;
   public final InvertedValue LEADER_INVERSION;
 
-  public final boolean ON_CANIVORE;
+  public final CANBus CAN_LOOP;
   public final boolean ENABLE_FOC;
 
   public final double CURRENT_LIMIT;
@@ -27,7 +28,7 @@ public class GenericFlywheelConstants {
   public GenericFlywheelConstants(
       int LEADER_CAN_ID,
       InvertedValue LEADER_INVERSION,
-      boolean ON_CANIVORE,
+      CANBus CAN_LOOP,
       boolean ENABLE_FOC,
       double CURRENT_LIMIT,
       double MOMENT_OF_INERTIA,
@@ -39,7 +40,7 @@ public class GenericFlywheelConstants {
       double GEAR_RATIO) {
     this.LEADER_CAN_ID = LEADER_CAN_ID;
     this.LEADER_INVERSION = LEADER_INVERSION;
-    this.ON_CANIVORE = ON_CANIVORE;
+    this.CAN_LOOP = CAN_LOOP;
     this.ENABLE_FOC = ENABLE_FOC;
     this.CURRENT_LIMIT = CURRENT_LIMIT;
     this.MOMENT_OF_INERTIA = MOMENT_OF_INERTIA;

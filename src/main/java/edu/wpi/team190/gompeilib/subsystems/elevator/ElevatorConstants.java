@@ -1,11 +1,13 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
 
+import com.ctre.phoenix6.CANBus;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 
 public class ElevatorConstants {
   public final int ELEVATOR_CAN_ID;
-  public final boolean ON_CANIVORE;
+  public final CANBus CAN_LOOP;
   public final double ELEVATOR_GEAR_RATIO;
   public final double DRUM_RADIUS;
 
@@ -23,7 +25,7 @@ public class ElevatorConstants {
 
   public ElevatorConstants(
       int ELEVATOR_CAN_ID,
-      boolean ON_CANIVORE,
+      CANBus CAN_LOOP,
       double ELEVATOR_GEAR_RATIO,
       double DRUM_RADIUS,
       double ELEVATOR_SUPPLY_CURRENT_LIMIT,
@@ -37,7 +39,7 @@ public class ElevatorConstants {
       int[] COUNTERCLOCKWISE_CAN_IDS) {
 
     this.ELEVATOR_CAN_ID = ELEVATOR_CAN_ID;
-    this.ON_CANIVORE = ON_CANIVORE;
+    this.CAN_LOOP = CAN_LOOP;
     this.ELEVATOR_GEAR_RATIO = ELEVATOR_GEAR_RATIO;
     this.DRUM_RADIUS = DRUM_RADIUS;
 

@@ -13,5 +13,5 @@ public class GenericRollerConstants {
   public final DCMotor ROLLER_GEARBOX;
   public final double ROLLER_MOTOR_GEAR_RATIO;
   public final MomentOfInertia MOMENT_OF_INERTIA;
-  public final CANBus ON_CANIVORE;
+  public final CANBus CAN_LOOP;
 }
