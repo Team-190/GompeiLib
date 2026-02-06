@@ -7,7 +7,6 @@ import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import java.util.Set;
 import lombok.Builder;
 import lombok.Singular;
-import lombok.experimental.SuperBuilder;
 
 @Builder
 public class GenericFlywheelConstants {

@@ -12,15 +12,14 @@ public class ArmConstants {
   @Builder.Default public final CANBus CAN_LOOP = new CANBus();
   public final ArmParameters ARM_PARAMETERS;
   public final Gains SLOT0_GAINS;
-  @Builder.Default public final Gains SLOT1_GAINS = new Gains("Arm/Slot1/Gains");
-  @Builder.Default public final Gains SLOT2_GAINS = new Gains("Arm/Slot2/Gains");
+  @Builder.Default public final Gains SLOT1_GAINS = new Gains("Arm/Slot1");
+  @Builder.Default public final Gains SLOT2_GAINS = new Gains("Arm/Slot2");
 
   public final Constraints CONSTRAINTS;
 
   public final CurrentLimits CURRENT_LIMITS;
 
   @Builder.Default public final boolean ENABLE_FOC = false;
-
 
   @Builder
   public record ArmParameters(
@@ -42,12 +41,12 @@ public class ArmConstants {
       LoggedTunableNumber kA) {
     public Gains(String prefix) {
       this(
-              new LoggedTunableNumber(prefix + "/kP"),
-              new LoggedTunableNumber(prefix + "/kD"),
-              new LoggedTunableNumber(prefix + "/kS"),
-              new LoggedTunableNumber(prefix + "/kG"),
-              new LoggedTunableNumber(prefix + "/kV"),
-              new LoggedTunableNumber(prefix + "/kA"));
+          new LoggedTunableNumber(prefix + "/kP"),
+          new LoggedTunableNumber(prefix + "/kD"),
+          new LoggedTunableNumber(prefix + "/kS"),
+          new LoggedTunableNumber(prefix + "/kG"),
+          new LoggedTunableNumber(prefix + "/kV"),
+          new LoggedTunableNumber(prefix + "/kA"));
     }
   }
 

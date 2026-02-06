@@ -6,7 +6,6 @@ import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import java.util.Set;
 import lombok.Builder;
 import lombok.Singular;
-import lombok.With;
 
 @Builder
 public class ElevatorConstants {
@@ -20,8 +19,8 @@ public class ElevatorConstants {
 
   public final ElevatorParameters ELEVATOR_PARAMETERS;
   public final Gains SLOT0_GAINS;
-  @Builder.Default public final Gains SLOT1_GAINS = new Gains("Elevator/Slot1/Gains");
-  @Builder.Default public final Gains SLOT2_GAINS = new Gains("Elevator/Slot2/Gains");
+  @Builder.Default public final Gains SLOT1_GAINS = new Gains("Elevator/Slot1");
+  @Builder.Default public final Gains SLOT2_GAINS = new Gains("Elevator/Slot2");
   public final Constraints CONSTRAINTS;
 
   @Singular(value = "ALIGNED_FOLLOWER_CAN_ID")
