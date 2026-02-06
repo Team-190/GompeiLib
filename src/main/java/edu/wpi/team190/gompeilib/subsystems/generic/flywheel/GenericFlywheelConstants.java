@@ -14,7 +14,7 @@ public class GenericFlywheelConstants {
   public final int LEADER_CAN_ID;
   public final InvertedValue LEADER_INVERSION;
 
-  @Builder.Default public final CANBus CAN_BUS = new CANBus();
+  @Builder.Default public final CANBus CAN_LOOP = new CANBus();
   public final boolean ENABLE_FOC;
 
   public final double CURRENT_LIMIT;

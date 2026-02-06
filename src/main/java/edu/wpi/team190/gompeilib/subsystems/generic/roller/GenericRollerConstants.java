@@ -12,5 +12,5 @@ public class GenericRollerConstants {
   public final DCMotor ROLLER_GEARBOX;
   public final double ROLLER_MOTOR_GEAR_RATIO;
   public final MomentOfInertia MOMENT_OF_INERTIA;
-  @Builder.Default public final CANBus CAN_BUS = new CANBus();
+  @Builder.Default public final CANBus CAN_LOOP = new CANBus();
 }

@@ -10,7 +10,7 @@ import lombok.Singular;
 @Builder
 public class ElevatorConstants {
   public final int LEADER_CAN_ID;
-  @Builder.Default public final CANBus CAN_BUS = new CANBus();
+  @Builder.Default public final CANBus CAN_LOOP = new CANBus();
   public final double ELEVATOR_GEAR_RATIO;
   public final double DRUM_RADIUS;
 
