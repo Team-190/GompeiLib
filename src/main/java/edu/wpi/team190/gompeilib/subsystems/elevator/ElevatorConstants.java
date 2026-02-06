@@ -48,6 +48,7 @@ public class ElevatorConstants {
     }
   }
 
+  @Builder(setterPrefix = "with")
   public record Constraints(
       LoggedTunableNumber maxAccelerationMetersPerSecondSquared,
       LoggedTunableNumber cruisingVelocityMetersPerSecond,

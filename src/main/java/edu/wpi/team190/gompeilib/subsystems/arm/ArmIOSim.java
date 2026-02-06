@@ -46,8 +46,12 @@ public class ArmIOSim implements ArmIO {
             0.0,
             constants.SLOT0_GAINS.kD().get(),
             new Constraints(
-                constants.CONSTRAINTS.CRUISING_VELOCITY_ROTATIONS_PER_SECOND().get(),
-                constants.CONSTRAINTS.MAX_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED().get()));
+                constants.CONSTRAINTS.cruisingVelocityRadiansPerSecond().get(),
+                constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get()));
+    feedback.enableContinuousInput(
+        constants.ARM_PARAMETERS.MIN_ANGLE().getRadians(),
+        constants.ARM_PARAMETERS.MAX_ANGLE().getRadians());
+    feedback.setTolerance(constants.CONSTRAINTS.goalToleranceRadians().get());
 
     feedforward =
         new ArmFeedforward(

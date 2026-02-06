@@ -40,6 +40,7 @@ public class GenericFlywheelConstants {
       LoggedTunableNumber kV,
       LoggedTunableNumber kA) {}
 
+  @Builder(setterPrefix = "with")
   public record Constraints(
       LoggedTunableNumber maxAccelerationRadiansPerSecondSquared,
       LoggedTunableNumber cruisingVelocityRadiansPerSecond,
