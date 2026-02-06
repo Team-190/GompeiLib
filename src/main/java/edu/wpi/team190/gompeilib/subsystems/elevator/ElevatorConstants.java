@@ -6,6 +6,7 @@ import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import java.util.Set;
 import lombok.Builder;
 import lombok.Singular;
+import lombok.With;
 
 @Builder
 public class ElevatorConstants {
@@ -29,6 +30,7 @@ public class ElevatorConstants {
   @Singular(value = "OPPOSED_FOLLOWER_CAN_ID")
   public final Set<Integer> OPPOSED_FOLLOWER_CAN_IDS;
 
+  @Builder
   public record Gains(
       LoggedTunableNumber kP,
       LoggedTunableNumber kD,
@@ -52,6 +54,7 @@ public class ElevatorConstants {
       LoggedTunableNumber cruisingVelocityMetersPerSecond,
       LoggedTunableNumber goalToleranceMeters) {}
 
+  @Builder
   public record ElevatorParameters(
       DCMotor ELEVATOR_MOTOR_CONFIG,
       double CARRIAGE_MASS_KG,

@@ -7,6 +7,7 @@ import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import java.util.Set;
 import lombok.Builder;
 import lombok.Singular;
+import lombok.experimental.SuperBuilder;
 
 @Builder
 public class GenericFlywheelConstants {
@@ -15,7 +16,7 @@ public class GenericFlywheelConstants {
   public final InvertedValue LEADER_INVERSION;
 
   @Builder.Default public final CANBus CAN_LOOP = new CANBus();
-  public final boolean ENABLE_FOC;
+  @Builder.Default public final boolean ENABLE_FOC = false;
 
   public final double CURRENT_LIMIT;
   public final double MOMENT_OF_INERTIA;
@@ -32,6 +33,7 @@ public class GenericFlywheelConstants {
   @Singular(value = "OPPOSED_FOLLOWER_CAN_ID")
   public final Set<Integer> OPPOSED_FOLLOWER_CAN_IDS;
 
+  @Builder
   public record Gains(
       LoggedTunableNumber kP,
       LoggedTunableNumber kD,
