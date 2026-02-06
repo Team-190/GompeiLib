@@ -17,7 +17,7 @@ public class GenericFlywheelConstants {
   @Builder.Default public final CANBus CAN_LOOP = new CANBus();
   @Builder.Default public final boolean ENABLE_FOC = false;
 
-  public final double CURRENT_LIMIT;
+  public final CurrentLimits CURRENT_LIMIT;
   public final double MOMENT_OF_INERTIA;
   public final double GEAR_RATIO;
 
@@ -44,4 +44,7 @@ public class GenericFlywheelConstants {
       LoggedTunableNumber maxAccelerationRadiansPerSecondSquared,
       LoggedTunableNumber cruisingVelocityRadiansPerSecond,
       LoggedTunableNumber goalToleranceRadiansPerSecond) {}
+
+  @Builder
+  public record CurrentLimits(double SUPPLY_CURRENT_LIMIT, double STATOR_CURRENT_LIMIT) {}
 }

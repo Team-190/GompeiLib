@@ -56,8 +56,10 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
     talonFXConfiguration
         .CurrentLimits
-        .withSupplyCurrentLimit(constants.CURRENT_LIMIT)
-        .withSupplyCurrentLimitEnable(true);
+        .withSupplyCurrentLimit(constants.CURRENT_LIMIT.SUPPLY_CURRENT_LIMIT())
+        .withSupplyCurrentLimitEnable(true)
+        .withStatorCurrentLimit(constants.CURRENT_LIMIT.STATOR_CURRENT_LIMIT())
+        .withStatorCurrentLimitEnable(true);
     talonFXConfiguration.MotorOutput.withNeutralMode(NeutralModeValue.Coast);
     talonFXConfiguration
         .Slot0
