@@ -17,7 +17,6 @@ import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   protected final TalonFX talonFX;
@@ -49,7 +48,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     talonFX = new TalonFX(constants.LEADER_CAN_ID);
     followerTalonFX =
         new TalonFX
-            [constants.ALIGNED_FOLLOWER_CAN_IDS.length + constants.OPPOSED_FOLLOWER_CAN_IDS.length];
+            [constants.ALIGNED_FOLLOWER_CAN_IDS.size() + constants.OPPOSED_FOLLOWER_CAN_IDS.size()];
 
     talonFXConfiguration = new TalonFXConfiguration();
 
@@ -86,30 +85,28 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     final int[] indexHolder = {0}; // mutable index for array insertion
 
     // CCW followers
-    Arrays.stream(constants.ALIGNED_FOLLOWER_CAN_IDS)
-        .forEach(
-            id -> {
-              TalonFX follower = new TalonFX(id, talonFX.getNetwork());
-              followerTalonFX[indexHolder[0]++] = follower;
+    constants.ALIGNED_FOLLOWER_CAN_IDS.forEach(
+        id -> {
+          TalonFX follower = new TalonFX(id, talonFX.getNetwork());
+          followerTalonFX[indexHolder[0]++] = follower;
 
-              PhoenixUtil.tryUntilOk(
-                  5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
+          PhoenixUtil.tryUntilOk(
+              5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
 
-              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
-            });
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
+        });
 
     // CW followers
-    Arrays.stream(constants.OPPOSED_FOLLOWER_CAN_IDS)
-        .forEach(
-            id -> {
-              TalonFX follower = new TalonFX(id, talonFX.getNetwork());
-              followerTalonFX[indexHolder[0]++] = follower;
+    constants.OPPOSED_FOLLOWER_CAN_IDS.forEach(
+        id -> {
+          TalonFX follower = new TalonFX(id, talonFX.getNetwork());
+          followerTalonFX[indexHolder[0]++] = follower;
 
-              PhoenixUtil.tryUntilOk(
-                  5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
+          PhoenixUtil.tryUntilOk(
+              5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
 
-              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
-            });
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
+        });
 
     positionRotations = talonFX.getPosition();
     velocityRotationsPerSecond = talonFX.getVelocity();
@@ -153,7 +150,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
     BaseStatusSignal.setUpdateFrequencyForAll(1 / GompeiLib.getLoopPeriod(), statusSignals);
 
-    PhoenixUtil.registerSignals(constants.ON_CANIVORE, statusSignals);
+    PhoenixUtil.registerSignals(constants.CAN_BUS.isNetworkFD(), statusSignals);
 
     talonFX.optimizeBusUtilization();
     for (TalonFX follower : followerTalonFX) {

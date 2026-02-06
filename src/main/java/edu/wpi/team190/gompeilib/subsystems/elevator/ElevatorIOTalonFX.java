@@ -14,7 +14,6 @@ import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
 
@@ -49,7 +48,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     this.constants = constants;
 
     // Create lead motor
-    talonFX = new TalonFX(constants.ELEVATOR_CAN_ID);
+    talonFX = new TalonFX(constants.LEADER_CAN_ID);
 
     // Create follower motor array (define length)
     followTalonFX = new TalonFX[constants.ELEVATOR_PARAMETERS.NUM_MOTORS() - 1];
@@ -103,28 +102,26 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     final int[] indexHolder = {0}; // mutable index for array insertion
 
     // CCW followers
-    Arrays.stream(constants.COUNTERCLOCKWISE_CAN_IDS)
-        .forEach(
-            id -> {
-              TalonFX follower = new TalonFX(id, talonFX.getNetwork());
-              followTalonFX[indexHolder[0]++] = follower;
+    constants.OPPOSED_FOLLOWER_CAN_IDS.forEach(
+        id -> {
+          TalonFX follower = new TalonFX(id, talonFX.getNetwork());
+          followTalonFX[indexHolder[0]++] = follower;
 
-              PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config, 0.25));
+          PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config, 0.25));
 
-              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
-            });
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
+        });
 
     // CW followers
-    Arrays.stream(constants.CLOCKWISE_CAN_IDS)
-        .forEach(
-            id -> {
-              TalonFX follower = new TalonFX(id, talonFX.getNetwork());
-              followTalonFX[indexHolder[0]++] = follower;
+    constants.ALIGNED_FOLLOWER_CAN_IDS.forEach(
+        id -> {
+          TalonFX follower = new TalonFX(id, talonFX.getNetwork());
+          followTalonFX[indexHolder[0]++] = follower;
 
-              PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config, 0.25));
+          PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config, 0.25));
 
-              follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
-            });
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
+        });
 
     appliedVolts = new ArrayList<>();
     supplyCurrentAmps = new ArrayList<>();
@@ -175,7 +172,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     positionVoltageRequest = new MotionMagicVoltage(0.0);
     voltageRequest = new VoltageOut(0.0);
 
-    PhoenixUtil.registerSignals(constants.ON_CANIVORE, statusSignals);
+    PhoenixUtil.registerSignals(constants.CAN_BUS.isNetworkFD(), statusSignals);
   }
 
   @Override
