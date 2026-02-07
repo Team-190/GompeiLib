@@ -16,7 +16,7 @@ import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 
 public class GenericRollerIOTalonFX implements GenericRollerIO {
-  private final TalonFX talonFX;
+  protected final TalonFX talonFX;
 
   private final TalonFXConfiguration config;
 
@@ -29,12 +29,14 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
 
   private final VoltageOut voltageRequest;
 
-  public GenericRollerIOTalonFX(GenericRollerConstants consts) {
-    talonFX = new TalonFX(consts.ROLLER_CAN_ID);
+  protected GenericRollerConstants constants;
+
+  public GenericRollerIOTalonFX(GenericRollerConstants constants) {
+    talonFX = new TalonFX(constants.ROLLER_CAN_ID, constants.CAN_LOOP);
 
     config = new TalonFXConfiguration();
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.CurrentLimits.SupplyCurrentLimit = consts.SUPPLY_CURRENT_LIMIT;
+    config.CurrentLimits.SupplyCurrentLimit = constants.SUPPLY_CURRENT_LIMIT;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
@@ -60,17 +62,19 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
     talonFX.optimizeBusUtilization();
 
     PhoenixUtil.registerSignals(
-        consts.ON_CANIVORE,
+        constants.CAN_LOOP.isNetworkFD(),
         positionRotations,
         velocity,
         appliedVoltage,
         supplyCurrent,
         torqueCurrent,
         temperature);
+
+    this.constants = constants;
   }
 
   @Override
-  public void updateInputs(RollerIOInputs inputs) {
+  public void updateInputs(GenericRollerIOInputs inputs) {
     inputs.position = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
     inputs.velocity = velocity.getValue();
     inputs.appliedVolts = appliedVoltage.getValue();

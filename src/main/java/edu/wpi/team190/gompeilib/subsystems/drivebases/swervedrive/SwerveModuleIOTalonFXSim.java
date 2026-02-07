@@ -16,13 +16,10 @@ public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
   private final DCMotorSim steerMotorSim;
   private final DCMotorSim driveMotorSim;
 
-  private TalonFXSimState steerController;
-  private TalonFXSimState driveController;
-  private CANcoderSimState encoderController;
-  private double offset;
-
-  private double motorVoltageDrive;
-  private double motorVoltageSteer;
+  private final TalonFXSimState steerController;
+  private final TalonFXSimState driveController;
+  private final CANcoderSimState encoderController;
+  private final double offset;
 
   public SwerveModuleIOTalonFXSim(
       SwerveDriveConstants driveConstants,
@@ -44,13 +41,19 @@ public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
                 constants.SteerInertia,
                 constants.SteerMotorGearRatio),
             driveConstants.DRIVE_CONFIG.turnModel());
+
+    steerController = super.turnTalonFX.getSimState();
+    driveController = super.driveTalonFX.getSimState();
+    encoderController = super.cancoder.getSimState();
+
+    offset = constants.EncoderOffset;
   }
 
   @Override
   @Trace
   public void updateInputs(ModuleIOInputs inputs) {
     driveController.setSupplyVoltage(RobotController.getBatteryVoltage());
-    motorVoltageDrive = driveController.getMotorVoltage();
+    double motorVoltageDrive = driveController.getMotorVoltage();
 
     driveMotorSim.setInputVoltage(motorVoltageDrive);
 
@@ -64,7 +67,7 @@ public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
     driveController.setRotorVelocity(rotorVelocityRotationsPerSecondDrive);
 
     steerController.setSupplyVoltage(RobotController.getBatteryVoltage());
-    motorVoltageSteer = steerController.getMotorVoltage();
+    double motorVoltageSteer = steerController.getMotorVoltage();
 
     steerMotorSim.setInputVoltage(motorVoltageSteer);
 
@@ -74,8 +77,8 @@ public class SwerveModuleIOTalonFXSim extends SwerveModuleIOTalonFX {
         steerMotorSim.getAngularPositionRotations() * steerMotorSim.getGearing();
     double rotorVelocityRotationsPerSecondSteer =
         steerMotorSim.getAngularVelocityRadPerSec() / (Math.PI * 2) * steerMotorSim.getGearing();
-    driveController.setRawRotorPosition(rotorPositionRotationsSteer);
-    driveController.setRotorVelocity(rotorVelocityRotationsPerSecondSteer);
+    steerController.setRawRotorPosition(rotorPositionRotationsSteer);
+    steerController.setRotorVelocity(rotorVelocityRotationsPerSecondSteer);
 
     encoderController.setRawPosition(steerMotorSim.getAngularPositionRotations() + offset);
 

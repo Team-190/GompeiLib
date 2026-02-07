@@ -21,51 +21,55 @@ public class ArmIOSim implements ArmIO {
 
   private boolean isClosedLoop;
 
-  private final ArmConstants constants;
+  private ArmConstants constants;
 
   public ArmIOSim(ArmConstants constants) {
     armSim =
-            new SingleJointedArmSim(
-                    LinearSystemId.createSingleJointedArmSystem(
-                            constants.ARM_PARAMETERS.MOTOR_CONFIG(),
-                            constants.ARM_PARAMETERS.MOMENT_OF_INERTIA_KG_M_SQUARED(),
-                            constants.ARM_PARAMETERS.GEAR_RATIO()),
-                    constants.ARM_PARAMETERS.MOTOR_CONFIG(),
-                    constants.ARM_PARAMETERS.GEAR_RATIO(),
-                    constants.ARM_PARAMETERS.LENGTH_METERS(),
-                    constants.ARM_PARAMETERS.MIN_ANGLE().getRadians(),
-                    constants.ARM_PARAMETERS.MAX_ANGLE().getRadians(),
-                    true,
-                    constants.ARM_PARAMETERS.MIN_ANGLE().getRadians());
+        new SingleJointedArmSim(
+            LinearSystemId.createSingleJointedArmSystem(
+                constants.ARM_PARAMETERS.MOTOR_CONFIG(),
+                constants.ARM_PARAMETERS.MOMENT_OF_INERTIA(),
+                constants.ARM_PARAMETERS.GEAR_RATIO()),
+            constants.ARM_PARAMETERS.MOTOR_CONFIG(),
+            constants.ARM_PARAMETERS.GEAR_RATIO(),
+            constants.ARM_PARAMETERS.LENGTH_METERS(),
+            constants.ARM_PARAMETERS.MIN_ANGLE().getRadians(),
+            constants.ARM_PARAMETERS.MAX_ANGLE().getRadians(),
+            true,
+            constants.ARM_PARAMETERS.MIN_ANGLE().getRadians());
 
     appliedVolts = 0.0;
 
     feedback =
-            new ProfiledPIDController(
-                    constants.SLOT0_GAINS.kP().get(),
-                    0.0,
-                    constants.SLOT0_GAINS.kD().get(),
-                    new Constraints(
-                            constants.CONSTRAINTS.CRUISING_VELOCITY_ROTATIONS_PER_SECOND().get(),
-                            constants.CONSTRAINTS.MAX_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED().get()));
+        new ProfiledPIDController(
+            constants.SLOT0_GAINS.kP().get(),
+            0.0,
+            constants.SLOT0_GAINS.kD().get(),
+            new Constraints(
+                constants.CONSTRAINTS.cruisingVelocityRadiansPerSecond().get(),
+                constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get()));
+    if (constants.ARM_PARAMETERS.CONTINUOUS_INPUT()) {
+      feedback.enableContinuousInput(
+          constants.ARM_PARAMETERS.MIN_ANGLE().getRadians(),
+          constants.ARM_PARAMETERS.MAX_ANGLE().getRadians());
+    }
+    feedback.setTolerance(constants.CONSTRAINTS.goalToleranceRadians().get());
 
     feedforward =
-            new ArmFeedforward(
-                    constants.SLOT0_GAINS.kS().get(),
-                    constants.SLOT0_GAINS.kV().get(),
-                    constants.SLOT0_GAINS.kA().get(),
-                    constants.SLOT0_GAINS.kG().get());
-
-    this.constants = constants;
+        new ArmFeedforward(
+            constants.SLOT0_GAINS.kS().get(),
+            constants.SLOT0_GAINS.kV().get(),
+            constants.SLOT0_GAINS.kA().get(),
+            constants.SLOT0_GAINS.kG().get());
   }
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
     if (isClosedLoop)
       appliedVolts =
-              feedback.calculate(armSim.getAngleRads())
-                      + feedforward.calculate(
-                      feedback.getSetpoint().position, feedback.getSetpoint().velocity);
+          feedback.calculate(armSim.getAngleRads())
+              + feedforward.calculate(
+                  feedback.getSetpoint().position, feedback.getSetpoint().velocity);
 
     appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
     armSim.setInputVoltage(appliedVolts);
@@ -122,15 +126,15 @@ public class ArmIOSim implements ArmIO {
 
   @Override
   public void updateGains(
-          double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
     feedback.setPID(kP, 0, kD);
     feedforward = new ArmFeedforward(kS, kG, kV);
   }
 
   @Override
   public void updateConstraints(
-          double cruisingVelocityRadiansPerSecond, double maxAccelerationRadiansPerSecondSquared) {
+      double cruisingVelocityRadiansPerSecond, double maxAccelerationRadiansPerSecondSquared) {
     feedback.setConstraints(
-            new Constraints(cruisingVelocityRadiansPerSecond, maxAccelerationRadiansPerSecondSquared));
+        new Constraints(cruisingVelocityRadiansPerSecond, maxAccelerationRadiansPerSecondSquared));
   }
 }
