@@ -6,7 +6,7 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import lombok.Builder;
 import lombok.NonNull;
 
-@Builder
+@Builder(setterPrefix = "with")
 public class GenericRollerConstants {
   @NonNull public final Integer rollerCANID;
   @NonNull public final Double supplyCurrentLimit;
