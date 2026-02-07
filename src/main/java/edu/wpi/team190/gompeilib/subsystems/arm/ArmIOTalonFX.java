@@ -15,6 +15,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -234,7 +235,8 @@ public class ArmIOTalonFX implements ArmIO {
   }
 
   @Override
-  public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
+  public void updateConstraints(
+      double maxAcceleration, double cruisingVelocity, double goalTolerance) {
     config.MotionMagic =
         new MotionMagicConfigs()
             .withMotionMagicAcceleration(
@@ -246,5 +248,11 @@ public class ArmIOTalonFX implements ArmIO {
     for (int i = 0; i < constants.ARM_PARAMETERS.NUM_MOTORS() - 1; i++) {
       followTalonFX[i] = new TalonFX(constants.ARM_CAN_ID + i + 1);
     }
+  }
+
+  @Override
+  public boolean atGoal() {
+    return Math.abs(Units.rotationsToRadians(positionErrorRotations.getValueAsDouble()))
+        < constants.CONSTRAINTS.goalToleranceRadians().get();
   }
 }

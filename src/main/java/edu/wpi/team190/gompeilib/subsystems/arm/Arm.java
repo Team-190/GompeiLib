@@ -3,6 +3,8 @@ package edu.wpi.team190.gompeilib.subsystems.arm;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
@@ -35,24 +37,33 @@ public class Arm {
     io.updateGains(kP, kD, kS, kV, kA, kG, slot);
   }
 
-  public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
-    io.updateConstraints(maxAcceleration, cruisingVelocity);
+  public void updateConstraints(
+      double maxAcceleration, double cruisingVelocity, double goalTolerance) {
+    io.updateConstraints(maxAcceleration, cruisingVelocity, goalTolerance);
   }
 
-  public void setPosition(Rotation2d position) {
-    io.setPosition(position);
+  public Command setPosition(Rotation2d position) {
+    return Commands.runOnce(() -> io.setPosition(position));
   }
 
-  public void setPositionGoal(Rotation2d positionGoal) {
-    io.setPositionGoal(positionGoal);
+  public Command setPositionGoal(Rotation2d positionGoal) {
+    return Commands.runOnce(() -> io.setPositionGoal(positionGoal));
   }
 
-  public void setVoltage(double volts) {
-    io.setVoltage(volts);
+  public Command setVoltage(double volts) {
+    return Commands.runOnce(() -> io.setVoltage(volts));
   }
 
   public void setSlot(GainSlot slot) {
     io.setSlot(slot);
+  }
+
+  public boolean atGoal() {
+    return io.atGoal();
+  }
+
+  public Command waitUntilAtGoal() {
+    return Commands.waitUntil(this::atGoal);
   }
 
   public SysIdRoutine getCharacterization(
