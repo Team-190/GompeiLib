@@ -22,10 +22,10 @@ public class GenericRollerIOTalonFXSim extends GenericRollerIOTalonFX {
     rollerSim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                constants.ROLLER_GEARBOX,
-                constants.MOMENT_OF_INERTIA.baseUnitMagnitude(),
-                constants.ROLLER_MOTOR_GEAR_RATIO),
-            constants.ROLLER_GEARBOX);
+                constants.rollerGearbox,
+                constants.momentOfInertia.baseUnitMagnitude(),
+                constants.rollerMotorGearRatio),
+            constants.rollerGearbox);
 
     rollerController = super.talonFX.getSimState();
   }
@@ -42,10 +42,10 @@ public class GenericRollerIOTalonFXSim extends GenericRollerIOTalonFX {
 
     Angle rotorPosition =
         Angle.ofBaseUnits(
-            rollerSim.getAngularPositionRad() * constants.ROLLER_MOTOR_GEAR_RATIO, Radians);
+            rollerSim.getAngularPositionRad() * constants.rollerMotorGearRatio, Radians);
     AngularVelocity rotorVelocity =
         AngularVelocity.ofBaseUnits(
-            rollerSim.getAngularVelocityRadPerSec() * constants.ROLLER_MOTOR_GEAR_RATIO,
+            rollerSim.getAngularVelocityRadPerSec() * constants.rollerMotorGearRatio,
             RadiansPerSecond);
     rollerController.setRawRotorPosition(rotorPosition);
     rollerController.setRotorVelocity(rotorVelocity);

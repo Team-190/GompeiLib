@@ -15,6 +15,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -49,53 +50,53 @@ public class ArmIOTalonFX implements ArmIO {
   protected final ArmConstants constants;
 
   public ArmIOTalonFX(ArmConstants constants) {
-    talonFX = new TalonFX(constants.ARM_CAN_ID);
-    followTalonFX = new TalonFX[constants.ARM_PARAMETERS.NUM_MOTORS() - 1];
+    talonFX = new TalonFX(constants.armCANID);
+    followTalonFX = new TalonFX[constants.armParameters.numMotors() - 1];
 
     config = new TalonFXConfiguration();
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.CurrentLimits.SupplyCurrentLimit = constants.CURRENT_LIMITS.ARM_SUPPLY_CURRENT_LIMIT();
+    config.CurrentLimits.SupplyCurrentLimit = constants.currentLimits.armSupplyCurrentLimit();
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
-    config.CurrentLimits.StatorCurrentLimit = constants.CURRENT_LIMITS.ARM_STATOR_CURRENT_LIMIT();
+    config.CurrentLimits.StatorCurrentLimit = constants.currentLimits.armStatorCurrentLimit();
     config.CurrentLimits.StatorCurrentLimitEnable = true;
-    config.Feedback.SensorToMechanismRatio = constants.ARM_PARAMETERS.GEAR_RATIO();
+    config.Feedback.SensorToMechanismRatio = constants.armParameters.gearRatio();
 
-    config.Slot0.withKP(constants.SLOT0_GAINS.kP().get())
-        .withKD(constants.SLOT0_GAINS.kD().get())
-        .withKS(constants.SLOT0_GAINS.kS().get())
-        .withKV(constants.SLOT0_GAINS.kV().get())
-        .withKA(constants.SLOT0_GAINS.kA().get())
-        .withKG(constants.SLOT0_GAINS.kG().get())
+    config.Slot0.withKP(constants.slot0Gains.kP().get())
+        .withKD(constants.slot0Gains.kD().get())
+        .withKS(constants.slot0Gains.kS().get())
+        .withKV(constants.slot0Gains.kV().get())
+        .withKA(constants.slot0Gains.kA().get())
+        .withKG(constants.slot0Gains.kG().get())
         .withGravityType(GravityTypeValue.Arm_Cosine);
 
-    config.Slot1.withKP(constants.SLOT1_GAINS.kP().get())
-        .withKD(constants.SLOT1_GAINS.kD().get())
-        .withKS(constants.SLOT1_GAINS.kS().get())
-        .withKV(constants.SLOT1_GAINS.kV().get())
-        .withKA(constants.SLOT1_GAINS.kA().get())
-        .withKG(constants.SLOT1_GAINS.kG().get())
+    config.Slot1.withKP(constants.slot1Gains.kP().get())
+        .withKD(constants.slot1Gains.kD().get())
+        .withKS(constants.slot1Gains.kS().get())
+        .withKV(constants.slot1Gains.kV().get())
+        .withKA(constants.slot1Gains.kA().get())
+        .withKG(constants.slot1Gains.kG().get())
         .withGravityType(GravityTypeValue.Arm_Cosine);
 
-    config.Slot2.withKP(constants.SLOT2_GAINS.kP().get())
-        .withKD(constants.SLOT2_GAINS.kD().get())
-        .withKS(constants.SLOT2_GAINS.kS().get())
-        .withKV(constants.SLOT2_GAINS.kV().get())
-        .withKA(constants.SLOT2_GAINS.kA().get())
-        .withKG(constants.SLOT2_GAINS.kG().get())
+    config.Slot2.withKP(constants.slot2Gains.kP().get())
+        .withKD(constants.slot2Gains.kD().get())
+        .withKS(constants.slot2Gains.kS().get())
+        .withKV(constants.slot2Gains.kV().get())
+        .withKA(constants.slot2Gains.kA().get())
+        .withKG(constants.slot2Gains.kG().get())
         .withGravityType(GravityTypeValue.Arm_Cosine);
 
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    config.ClosedLoopGeneral.ContinuousWrap = constants.ARM_PARAMETERS.CONTINUOUS_INPUT();
+    config.ClosedLoopGeneral.ContinuousWrap = constants.armParameters.continuousOutput();
     config.MotionMagic =
         new MotionMagicConfigs()
             .withMotionMagicAcceleration(
                 AngularAcceleration.ofRelativeUnits(
-                    constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get(),
+                    constants.constraints.maxAccelerationRadiansPerSecondSquared().get(),
                     RadiansPerSecondPerSecond))
             .withMotionMagicCruiseVelocity(
                 AngularVelocity.ofRelativeUnits(
-                    constants.CONSTRAINTS.cruisingVelocityRadiansPerSecond().get(),
+                    constants.constraints.cruisingVelocityRadiansPerSecond().get(),
                     RadiansPerSecond));
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
@@ -120,15 +121,15 @@ public class ArmIOTalonFX implements ArmIO {
     positionSetpointRotations = talonFX.getClosedLoopReference();
     positionErrorRotations = talonFX.getClosedLoopError();
 
-    for (int i = 0; i < constants.ARM_PARAMETERS.NUM_MOTORS() - 1; i++) {
+    for (int i = 0; i < constants.armParameters.numMotors() - 1; i++) {
       appliedVolts.add(followTalonFX[i].getMotorVoltage());
       supplyCurrentAmps.add(followTalonFX[i].getSupplyCurrent());
       torqueCurrentAmps.add(followTalonFX[i].getTorqueCurrent());
       temperatureCelsius.add(followTalonFX[i].getDeviceTemp());
     }
 
-    voltageRequest = new VoltageOut(0).withEnableFOC(constants.ENABLE_FOC);
-    positionVoltageRequest = new MotionMagicVoltage(0).withEnableFOC(constants.ENABLE_FOC);
+    voltageRequest = new VoltageOut(0).withEnableFOC(constants.enableFOC);
+    positionVoltageRequest = new MotionMagicVoltage(0).withEnableFOC(constants.enableFOC);
 
     var signalsList = new ArrayList<StatusSignal<?>>();
 
@@ -164,12 +165,12 @@ public class ArmIOTalonFX implements ArmIO {
     inputs.position = new Rotation2d(positionRotations.getValue());
     inputs.velocityRadiansPerSecond = velocityRotationsPerSecond.getValue().in(RadiansPerSecond);
 
-    inputs.appliedVolts = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
-    inputs.supplyCurrentAmps = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
-    inputs.torqueCurrentAmps = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
-    inputs.temperatureCelsius = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
+    inputs.appliedVolts = new double[constants.armParameters.numMotors()];
+    inputs.supplyCurrentAmps = new double[constants.armParameters.numMotors()];
+    inputs.torqueCurrentAmps = new double[constants.armParameters.numMotors()];
+    inputs.temperatureCelsius = new double[constants.armParameters.numMotors()];
 
-    for (int i = 0; i < constants.ARM_PARAMETERS.NUM_MOTORS(); i++) {
+    for (int i = 0; i < constants.armParameters.numMotors(); i++) {
       inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
       inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
       inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValueAsDouble();
@@ -228,13 +229,15 @@ public class ArmIOTalonFX implements ArmIO {
     }
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config));
 
-    for (int i = 0; i < constants.ARM_PARAMETERS.NUM_MOTORS() - 1; i++) {
-      followTalonFX[i] = new TalonFX(constants.ARM_CAN_ID + i + 1);
+    for (int i = 0; i < constants.armParameters.numMotors() - 1; i++) {
+      int finalI = i;
+      PhoenixUtil.tryUntilOk(5, () -> followTalonFX[finalI].getConfigurator().apply(config));
     }
   }
 
   @Override
-  public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
+  public void updateConstraints(
+      double maxAcceleration, double cruisingVelocity, double goalTolerance) {
     config.MotionMagic =
         new MotionMagicConfigs()
             .withMotionMagicAcceleration(
@@ -243,8 +246,15 @@ public class ArmIOTalonFX implements ArmIO {
                 AngularVelocity.ofRelativeUnits(cruisingVelocity, RadiansPerSecond));
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
-    for (int i = 0; i < constants.ARM_PARAMETERS.NUM_MOTORS() - 1; i++) {
-      followTalonFX[i] = new TalonFX(constants.ARM_CAN_ID + i + 1);
+    for (int i = 0; i < constants.armParameters.numMotors() - 1; i++) {
+      int finalI = i;
+      PhoenixUtil.tryUntilOk(5, () -> followTalonFX[finalI].getConfigurator().apply(config, 0.25));
     }
+  }
+
+  @Override
+  public boolean atGoal() {
+    return Math.abs(Units.rotationsToRadians(positionErrorRotations.getValueAsDouble()))
+        < constants.constraints.goalToleranceRadians().get();
   }
 }

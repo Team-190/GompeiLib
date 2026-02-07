@@ -84,7 +84,7 @@ public class SwerveDrive extends SubsystemBase {
     filteredX = 0;
     filteredY = 0;
 
-    kinematics = this.driveConstants.DRIVE_CONFIG.kinematics();
+    kinematics = this.driveConstants.driveConfig.kinematics();
     rawGyroRotation = new Rotation2d();
     lastModulePositions = // For delta tracking
         new SwerveModulePosition[] {
@@ -116,21 +116,21 @@ public class SwerveDrive extends SubsystemBase {
 
     autoHeadingController =
         new PIDController(
-            driveConstants.AUTO_GAINS.rotation_Kp().get(),
+            driveConstants.autoGains.rotationKp().get(),
             0.0,
-            driveConstants.AUTO_GAINS.rotation_Kd().get(),
+            driveConstants.autoGains.rotationKd().get(),
             GompeiLib.getLoopPeriod());
     autoXController =
         new PIDController(
-            driveConstants.AUTO_GAINS.translation_Kp().get(),
+            driveConstants.autoGains.translationKp().get(),
             0.0,
-            driveConstants.AUTO_GAINS.translation_Kd().get(),
+            driveConstants.autoGains.translationKd().get(),
             GompeiLib.getLoopPeriod());
     autoYController =
         new PIDController(
-            driveConstants.AUTO_GAINS.translation_Kp().get(),
+            driveConstants.autoGains.translationKp().get(),
             0.0,
-            driveConstants.AUTO_GAINS.translation_Kd().get(),
+            driveConstants.autoGains.translationKd().get(),
             GompeiLib.getLoopPeriod());
 
     autoHeadingController.enableContinuousInput(-Math.PI, Math.PI);
@@ -139,7 +139,7 @@ public class SwerveDrive extends SubsystemBase {
 
   @Trace
   public void periodic() {
-    driveConstants.lock.lock();
+    driveConstants.reentrantLock.lock();
 
     if (yawTimestampQueue.isPresent() && yawPositionQueue.isPresent()) {
       gyroIO.updateInputs(gyroInputs, yawTimestampQueue.get(), yawPositionQueue.get());
@@ -153,7 +153,7 @@ public class SwerveDrive extends SubsystemBase {
       modules[i].updateInputs();
     }
 
-    driveConstants.lock.unlock();
+    driveConstants.reentrantLock.unlock();
 
     Logger.processInputs("Drive/Gyro", gyroInputs);
 
@@ -221,7 +221,7 @@ public class SwerveDrive extends SubsystemBase {
     ChassisSpeeds optimizedSpeeds = ChassisSpeeds.discretize(speeds, GompeiLib.getLoopPeriod());
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(optimizedSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        setpointStates, driveConstants.DRIVE_CONFIG.maxLinearVelocityMetersPerSecond());
+        setpointStates, driveConstants.driveConfig.maxLinearVelocityMetersPerSecond());
 
     // Log unoptimized setpoints and setpoint speeds
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
@@ -251,7 +251,7 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(optimizedSpeeds);
     SwerveModuleState[] setpointTorques = new SwerveModuleState[4];
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        setpointStates, driveConstants.DRIVE_CONFIG.maxLinearVelocityMetersPerSecond());
+        setpointStates, driveConstants.driveConfig.maxLinearVelocityMetersPerSecond());
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
@@ -259,7 +259,7 @@ public class SwerveDrive extends SubsystemBase {
           VecBuilder.fill(setpointStates[i].angle.getCos(), setpointStates[i].angle.getSin());
       setpointTorques[i] =
           new SwerveModuleState(
-              forces.get(i).dot(wheelDirection) * driveConstants.FRONT_LEFT.DriveMotorGearRatio,
+              forces.get(i).dot(wheelDirection) * driveConstants.frontLeft.DriveMotorGearRatio,
               setpointStates[i].angle);
 
       setpointStates[i].optimize(modules[i].getAngle());
@@ -295,7 +295,7 @@ public class SwerveDrive extends SubsystemBase {
   public void stopWithX() {
     Rotation2d[] headings = new Rotation2d[4];
     for (int i = 0; i < 4; i++) {
-      headings[i] = driveConstants.DRIVE_CONFIG.getModuleTranslations()[i].getAngle();
+      headings[i] = driveConstants.driveConfig.getModuleTranslations()[i].getAngle();
     }
     kinematics.resetHeadings(headings);
     stop();
@@ -352,13 +352,13 @@ public class SwerveDrive extends SubsystemBase {
   /** Returns the maximum linear speed in meters per sec. */
   @Trace
   public double getMaxLinearSpeedMetersPerSec() {
-    return driveConstants.DRIVE_CONFIG.maxLinearVelocityMetersPerSecond();
+    return driveConstants.driveConfig.maxLinearVelocityMetersPerSecond();
   }
 
   /** Returns the maximum angular speed in radians per sec. */
   @Trace
   public double getMaxAngularSpeedRadPerSec() {
-    return getMaxLinearSpeedMetersPerSec() / driveConstants.DRIVE_CONFIG.driveBaseRadius();
+    return getMaxLinearSpeedMetersPerSec() / driveConstants.driveConfig.driveBaseRadius();
   }
 
   /** Returns the field relative velocity in X and Y. */

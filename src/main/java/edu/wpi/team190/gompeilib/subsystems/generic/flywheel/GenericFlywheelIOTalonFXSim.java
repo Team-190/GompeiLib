@@ -22,8 +22,8 @@ public class GenericFlywheelIOTalonFXSim extends GenericFlywheelIOTalonFX {
     flywheelSim =
         new FlywheelSim(
             LinearSystemId.createFlywheelSystem(
-                constants.MOTOR_CONFIG, constants.MOMENT_OF_INERTIA, constants.GEAR_RATIO),
-            constants.MOTOR_CONFIG);
+                constants.motorConfig, constants.momentOfInertia, constants.gearRatio),
+            constants.motorConfig);
 
     flywheelController = super.talonFX.getSimState();
   }
@@ -40,10 +40,10 @@ public class GenericFlywheelIOTalonFXSim extends GenericFlywheelIOTalonFX {
 
     AngularVelocity rotorVelocity =
         AngularVelocity.ofBaseUnits(
-            flywheelSim.getAngularVelocityRadPerSec() * constants.GEAR_RATIO, RadiansPerSecond);
+            flywheelSim.getAngularVelocityRadPerSec() * constants.gearRatio, RadiansPerSecond);
     AngularAcceleration rotorAcceleration =
         AngularAcceleration.ofBaseUnits(
-            flywheelSim.getAngularAccelerationRadPerSecSq() * constants.GEAR_RATIO,
+            flywheelSim.getAngularAccelerationRadPerSecSq() * constants.gearRatio,
             RadiansPerSecondPerSecond);
     flywheelController.setRotorVelocity(rotorVelocity);
     flywheelController.setRotorAcceleration(rotorAcceleration);

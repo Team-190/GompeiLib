@@ -78,9 +78,9 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
       SwerveDriveConstants driveConstants,
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
-    driveTalonFX = new TalonFX(constants.DriveMotorId, driveConstants.DRIVE_CONFIG.canBus());
-    turnTalonFX = new TalonFX(constants.SteerMotorId, driveConstants.DRIVE_CONFIG.canBus());
-    cancoder = new CANcoder(constants.EncoderId, driveConstants.DRIVE_CONFIG.canBus());
+    driveTalonFX = new TalonFX(constants.DriveMotorId, driveConstants.driveConfig.canBus());
+    turnTalonFX = new TalonFX(constants.SteerMotorId, driveConstants.driveConfig.canBus());
+    cancoder = new CANcoder(constants.EncoderId, driveConstants.driveConfig.canBus());
 
     driveConfig = new TalonFXConfiguration();
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -107,8 +107,8 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
           case RemoteCANcoder -> FeedbackSensorSourceValue.RemoteCANcoder;
           case FusedCANcoder -> FeedbackSensorSourceValue.FusedCANcoder;
           case SyncCANcoder -> FeedbackSensorSourceValue.SyncCANcoder;
-          default -> throw new IllegalArgumentException(
-              "Unexpected value: " + constants.FeedbackSource);
+          default ->
+              throw new IllegalArgumentException("Unexpected value: " + constants.FeedbackSource);
         };
     turnConfig.Feedback.RotorToSensorRatio = constants.SteerMotorGearRatio;
     turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
@@ -170,7 +170,7 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 
     // Configure periodic frames
     BaseStatusSignal.setUpdateFrequencyForAll(
-        driveConstants.ODOMETRY_FREQUENCY,
+        driveConstants.odometryFrequency,
         drivePositionRotations,
         turnPositionRotations,
         turnAbsolutePositionRotations);

@@ -9,81 +9,74 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import java.util.concurrent.locks.ReentrantLock;
+import lombok.Builder;
+import lombok.NonNull;
 
+@Builder(setterPrefix = "with")
 public class SwerveDriveConstants {
-  public final ReentrantLock lock;
+  @NonNull public final ReentrantLock reentrantLock;
 
+  @NonNull
   public final SwerveModuleConstants<
           TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-      FRONT_LEFT;
+      frontLeft;
+
+  @NonNull
   public final SwerveModuleConstants<
           TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-      FRONT_RIGHT;
+      frontRight;
+
+  @NonNull
   public final SwerveModuleConstants<
           TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-      BACK_LEFT;
+      backLeft;
+
+  @NonNull
   public final SwerveModuleConstants<
           TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-      BACK_RIGHT;
+      backRight;
 
-  public final DriveConfig DRIVE_CONFIG;
+  @NonNull public final DriveConfig driveConfig;
 
-  public final Gains GAINS;
-  public final AutoGains AUTO_GAINS;
-  public final AutoAlignNearConstants AUTO_ALIGN_NEAR_CONSTANTS;
+  @NonNull public final Gains gains;
+  @NonNull public final AutoGains autoGains;
+  @NonNull public final AutoAlignNearConstants autoAlignConstants;
 
-  public final double ODOMETRY_FREQUENCY;
-  public final double DRIVER_DEADBAND;
-  public final double OPERATOR_DEADBAND;
+  @NonNull public final Double odometryFrequency;
+  @NonNull public final Double driverDeadband;
+  @NonNull public final Double operatorDeadband;
 
-  public SwerveDriveConstants(
-      DriveConfig driveConfig,
-      Gains gains,
-      AutoGains autoGains,
-      AutoAlignNearConstants autoAlignNearConstants,
-      double odometryFrequency,
-      double driverDeadband,
-      double operatorDeadband) {
-    this.lock = new ReentrantLock();
-    this.FRONT_LEFT = driveConfig.frontLeft();
-    this.FRONT_RIGHT = driveConfig.frontRight();
-    this.BACK_LEFT = driveConfig.backLeft();
-    this.BACK_RIGHT = driveConfig.backRight();
-    this.DRIVE_CONFIG = driveConfig;
-    this.GAINS = gains;
-    this.AUTO_GAINS = autoGains;
-    this.AUTO_ALIGN_NEAR_CONSTANTS = autoAlignNearConstants;
-    this.ODOMETRY_FREQUENCY = odometryFrequency;
-    this.DRIVER_DEADBAND = driverDeadband;
-    this.OPERATOR_DEADBAND = operatorDeadband;
-  }
-
+  @Builder(setterPrefix = "with")
   public record DriveConfig(
-      CANBus canBus,
-      int pigeon2Id,
-      double maxLinearVelocityMetersPerSecond,
-      double wheelRadiusMeters,
-      DCMotor driveModel,
-      DCMotor turnModel,
-      SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-          frontLeft,
-      SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-          frontRight,
-      SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-          backLeft,
-      SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-          backRight,
-      SwerveModuleConstants.ClosedLoopOutputType driveClosedLoopOutputType,
-      SwerveModuleConstants.ClosedLoopOutputType steerClosedLoopOutputType,
-      double bumperWidth,
-      double bumperLength) {
-    public double driveBaseRadius() {
+      @NonNull CANBus canBus,
+      @NonNull Integer pigeon2Id,
+      @NonNull Double maxLinearVelocityMetersPerSecond,
+      @NonNull Double wheelRadiusMeters,
+      @NonNull DCMotor driveModel,
+      @NonNull DCMotor turnModel,
+      @NonNull
+          SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+              frontLeft,
+      @NonNull
+          SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+              frontRight,
+      @NonNull
+          SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+              backLeft,
+      @NonNull
+          SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+              backRight,
+      @NonNull SwerveModuleConstants.ClosedLoopOutputType driveClosedLoopOutputType,
+      @NonNull SwerveModuleConstants.ClosedLoopOutputType steerClosedLoopOutputType,
+      @NonNull Double bumperWidth,
+      @NonNull Double bumperLength) {
+    public Double driveBaseRadius() {
       return Math.hypot(
           (Math.abs(frontLeft.LocationX) + Math.abs(frontRight.LocationX)) / 2.0,
           (Math.abs(frontLeft.LocationY) + Math.abs(backLeft.LocationY)) / 2.0);
     }
 
-    public double maxAngularVelocity() {
+    public Double maxAngularVelocity() {
       return maxLinearVelocityMetersPerSecond / driveBaseRadius();
     }
 
@@ -101,29 +94,33 @@ public class SwerveDriveConstants {
     }
   }
 
+  @Builder(setterPrefix = "with")
   public record Gains(
-      LoggedTunableNumber drive_Ks,
-      LoggedTunableNumber drive_Kv,
-      LoggedTunableNumber drive_Kp,
-      LoggedTunableNumber drive_Kd,
-      LoggedTunableNumber turn_Kp,
-      LoggedTunableNumber turn_Kd) {}
+      @NonNull LoggedTunableNumber driveKs,
+      @NonNull LoggedTunableNumber driveKv,
+      @NonNull LoggedTunableNumber driveKp,
+      @NonNull LoggedTunableNumber driveKd,
+      @NonNull LoggedTunableNumber turnKp,
+      @NonNull LoggedTunableNumber turnKd) {}
 
+  @Builder(setterPrefix = "with")
   public record AutoGains(
-      LoggedTunableNumber translation_Kp,
-      LoggedTunableNumber translation_Kd,
-      LoggedTunableNumber rotation_Kp,
-      LoggedTunableNumber rotation_Kd) {}
+      @NonNull LoggedTunableNumber translationKp,
+      @NonNull LoggedTunableNumber translationKd,
+      @NonNull LoggedTunableNumber rotationKp,
+      @NonNull LoggedTunableNumber rotationKd) {}
 
+  @Builder(setterPrefix = "with")
   public record PIDControllerConstants(
-      LoggedTunableNumber kP,
-      LoggedTunableNumber kD,
-      LoggedTunableNumber tolerance,
-      LoggedTunableNumber maxVelocity) {}
+      @NonNull LoggedTunableNumber kP,
+      @NonNull LoggedTunableNumber kD,
+      @NonNull LoggedTunableNumber tolerance,
+      @NonNull LoggedTunableNumber maxVelocity) {}
 
+  @Builder(setterPrefix = "with")
   public record AutoAlignNearConstants(
-      PIDControllerConstants xPIDConstants,
-      PIDControllerConstants yPIDConstants,
-      PIDControllerConstants omegaPIDConstants,
-      LoggedTunableNumber positionThresholdMeters) {}
+      @NonNull PIDControllerConstants xPIDConstants,
+      @NonNull PIDControllerConstants yPIDConstants,
+      @NonNull PIDControllerConstants omegaPIDConstants,
+      @NonNull LoggedTunableNumber positionThresholdMeters) {}
 }

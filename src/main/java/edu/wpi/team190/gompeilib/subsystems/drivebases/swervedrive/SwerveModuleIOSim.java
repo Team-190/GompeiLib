@@ -49,17 +49,17 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
     driveSim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                driveConstants.DRIVE_CONFIG.driveModel(),
+                driveConstants.driveConfig.driveModel(),
                 constants.DriveInertia,
                 constants.DriveMotorGearRatio),
-            driveConstants.DRIVE_CONFIG.driveModel());
+            driveConstants.driveConfig.driveModel());
     turnSim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                driveConstants.DRIVE_CONFIG.turnModel(),
+                driveConstants.driveConfig.turnModel(),
                 constants.SteerInertia,
                 constants.SteerMotorGearRatio),
-            driveConstants.DRIVE_CONFIG.turnModel());
+            driveConstants.driveConfig.turnModel());
 
     driveClosedLoop = false;
     turnClosedLoop = false;

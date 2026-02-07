@@ -22,15 +22,15 @@ public class ElevatorIOTalonFXSim extends ElevatorIOTalonFX {
     elevatorSim =
         new ElevatorSim(
             LinearSystemId.createElevatorSystem(
-                constants.ELEVATOR_PARAMETERS.ELEVATOR_MOTOR_CONFIG(),
-                constants.ELEVATOR_PARAMETERS.CARRIAGE_MASS_KG(),
-                constants.DRUM_RADIUS,
-                constants.ELEVATOR_GEAR_RATIO),
-            constants.ELEVATOR_PARAMETERS.ELEVATOR_MOTOR_CONFIG(),
-            constants.ELEVATOR_PARAMETERS.MIN_HEIGHT_METERS(),
-            constants.ELEVATOR_PARAMETERS.MAX_HEIGHT_METERS(),
+                constants.elevatorParameters.ELEVATOR_MOTOR_CONFIG(),
+                constants.elevatorParameters.CARRIAGE_MASS_KG(),
+                constants.drumRadius,
+                constants.elevatorGearRatio),
+            constants.elevatorParameters.ELEVATOR_MOTOR_CONFIG(),
+            constants.elevatorParameters.MIN_HEIGHT_METERS(),
+            constants.elevatorParameters.MAX_HEIGHT_METERS(),
             true,
-            constants.ELEVATOR_PARAMETERS.MIN_HEIGHT_METERS());
+            constants.elevatorParameters.MIN_HEIGHT_METERS());
 
     elevatorController = super.talonFX.getSimState();
   }
@@ -47,13 +47,13 @@ public class ElevatorIOTalonFXSim extends ElevatorIOTalonFX {
 
     Angle rotorPosition =
         Angle.ofBaseUnits(
-            elevatorSim.getPositionMeters() * constants.ELEVATOR_GEAR_RATIO * constants.DRUM_RADIUS,
+            elevatorSim.getPositionMeters() * constants.elevatorGearRatio * constants.drumRadius,
             Radians);
     AngularVelocity rotorVelocity =
         AngularVelocity.ofBaseUnits(
             elevatorSim.getVelocityMetersPerSecond()
-                * constants.ELEVATOR_GEAR_RATIO
-                * constants.DRUM_RADIUS,
+                * constants.elevatorGearRatio
+                * constants.drumRadius,
             RadiansPerSecond);
     elevatorController.setRawRotorPosition(rotorPosition);
     elevatorController.setRotorVelocity(rotorVelocity);
