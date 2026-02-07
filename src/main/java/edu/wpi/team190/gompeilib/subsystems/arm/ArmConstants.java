@@ -1,71 +1,73 @@
 package edu.wpi.team190.gompeilib.subsystems.arm;
 
+import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
+import lombok.Builder;
 
+@Builder
 public class ArmConstants {
   public final int ARM_CAN_ID;
-  public final boolean ON_CANIVORE;
+  @Builder.Default public final CANBus CAN_LOOP = new CANBus();
   public final ArmParameters ARM_PARAMETERS;
   public final Gains SLOT0_GAINS;
-  public final Gains SLOT1_GAINS;
-  public final Gains SLOT2_GAINS;
+  @Builder.Default public final Gains SLOT1_GAINS = new Gains("Arm/Slot1");
+  @Builder.Default public final Gains SLOT2_GAINS = new Gains("Arm/Slot2");
 
   public final Constraints CONSTRAINTS;
 
   public final CurrentLimits CURRENT_LIMITS;
 
-  public final boolean ENABLE_FOC;
+  @Builder.Default public final boolean ENABLE_FOC = false;
 
-  public ArmConstants(
-      int ARM_CAN_ID,
-      boolean ON_CANIVORE,
-      ArmParameters ARM_PARAMETERS,
-      Gains SLOT0_GAINS,
-      Gains SLOT1_GAINS,
-      Gains SLOT2_GAINS,
-      Constraints CONSTRAINTS,
-      CurrentLimits CURRENT_LIMITS,
-      double MOMENT_OF_INERTIA,
-      boolean ENABLE_FOC) {
-    this.ARM_CAN_ID = ARM_CAN_ID;
-    this.ON_CANIVORE = ON_CANIVORE;
-    this.ARM_PARAMETERS = ARM_PARAMETERS;
-    this.SLOT0_GAINS = SLOT0_GAINS;
-    this.SLOT1_GAINS = SLOT1_GAINS;
-    this.SLOT2_GAINS = SLOT2_GAINS;
-    this.CONSTRAINTS = CONSTRAINTS;
-    this.CURRENT_LIMITS = CURRENT_LIMITS;
-    this.ENABLE_FOC = ENABLE_FOC;
-  }
-
+  @Builder
   public record ArmParameters(
       DCMotor MOTOR_CONFIG,
       Rotation2d MIN_ANGLE,
       Rotation2d MAX_ANGLE,
+      Boolean CONTINUOUS_INPUT,
       int NUM_MOTORS,
       double GEAR_RATIO,
       double LENGTH_METERS,
-      double MOMENT_OF_INERTIA) {}
+      double MOMENT_OF_INERTIA) {
+    static class ArmParametersBuilder {
+      ArmParametersBuilder() {
+        CONTINUOUS_INPUT = false;
+      }
+    }
+  }
 
+  @Builder
   public record Gains(
       LoggedTunableNumber kP,
       LoggedTunableNumber kD,
       LoggedTunableNumber kS,
       LoggedTunableNumber kG,
       LoggedTunableNumber kV,
-      LoggedTunableNumber kA) {}
+      LoggedTunableNumber kA) {
+    public Gains(String prefix) {
+      this(
+          new LoggedTunableNumber(prefix + "/kP"),
+          new LoggedTunableNumber(prefix + "/kD"),
+          new LoggedTunableNumber(prefix + "/kS"),
+          new LoggedTunableNumber(prefix + "/kG"),
+          new LoggedTunableNumber(prefix + "/kV"),
+          new LoggedTunableNumber(prefix + "/kA"));
+    }
+  }
 
+  @Builder
   public record CurrentLimits(
       double ARM_SUPPLY_CURRENT_LIMIT,
       double ARM_STATOR_CURRENT_LIMIT,
       double ARM_TORQUE_CURRENT_LIMIT) {}
 
+  @Builder(setterPrefix = "with")
   public record Constraints(
-      LoggedTunableNumber MAX_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED,
-      LoggedTunableNumber CRUISING_VELOCITY_ROTATIONS_PER_SECOND,
+      LoggedTunableNumber maxAccelerationRadiansPerSecondSquared,
+      LoggedTunableNumber cruisingVelocityRadiansPerSecond,
       LoggedTunableNumber
-          GOAL_TOLERANCE_RADIANS) {} // Units intentionally apply to arm rotations, not motor
+          goalToleranceRadians) {} // Units intentionally apply to arm rotations, not motor
   // rotations
 }

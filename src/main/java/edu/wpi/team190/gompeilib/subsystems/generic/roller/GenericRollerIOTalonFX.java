@@ -32,7 +32,7 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
   protected GenericRollerConstants constants;
 
   public GenericRollerIOTalonFX(GenericRollerConstants constants) {
-    talonFX = new TalonFX(constants.ROLLER_CAN_ID);
+    talonFX = new TalonFX(constants.ROLLER_CAN_ID, constants.CAN_LOOP);
 
     config = new TalonFXConfiguration();
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -62,7 +62,7 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
     talonFX.optimizeBusUtilization();
 
     PhoenixUtil.registerSignals(
-        constants.ON_CANIVORE,
+        constants.CAN_LOOP.isNetworkFD(),
         positionRotations,
         velocity,
         appliedVoltage,

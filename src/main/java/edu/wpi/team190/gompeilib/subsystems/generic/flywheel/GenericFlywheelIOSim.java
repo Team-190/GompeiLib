@@ -99,7 +99,11 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
     double amps = feedback.calculate(omega, setpoint);
 
     // Optional current limit
-    amps = MathUtil.clamp(amps, -constants.CURRENT_LIMIT, constants.CURRENT_LIMIT);
+    amps =
+        MathUtil.clamp(
+            amps,
+            -constants.CURRENT_LIMIT.SUPPLY_CURRENT_LIMIT(),
+            constants.CURRENT_LIMIT.SUPPLY_CURRENT_LIMIT());
 
     // Amps → volts using motor physics
     var motor = motorSim.getGearbox();

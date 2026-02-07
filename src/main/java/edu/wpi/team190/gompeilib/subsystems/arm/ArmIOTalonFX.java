@@ -1,8 +1,6 @@
 package edu.wpi.team190.gompeilib.subsystems.arm;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -88,17 +86,17 @@ public class ArmIOTalonFX implements ArmIO {
         .withGravityType(GravityTypeValue.Arm_Cosine);
 
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    config.ClosedLoopGeneral.ContinuousWrap = true;
+    config.ClosedLoopGeneral.ContinuousWrap = constants.ARM_PARAMETERS.CONTINUOUS_INPUT();
     config.MotionMagic =
         new MotionMagicConfigs()
             .withMotionMagicAcceleration(
                 AngularAcceleration.ofRelativeUnits(
-                    constants.CONSTRAINTS.MAX_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED().get(),
-                    RotationsPerSecondPerSecond))
+                    constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get(),
+                    RadiansPerSecondPerSecond))
             .withMotionMagicCruiseVelocity(
                 AngularVelocity.ofRelativeUnits(
-                    constants.CONSTRAINTS.CRUISING_VELOCITY_ROTATIONS_PER_SECOND().get(),
-                    RotationsPerSecond));
+                    constants.CONSTRAINTS.cruisingVelocityRadiansPerSecond().get(),
+                    RadiansPerSecond));
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
@@ -129,8 +127,8 @@ public class ArmIOTalonFX implements ArmIO {
       temperatureCelsius.add(followTalonFX[i].getDeviceTemp());
     }
 
-    voltageRequest = new VoltageOut(0);
-    positionVoltageRequest = new MotionMagicVoltage(0);
+    voltageRequest = new VoltageOut(0).withEnableFOC(constants.ENABLE_FOC);
+    positionVoltageRequest = new MotionMagicVoltage(0).withEnableFOC(constants.ENABLE_FOC);
 
     var signalsList = new ArrayList<StatusSignal<?>>();
 
@@ -186,7 +184,7 @@ public class ArmIOTalonFX implements ArmIO {
 
   @Override
   public void setVoltage(double volts) {
-    talonFX.setControl(voltageRequest.withOutput(volts).withEnableFOC(constants.ENABLE_FOC));
+    talonFX.setControl(voltageRequest.withOutput(volts));
   }
 
   @Override
@@ -196,25 +194,20 @@ public class ArmIOTalonFX implements ArmIO {
 
   @Override
   public void setPositionGoal(Rotation2d positionGoal) {
-    talonFX.setControl(
-        positionVoltageRequest
-            .withPosition(positionGoal.getRotations())
-            .withEnableFOC(constants.ENABLE_FOC));
+    talonFX.setControl(positionVoltageRequest.withPosition(positionGoal.getRotations()));
   }
 
   @Override
   public void setSlot(GainSlot slot) {
     switch (slot) {
-      case ZERO:
-        talonFX.setControl(positionVoltageRequest.withSlot(0));
-        break;
       case ONE:
         talonFX.setControl(positionVoltageRequest.withSlot(1));
         break;
       case TWO:
-      default:
         talonFX.setControl(positionVoltageRequest.withSlot(2));
         break;
+      default:
+        talonFX.setControl(positionVoltageRequest.withSlot(0));
     }
   }
 
@@ -245,9 +238,9 @@ public class ArmIOTalonFX implements ArmIO {
     config.MotionMagic =
         new MotionMagicConfigs()
             .withMotionMagicAcceleration(
-                AngularAcceleration.ofRelativeUnits(maxAcceleration, RotationsPerSecondPerSecond))
+                AngularAcceleration.ofRelativeUnits(maxAcceleration, RadiansPerSecondPerSecond))
             .withMotionMagicCruiseVelocity(
-                AngularVelocity.ofRelativeUnits(cruisingVelocity, RotationsPerSecond));
+                AngularVelocity.ofRelativeUnits(cruisingVelocity, RadiansPerSecond));
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
     for (int i = 0; i < constants.ARM_PARAMETERS.NUM_MOTORS() - 1; i++) {
