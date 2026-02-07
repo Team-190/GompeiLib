@@ -230,7 +230,8 @@ public class ArmIOTalonFX implements ArmIO {
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config));
 
     for (int i = 0; i < constants.ARM_PARAMETERS.NUM_MOTORS() - 1; i++) {
-      followTalonFX[i] = new TalonFX(constants.ARM_CAN_ID + i + 1);
+      int finalI = i;
+      PhoenixUtil.tryUntilOk(5, () -> followTalonFX[finalI].getConfigurator().apply(config));
     }
   }
 
@@ -246,7 +247,8 @@ public class ArmIOTalonFX implements ArmIO {
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
     for (int i = 0; i < constants.ARM_PARAMETERS.NUM_MOTORS() - 1; i++) {
-      followTalonFX[i] = new TalonFX(constants.ARM_CAN_ID + i + 1);
+      int finalI = i;
+      PhoenixUtil.tryUntilOk(5, () -> followTalonFX[finalI].getConfigurator().apply(config, 0.25));
     }
   }
 

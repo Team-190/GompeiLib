@@ -16,16 +16,42 @@ public class Arm {
 
   private final String aKitTopic;
 
+  private final SysIdRoutine characterizationRoutine;
+
+  private ArmState currentState;
+
+  private double voltageGoalVolts;
+  private Rotation2d positionGoal;
+
   public Arm(ArmIO io, Subsystem subsystem, int index) {
     this.io = io;
     this.inputs = new ArmIOInputsAutoLogged();
 
     aKitTopic = subsystem.getName() + "/Arms" + index;
+    characterizationRoutine =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                Volts.of(0.2).per(Second),
+                Volts.of(3.5),
+                Seconds.of(5),
+                (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
+
+    currentState = ArmState.IDLE;
   }
 
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(aKitTopic, inputs);
+
+    Logger.recordOutput(aKitTopic + "/State", currentState.name());
+    Logger.recordOutput(aKitTopic + "/At Goal", atGoal());
+
+    switch (currentState) {
+      case OPEN_LOOP_VOLTAGE_CONTROL -> io.setVoltage(voltageGoalVolts);
+      case CLOSED_LOOP_POSITION_CONTROL -> io.setPosition(positionGoal);
+    }
   }
 
   public Rotation2d getArmPosition() {
@@ -47,11 +73,19 @@ public class Arm {
   }
 
   public Command setPositionGoal(Rotation2d positionGoal) {
-    return Commands.runOnce(() -> io.setPositionGoal(positionGoal));
+    return Commands.runOnce(
+        () -> {
+          currentState = ArmState.CLOSED_LOOP_POSITION_CONTROL;
+          this.positionGoal = positionGoal;
+        });
   }
 
   public Command setVoltage(double volts) {
-    return Commands.runOnce(() -> io.setVoltage(volts));
+    return Commands.runOnce(
+        () -> {
+          currentState = ArmState.OPEN_LOOP_VOLTAGE_CONTROL;
+          this.voltageGoalVolts = volts;
+        });
   }
 
   public void setSlot(GainSlot slot) {
@@ -66,14 +100,15 @@ public class Arm {
     return Commands.waitUntil(this::atGoal);
   }
 
-  public SysIdRoutine getCharacterization(
-      double rampVoltage, double stepVoltage, double timeoutSeconds, Subsystem subsystem) {
-    return new SysIdRoutine(
-        new SysIdRoutine.Config(
-            Volts.of(rampVoltage).per(Second),
-            Volts.of(stepVoltage),
-            Seconds.of(timeoutSeconds),
-            (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
-        new SysIdRoutine.Mechanism((voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
+  public Command sysIdRoutine() {
+    return Commands.sequence(
+            Commands.runOnce(() -> currentState = ArmState.IDLE),
+        characterizationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+            Commands.waitSeconds(1.0),
+            characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+            Commands.waitSeconds(1.0),
+            characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
   }
 }
