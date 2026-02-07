@@ -86,7 +86,6 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
     final int[] indexHolder = {0}; // mutable index for array insertion
 
-    // CCW followers
     constants.ALIGNED_FOLLOWER_CAN_IDS.forEach(
         id -> {
           TalonFX follower = new TalonFX(id, talonFX.getNetwork());
@@ -98,7 +97,6 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
           follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
         });
 
-    // CW followers
     constants.OPPOSED_FOLLOWER_CAN_IDS.forEach(
         id -> {
           TalonFX follower = new TalonFX(id, talonFX.getNetwork());

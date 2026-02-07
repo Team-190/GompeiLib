@@ -26,10 +26,22 @@ public class ArmConstants {
       DCMotor MOTOR_CONFIG,
       Rotation2d MIN_ANGLE,
       Rotation2d MAX_ANGLE,
+      Boolean CONTINUOUS_INPUT,
       int NUM_MOTORS,
       double GEAR_RATIO,
       double LENGTH_METERS,
-      double MOMENT_OF_INERTIA) {}
+      double MOMENT_OF_INERTIA) {
+    static class ArmParametersBuilder {
+      ArmParametersBuilder() {
+        CONTINUOUS_INPUT = false;
+      }
+    }
+  }
+
+  static {
+    ArmParameters p = ArmParameters.builder().build();
+    System.out.println(p.CONTINUOUS_INPUT());
+  }
 
   @Builder
   public record Gains(

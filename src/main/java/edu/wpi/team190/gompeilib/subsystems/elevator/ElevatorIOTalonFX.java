@@ -101,8 +101,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
     final int[] indexHolder = {0}; // mutable index for array insertion
 
-    // CCW followers
-    constants.OPPOSED_FOLLOWER_CAN_IDS.forEach(
+    constants.ALIGNED_FOLLOWER_CAN_IDS.forEach(
         id -> {
           TalonFX follower = new TalonFX(id, talonFX.getNetwork());
           followTalonFX[indexHolder[0]++] = follower;
@@ -112,8 +111,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
           follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
         });
 
-    // CW followers
-    constants.ALIGNED_FOLLOWER_CAN_IDS.forEach(
+    constants.OPPOSED_FOLLOWER_CAN_IDS.forEach(
         id -> {
           TalonFX follower = new TalonFX(id, talonFX.getNetwork());
           followTalonFX[indexHolder[0]++] = follower;
@@ -235,15 +233,14 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   @Override
   public void setSlot(GainSlot slot) {
     switch (slot) {
-      case ZERO:
-        talonFX.setControl(positionVoltageRequest.withSlot(0));
-        break;
       case ONE:
         talonFX.setControl(positionVoltageRequest.withSlot(1));
         break;
       case TWO:
-      default:
         talonFX.setControl(positionVoltageRequest.withSlot(2));
+        break;
+      default:
+        talonFX.setControl(positionVoltageRequest.withSlot(0));
         break;
     }
   }

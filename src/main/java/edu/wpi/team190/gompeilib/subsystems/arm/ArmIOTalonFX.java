@@ -86,7 +86,7 @@ public class ArmIOTalonFX implements ArmIO {
         .withGravityType(GravityTypeValue.Arm_Cosine);
 
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    config.ClosedLoopGeneral.ContinuousWrap = true;
+    config.ClosedLoopGeneral.ContinuousWrap = constants.ARM_PARAMETERS.CONTINUOUS_INPUT();
     config.MotionMagic =
         new MotionMagicConfigs()
             .withMotionMagicAcceleration(
@@ -200,16 +200,14 @@ public class ArmIOTalonFX implements ArmIO {
   @Override
   public void setSlot(GainSlot slot) {
     switch (slot) {
-      case ZERO:
-        positionVoltageRequest.withSlot(0);
-        break;
       case ONE:
-        positionVoltageRequest.withSlot(1);
+        talonFX.setControl(positionVoltageRequest.withSlot(1));
         break;
       case TWO:
-      default:
-        positionVoltageRequest.withSlot(2);
+        talonFX.setControl(positionVoltageRequest.withSlot(2));
         break;
+      default:
+        talonFX.setControl(positionVoltageRequest.withSlot(0));
     }
   }
 
