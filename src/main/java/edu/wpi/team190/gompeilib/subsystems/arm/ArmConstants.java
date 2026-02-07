@@ -38,11 +38,6 @@ public class ArmConstants {
     }
   }
 
-  static {
-    ArmParameters p = ArmParameters.builder().build();
-    System.out.println(p.CONTINUOUS_INPUT());
-  }
-
   @Builder
   public record Gains(
       LoggedTunableNumber kP,

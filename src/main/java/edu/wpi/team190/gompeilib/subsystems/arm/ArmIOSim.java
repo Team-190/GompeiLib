@@ -52,8 +52,6 @@ public class ArmIOSim implements ArmIO {
       feedback.enableContinuousInput(
           constants.ARM_PARAMETERS.MIN_ANGLE().getRadians(),
           constants.ARM_PARAMETERS.MAX_ANGLE().getRadians());
-    } else {
-      feedback.disableContinuousInput();
     }
     feedback.setTolerance(constants.CONSTRAINTS.goalToleranceRadians().get());
 
