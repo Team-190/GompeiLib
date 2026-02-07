@@ -26,21 +26,21 @@ public interface ElevatorIO {
    *
    * @param inputs The inputs to update.
    */
-  public void updateInputs(ElevatorIOInputs inputs);
+  public default void updateInputs(ElevatorIOInputs inputs){}
 
   /**
    * Sets the position of the elevator.
    *
    * @param positionMeters The position to set in meters.
    */
-  public void setPosition(double positionMeters);
+  public default void setPosition(double positionMeters){}
 
   /**
    * Sets the position goal of the elevator.
    *
    * @param positionMeters The position goal of the elevator in meters.
    */
-  public void setPositionGoal(double positionMeters);
+  public default void setPositionGoal(double positionMeters){}
 
   /**
    * Sets the position goal of the elevator, while taking in the current slot as an input
@@ -48,19 +48,19 @@ public interface ElevatorIO {
    * @param positionMeters The position goal of the elevator in meters.
    * @param slot The slot that the current position goal is being set for.
    */
-  public void setPositionGoal(double positionMeters, GainSlot slot);
+  public default void setPositionGoal(double positionMeters, GainSlot slot){}
 
   /**
    * @param slot The slot to set the elevator to.
    */
-  public void setSlot(GainSlot slot);
+  public default void setSlot(GainSlot slot){}
 
   /**
    * Sets the voltage for the elevator.
    *
    * @param volts The voltage of the elevator in volts.
    */
-  public void setVoltage(double volts);
+  public default void setVoltage(double volts){}
 
   /**
    * Sets the gains for the elevator.
@@ -72,7 +72,7 @@ public interface ElevatorIO {
    * @param kA the acceleration gain.
    * @param kG the gravity gain.
    */
-  public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG);
+  public default void updateGains(double kP, double kD, double kS, double kV, double kA, double kG){}
 
   /**
    * Sets the gains for the elevator.
@@ -85,8 +85,8 @@ public interface ElevatorIO {
    * @param kG the gravity gain.
    * @param slot the PID slot to change the gains for
    */
-  public void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot);
+  public default void updateGains(
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot){}
 
   /**
    * Sets the constraints for the elevator.
@@ -94,5 +94,9 @@ public interface ElevatorIO {
    * @param maxAcceleration the max acceleration of the elevator.
    * @param cruisingVelocity the cruising velocity
    */
-  public void updateConstraints(double maxAcceleration, double cruisingVelocity);
+  public default void updateConstraints(double maxAcceleration, double cruisingVelocity, double goalTolerance){}
+
+  public default boolean atGoal(){
+    return false;
+  }
 }

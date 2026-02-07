@@ -9,6 +9,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.GainSlot;
@@ -272,12 +273,17 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   }
 
   @Override
-  public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
+  public void updateConstraints(double maxAcceleration, double cruisingVelocity, double goalTolerance) {
     config.MotionMagic.withMotionMagicAcceleration(maxAcceleration)
         .withMotionMagicCruiseVelocity(cruisingVelocity);
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
     for (TalonFX follower : followTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config, 0.25));
     }
+  }
+
+  @Override
+  public boolean atGoal() {
+    return Math.abs(positionErrorRotations.getValueAsDouble())<=constants.CONSTRAINTS.goalToleranceMeters().get();
   }
 }
