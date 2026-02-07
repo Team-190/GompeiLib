@@ -133,8 +133,16 @@ public class ArmIOSim implements ArmIO {
 
   @Override
   public void updateConstraints(
-      double cruisingVelocityRadiansPerSecond, double maxAccelerationRadiansPerSecondSquared) {
+      double cruisingVelocityRadiansPerSecond,
+      double maxAccelerationRadiansPerSecondSquared,
+      double goalToleranceRadians) {
     feedback.setConstraints(
         new Constraints(cruisingVelocityRadiansPerSecond, maxAccelerationRadiansPerSecondSquared));
+    feedback.setTolerance(goalToleranceRadians);
+  }
+
+  @Override
+  public boolean atGoal() {
+    return feedback.atGoal();
   }
 }

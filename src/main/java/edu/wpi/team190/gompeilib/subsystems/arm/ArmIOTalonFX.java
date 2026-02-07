@@ -15,6 +15,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -164,7 +165,8 @@ public class ArmIOTalonFX implements ArmIO {
     inputs.position = new Rotation2d(positionRotations.getValue());
     inputs.velocityRadiansPerSecond = velocityRotationsPerSecond.getValue().in(RadiansPerSecond);
 
-    inputs.appliedVolts = new double[constants.armParameters.numMotors()];
+    inputs.appliedVolts = new double[constants.armParameters.
+                                     Motors()];
     inputs.supplyCurrentAmps = new double[constants.armParameters.numMotors()];
     inputs.torqueCurrentAmps = new double[constants.armParameters.numMotors()];
     inputs.temperatureCelsius = new double[constants.armParameters.numMotors()];
@@ -229,12 +231,14 @@ public class ArmIOTalonFX implements ArmIO {
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config));
 
     for (int i = 0; i < constants.armParameters.numMotors() - 1; i++) {
-      followTalonFX[i] = new TalonFX(constants.armCANID + i + 1);
+      int finalI = i;
+      PhoenixUtil.tryUntilOk(5, () -> followTalonFX[finalI].getConfigurator().apply(config));
     }
   }
 
   @Override
-  public void updateConstraints(double maxAcceleration, double cruisingVelocity) {
+  public void updateConstraints(
+      double maxAcceleration, double cruisingVelocity, double goalTolerance) {
     config.MotionMagic =
         new MotionMagicConfigs()
             .withMotionMagicAcceleration(
@@ -244,7 +248,14 @@ public class ArmIOTalonFX implements ArmIO {
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
     for (int i = 0; i < constants.armParameters.numMotors() - 1; i++) {
-      followTalonFX[i] = new TalonFX(constants.armCANID + i + 1);
+      int finalI = i;
+      PhoenixUtil.tryUntilOk(5, () -> followTalonFX[finalI].getConfigurator().apply(config, 0.25));
     }
+  }
+
+  @Override
+  public boolean atGoal() {
+    return Math.abs(Units.rotationsToRadians(positionErrorRotations.getValueAsDouble()))
+        < constants.CONSTRAINTS.goalToleranceRadians().get();
   }
 }

@@ -37,5 +37,10 @@ public interface ArmIO {
   public default void updateGains(
       double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {}
 
-  public default void updateConstraints(double maxAcceleration, double cruisingVelocity) {}
+  public default void updateConstraints(
+      double maxAcceleration, double cruisingVelocity, double goalTolerance) {}
+
+  public default boolean atGoal() {
+    return false;
+  }
 }
