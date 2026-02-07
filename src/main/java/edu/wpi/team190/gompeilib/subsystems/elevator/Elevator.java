@@ -30,12 +30,13 @@ public class Elevator {
 
     currentState = ElevatorState.IDLE;
     aKitTopic = subsystem.getName() + "/Elevators" + index;
-    characterizationRoutine = new SysIdRoutine(
+    characterizationRoutine =
+        new SysIdRoutine(
             new SysIdRoutine.Config(
-                    Volts.of(1).per(Second),
-                    Volts.of(3),
-                    Seconds.of(3),
-                    (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
+                Volts.of(1).per(Second),
+                Volts.of(3),
+                Seconds.of(3),
+                (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism((volts) -> io.setVoltage(volts.in(Volts)), null, subsystem));
 
     positionGoal = 0;
@@ -65,7 +66,8 @@ public class Elevator {
     io.updateGains(kP, kD, kS, kV, kA, kG, slot);
   }
 
-  public void updateConstraints(double maxAcceleration, double cruisingVelocity, double goalTolerance) {
+  public void updateConstraints(
+      double maxAcceleration, double cruisingVelocity, double goalTolerance) {
     io.updateConstraints(maxAcceleration, cruisingVelocity, goalTolerance);
   }
 
@@ -74,17 +76,19 @@ public class Elevator {
   }
 
   public Command setPositionGoal(double positionMeters) {
-    return Commands.runOnce(() -> {
-      currentState = ElevatorState.CLOSED_LOOP_POSITION_CONTROL;
-      positionGoal = positionMeters;
-    });
+    return Commands.runOnce(
+        () -> {
+          currentState = ElevatorState.CLOSED_LOOP_POSITION_CONTROL;
+          positionGoal = positionMeters;
+        });
   }
 
   public Command setVoltage(double volts) {
-    return Commands.runOnce(() -> {
-      currentState = ElevatorState.OPEN_LOOP_VOLTAGE_CONTROL;
-      voltageGoal = volts;
-    });
+    return Commands.runOnce(
+        () -> {
+          currentState = ElevatorState.OPEN_LOOP_VOLTAGE_CONTROL;
+          voltageGoal = volts;
+        });
   }
 
   public boolean atGoal() {
@@ -101,13 +105,13 @@ public class Elevator {
 
   public Command runSysIdRoutine() {
     return Commands.sequence(
-            Commands.runOnce(() -> currentState = ElevatorState.IDLE),
-            characterizationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
-            Commands.waitSeconds(1.0),
-            characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
-            Commands.waitSeconds(1.0),
-            characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward),
-            Commands.waitSeconds(1.0),
-            characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+        Commands.runOnce(() -> currentState = ElevatorState.IDLE),
+        characterizationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
   }
 }

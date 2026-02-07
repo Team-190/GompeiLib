@@ -165,8 +165,7 @@ public class ArmIOTalonFX implements ArmIO {
     inputs.position = new Rotation2d(positionRotations.getValue());
     inputs.velocityRadiansPerSecond = velocityRotationsPerSecond.getValue().in(RadiansPerSecond);
 
-    inputs.appliedVolts = new double[constants.armParameters.
-                                     Motors()];
+    inputs.appliedVolts = new double[constants.armParameters.numMotors()];
     inputs.supplyCurrentAmps = new double[constants.armParameters.numMotors()];
     inputs.torqueCurrentAmps = new double[constants.armParameters.numMotors()];
     inputs.temperatureCelsius = new double[constants.armParameters.numMotors()];
@@ -256,6 +255,6 @@ public class ArmIOTalonFX implements ArmIO {
   @Override
   public boolean atGoal() {
     return Math.abs(Units.rotationsToRadians(positionErrorRotations.getValueAsDouble()))
-        < constants.CONSTRAINTS.goalToleranceRadians().get();
+        < constants.constraints.goalToleranceRadians().get();
   }
 }

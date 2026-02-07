@@ -140,7 +140,8 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void updateConstraints(double maxAcceleration, double cruisingVelocity, double goalTolerance) {
+  public void updateConstraints(
+      double maxAcceleration, double cruisingVelocity, double goalTolerance) {
     feedback.setConstraints(new TrapezoidProfile.Constraints(cruisingVelocity, maxAcceleration));
     feedback.setTolerance(goalTolerance);
   }
