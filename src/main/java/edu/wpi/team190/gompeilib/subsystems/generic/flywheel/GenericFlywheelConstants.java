@@ -6,46 +6,51 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import java.util.Set;
 import lombok.Builder;
+import lombok.NonNull;
 import lombok.Singular;
 
-@Builder
+@Builder(setterPrefix = "with")
 public class GenericFlywheelConstants {
 
-  public final int LEADER_CAN_ID;
-  public final InvertedValue LEADER_INVERSION;
+  @NonNull public final Integer leaderCANID;
+  @NonNull public final InvertedValue leaderInversion;
 
-  @Builder.Default public final CANBus CAN_LOOP = new CANBus();
-  @Builder.Default public final boolean ENABLE_FOC = false;
+  @NonNull public final CANBus canBus = new CANBus();
+  @NonNull public final Boolean enableFOC = false;
 
-  public final CurrentLimits CURRENT_LIMIT;
-  public final double MOMENT_OF_INERTIA;
-  public final double GEAR_RATIO;
+  @NonNull public final CurrentLimits currentLimit;
+  @NonNull public final Double momentOfInertia;
+  @NonNull public final Double gearRatio;
 
-  public final DCMotor MOTOR_CONFIG;
+  @NonNull public final DCMotor motorConfig;
 
-  public final Gains GAINS;
-  public final Constraints CONSTRAINTS;
+  @NonNull public final Gains gains;
+  @NonNull public final Constraints constraints;
 
-  @Singular(value = "ALIGNED_FOLLOWER_CAN_ID")
-  public final Set<Integer> ALIGNED_FOLLOWER_CAN_IDS;
+  @Singular(value = "alignedFollowerCANIDs")
+  @NonNull
+  public final Set<Integer> alignedFollowerCANIDs;
 
-  @Singular(value = "OPPOSED_FOLLOWER_CAN_ID")
-  public final Set<Integer> OPPOSED_FOLLOWER_CAN_IDS;
+  @Singular(value = "opposedFollowerCANIDs")
+  @NonNull
+  public final Set<Integer> opposedFollowerCANIDs;
 
-  @Builder
+  @Builder(setterPrefix = "with")
+  @NonNull
   public record Gains(
-      LoggedTunableNumber kP,
-      LoggedTunableNumber kD,
-      LoggedTunableNumber kS,
-      LoggedTunableNumber kV,
-      LoggedTunableNumber kA) {}
+      @NonNull LoggedTunableNumber kP,
+      @NonNull LoggedTunableNumber kD,
+      @NonNull LoggedTunableNumber kS,
+      @NonNull LoggedTunableNumber kV,
+      @NonNull LoggedTunableNumber kA) {}
 
   @Builder(setterPrefix = "with")
   public record Constraints(
-      LoggedTunableNumber maxAccelerationRadiansPerSecondSquared,
-      LoggedTunableNumber cruisingVelocityRadiansPerSecond,
-      LoggedTunableNumber goalToleranceRadiansPerSecond) {}
+      @NonNull LoggedTunableNumber maxAccelerationRadiansPerSecondSquared,
+      @NonNull LoggedTunableNumber cruisingVelocityRadiansPerSecond,
+      @NonNull LoggedTunableNumber goalToleranceRadiansPerSecond) {}
 
-  @Builder
-  public record CurrentLimits(double SUPPLY_CURRENT_LIMIT, double STATOR_CURRENT_LIMIT) {}
+  @Builder(setterPrefix = "with")
+  public record CurrentLimits(
+      @NonNull Double SUPPLY_CURRENT_LIMIT, @NonNull Double STATOR_CURRENT_LIMIT) {}
 }

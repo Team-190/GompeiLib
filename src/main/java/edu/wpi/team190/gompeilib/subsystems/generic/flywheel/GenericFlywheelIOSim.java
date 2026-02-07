@@ -28,17 +28,17 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
     motorSim =
         new FlywheelSim(
             LinearSystemId.createFlywheelSystem(
-                constants.MOTOR_CONFIG, constants.MOMENT_OF_INERTIA, constants.GEAR_RATIO),
-            constants.MOTOR_CONFIG);
+                constants.motorConfig, constants.momentOfInertia, constants.gearRatio),
+            constants.motorConfig);
 
-    feedback = new PIDController(constants.GAINS.kP().get(), 0.0, constants.GAINS.kD().get());
-    feedback.setTolerance(constants.CONSTRAINTS.goalToleranceRadiansPerSecond().get());
+    feedback = new PIDController(constants.gains.kP().get(), 0.0, constants.gains.kD().get());
+    feedback.setTolerance(constants.constraints.goalToleranceRadiansPerSecond().get());
     profile =
         new LinearProfile(
-            constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get(),
+            constants.constraints.maxAccelerationRadiansPerSecondSquared().get(),
             1 / GompeiLib.getLoopPeriod());
     feedforward =
-        new SimpleMotorFeedforward(constants.GAINS.kS().get(), constants.GAINS.kV().get());
+        new SimpleMotorFeedforward(constants.gains.kS().get(), constants.gains.kV().get());
 
     appliedVolts = 0.0;
 
@@ -102,8 +102,8 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
     amps =
         MathUtil.clamp(
             amps,
-            -constants.CURRENT_LIMIT.SUPPLY_CURRENT_LIMIT(),
-            constants.CURRENT_LIMIT.SUPPLY_CURRENT_LIMIT());
+            -constants.currentLimit.SUPPLY_CURRENT_LIMIT(),
+            constants.currentLimit.SUPPLY_CURRENT_LIMIT());
 
     // Amps → volts using motor physics
     var motor = motorSim.getGearbox();

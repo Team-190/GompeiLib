@@ -24,31 +24,31 @@ public class ElevatorIOSim implements ElevatorIO {
     sim =
         new ElevatorSim(
             LinearSystemId.createElevatorSystem(
-                constants.ELEVATOR_PARAMETERS.ELEVATOR_MOTOR_CONFIG(),
-                constants.ELEVATOR_PARAMETERS.CARRIAGE_MASS_KG(),
-                constants.DRUM_RADIUS,
-                constants.ELEVATOR_GEAR_RATIO),
-            constants.ELEVATOR_PARAMETERS.ELEVATOR_MOTOR_CONFIG(),
-            constants.ELEVATOR_PARAMETERS.MIN_HEIGHT_METERS(),
-            constants.ELEVATOR_PARAMETERS.MAX_HEIGHT_METERS(),
+                constants.elevatorParameters.ELEVATOR_MOTOR_CONFIG(),
+                constants.elevatorParameters.CARRIAGE_MASS_KG(),
+                constants.drumRadius,
+                constants.elevatorGearRatio),
+            constants.elevatorParameters.ELEVATOR_MOTOR_CONFIG(),
+            constants.elevatorParameters.MIN_HEIGHT_METERS(),
+            constants.elevatorParameters.MAX_HEIGHT_METERS(),
             true,
-            constants.ELEVATOR_PARAMETERS.MIN_HEIGHT_METERS());
+            constants.elevatorParameters.MIN_HEIGHT_METERS());
 
     feedback =
         new ProfiledPIDController(
-            constants.SLOT0_GAINS.kP().get(),
+            constants.slot0Gains.kP().get(),
             0,
-            constants.SLOT0_GAINS.kD().get(),
+            constants.slot0Gains.kD().get(),
             new TrapezoidProfile.Constraints(
-                constants.CONSTRAINTS.cruisingVelocityMetersPerSecond().get(),
-                constants.CONSTRAINTS.maxAccelerationMetersPerSecondSquared().get()));
+                constants.constraints.cruisingVelocityMetersPerSecond().get(),
+                constants.constraints.maxAccelerationMetersPerSecondSquared().get()));
 
     feedforward =
         new ElevatorFeedforward(
-            constants.SLOT0_GAINS.kS().get(),
-            constants.SLOT0_GAINS.kG().get(),
-            constants.SLOT0_GAINS.kV().get(),
-            constants.SLOT0_GAINS.kA().get());
+            constants.slot0Gains.kS().get(),
+            constants.slot0Gains.kG().get(),
+            constants.slot0Gains.kV().get(),
+            constants.slot0Gains.kA().get());
 
     appliedVolts = 0;
     isClosedLoop = true;
@@ -74,10 +74,10 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.accelerationMetersPerSecondSquared =
         -1; // TODO: Replace with calculation based on velocity
 
-    inputs.appliedVolts = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
-    inputs.supplyCurrentAmps = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
-    inputs.torqueCurrentAmps = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
-    inputs.temperatureCelsius = new double[constants.ELEVATOR_PARAMETERS.NUM_MOTORS()];
+    inputs.appliedVolts = new double[constants.elevatorParameters.NUM_MOTORS()];
+    inputs.supplyCurrentAmps = new double[constants.elevatorParameters.NUM_MOTORS()];
+    inputs.torqueCurrentAmps = new double[constants.elevatorParameters.NUM_MOTORS()];
+    inputs.temperatureCelsius = new double[constants.elevatorParameters.NUM_MOTORS()];
 
     Arrays.fill(inputs.appliedVolts, appliedVolts);
     Arrays.fill(inputs.supplyCurrentAmps, sim.getCurrentDrawAmps());
@@ -109,13 +109,13 @@ public class ElevatorIOSim implements ElevatorIO {
   public void setSlot(GainSlot slot) {
     switch (slot) {
       case ZERO:
-        feedback.setPID(constants.SLOT0_GAINS.kP().get(), 0.0, constants.SLOT0_GAINS.kD().get());
+        feedback.setPID(constants.slot0Gains.kP().get(), 0.0, constants.slot0Gains.kD().get());
         break;
       case ONE:
-        feedback.setPID(constants.SLOT1_GAINS.kP().get(), 0.0, constants.SLOT1_GAINS.kD().get());
+        feedback.setPID(constants.slot1Gains.kP().get(), 0.0, constants.slot1Gains.kD().get());
         break;
       case TWO:
-        feedback.setPID(constants.SLOT2_GAINS.kP().get(), 0.0, constants.SLOT2_GAINS.kD().get());
+        feedback.setPID(constants.slot2Gains.kP().get(), 0.0, constants.slot2Gains.kD().get());
         break;
     }
   }

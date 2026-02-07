@@ -48,60 +48,60 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     this.constants = constants;
 
     // Create lead motor
-    talonFX = new TalonFX(constants.LEADER_CAN_ID);
+    talonFX = new TalonFX(constants.leaderCANID);
 
     // Create follower motor array (define length)
-    followTalonFX = new TalonFX[constants.ELEVATOR_PARAMETERS.NUM_MOTORS() - 1];
+    followTalonFX = new TalonFX[constants.elevatorParameters.NUM_MOTORS() - 1];
 
     config = new TalonFXConfiguration();
-    config.Slot0.withKP(constants.SLOT0_GAINS.kP().get())
-        .withKD(constants.SLOT0_GAINS.kD().get())
-        .withKS(constants.SLOT0_GAINS.kS().get())
-        .withKV(constants.SLOT0_GAINS.kV().get())
-        .withKA(constants.SLOT0_GAINS.kA().get())
-        .withKG(constants.SLOT0_GAINS.kG().get())
+    config.Slot0.withKP(constants.slot0Gains.kP().get())
+        .withKD(constants.slot0Gains.kD().get())
+        .withKS(constants.slot0Gains.kS().get())
+        .withKV(constants.slot0Gains.kV().get())
+        .withKA(constants.slot0Gains.kA().get())
+        .withKG(constants.slot0Gains.kG().get())
         .withGravityType(GravityTypeValue.Elevator_Static);
 
-    config.Slot1.withKP(constants.SLOT1_GAINS.kP().get())
-        .withKD(constants.SLOT1_GAINS.kD().get())
-        .withKS(constants.SLOT1_GAINS.kS().get())
-        .withKV(constants.SLOT1_GAINS.kV().get())
-        .withKA(constants.SLOT1_GAINS.kA().get())
-        .withKG(constants.SLOT1_GAINS.kG().get())
+    config.Slot1.withKP(constants.slot1Gains.kP().get())
+        .withKD(constants.slot1Gains.kD().get())
+        .withKS(constants.slot1Gains.kS().get())
+        .withKV(constants.slot1Gains.kV().get())
+        .withKA(constants.slot1Gains.kA().get())
+        .withKG(constants.slot1Gains.kG().get())
         .withGravityType(GravityTypeValue.Elevator_Static);
 
-    config.Slot2.withKP(constants.SLOT2_GAINS.kP().get())
-        .withKD(constants.SLOT2_GAINS.kD().get())
-        .withKS(constants.SLOT2_GAINS.kS().get())
-        .withKV(constants.SLOT2_GAINS.kV().get())
-        .withKA(constants.SLOT2_GAINS.kA().get())
-        .withKG(constants.SLOT2_GAINS.kG().get())
+    config.Slot2.withKP(constants.slot2Gains.kP().get())
+        .withKD(constants.slot2Gains.kD().get())
+        .withKS(constants.slot2Gains.kS().get())
+        .withKV(constants.slot2Gains.kV().get())
+        .withKA(constants.slot2Gains.kA().get())
+        .withKG(constants.slot2Gains.kG().get())
         .withGravityType(GravityTypeValue.Elevator_Static);
 
-    config.CurrentLimits.withSupplyCurrentLimit(constants.ELEVATOR_SUPPLY_CURRENT_LIMIT)
+    config.CurrentLimits.withSupplyCurrentLimit(constants.elevatorSupplyCurrentLimit)
         .withSupplyCurrentLimitEnable(true)
-        .withStatorCurrentLimit(constants.ELEVATOR_STATOR_CURRENT_LIMIT)
+        .withStatorCurrentLimit(constants.elevatorStatorCurrentLimit)
         .withStatorCurrentLimitEnable(true);
 
     config.Feedback.SensorToMechanismRatio =
-        constants.ELEVATOR_GEAR_RATIO / (2 * Math.PI * constants.DRUM_RADIUS);
+        constants.elevatorGearRatio / (2 * Math.PI * constants.drumRadius);
 
     config.SoftwareLimitSwitch.withForwardSoftLimitThreshold(
-            constants.ELEVATOR_PARAMETERS.MAX_HEIGHT_METERS())
+            constants.elevatorParameters.MAX_HEIGHT_METERS())
         .withForwardSoftLimitEnable(true)
-        .withReverseSoftLimitThreshold(constants.ELEVATOR_PARAMETERS.MIN_HEIGHT_METERS())
+        .withReverseSoftLimitThreshold(constants.elevatorParameters.MIN_HEIGHT_METERS())
         .withReverseSoftLimitEnable(true);
 
     config.MotionMagic.withMotionMagicAcceleration(
-            constants.CONSTRAINTS.maxAccelerationMetersPerSecondSquared().getAsDouble())
+            constants.constraints.maxAccelerationMetersPerSecondSquared().getAsDouble())
         .withMotionMagicCruiseVelocity(
-            constants.CONSTRAINTS.cruisingVelocityMetersPerSecond().getAsDouble());
+            constants.constraints.cruisingVelocityMetersPerSecond().getAsDouble());
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config));
 
     final int[] indexHolder = {0}; // mutable index for array insertion
 
-    constants.ALIGNED_FOLLOWER_CAN_IDS.forEach(
+    constants.alignedFollowerCANIDs.forEach(
         id -> {
           TalonFX follower = new TalonFX(id, talonFX.getNetwork());
           followTalonFX[indexHolder[0]++] = follower;
@@ -111,7 +111,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
           follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
         });
 
-    constants.OPPOSED_FOLLOWER_CAN_IDS.forEach(
+    constants.opposedFollowerCANIDs.forEach(
         id -> {
           TalonFX follower = new TalonFX(id, talonFX.getNetwork());
           followTalonFX[indexHolder[0]++] = follower;
@@ -170,7 +170,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     positionVoltageRequest = new MotionMagicVoltage(0.0);
     voltageRequest = new VoltageOut(0.0);
 
-    PhoenixUtil.registerSignals(constants.CAN_LOOP.isNetworkFD(), statusSignals);
+    PhoenixUtil.registerSignals(constants.canBus.isNetworkFD(), statusSignals);
   }
 
   @Override

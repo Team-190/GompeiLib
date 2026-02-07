@@ -5,38 +5,41 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import java.util.Set;
 import lombok.Builder;
+import lombok.NonNull;
 import lombok.Singular;
 
-@Builder
+@Builder(setterPrefix = "with")
 public class ElevatorConstants {
-  public final int LEADER_CAN_ID;
-  @Builder.Default public final CANBus CAN_LOOP = new CANBus();
-  public final double ELEVATOR_GEAR_RATIO;
-  public final double DRUM_RADIUS;
+  @NonNull public final Integer leaderCANID;
+  @NonNull public final CANBus canBus = new CANBus();
+  @NonNull public final Double elevatorGearRatio;
+  @NonNull public final Double drumRadius;
 
-  public final double ELEVATOR_SUPPLY_CURRENT_LIMIT;
-  public final double ELEVATOR_STATOR_CURRENT_LIMIT;
+  @NonNull public final Double elevatorSupplyCurrentLimit;
+  @NonNull public final Double elevatorStatorCurrentLimit;
 
-  public final ElevatorParameters ELEVATOR_PARAMETERS;
-  public final Gains SLOT0_GAINS;
-  @Builder.Default public final Gains SLOT1_GAINS = new Gains("Elevator/Slot1");
-  @Builder.Default public final Gains SLOT2_GAINS = new Gains("Elevator/Slot2");
-  public final Constraints CONSTRAINTS;
+  @NonNull public final ElevatorParameters elevatorParameters;
+  @NonNull public final Gains slot0Gains;
+  @NonNull public final Gains slot1Gains = new Gains("Elevator/Slot1");
+  @NonNull public final Gains slot2Gains = new Gains("Elevator/Slot2");
+  @NonNull public final Constraints constraints;
 
-  @Singular(value = "ALIGNED_FOLLOWER_CAN_ID")
-  public final Set<Integer> ALIGNED_FOLLOWER_CAN_IDS;
+  @Singular(value = "alignedFollowerCANIDs")
+  @NonNull
+  public final Set<Integer> alignedFollowerCANIDs;
 
-  @Singular(value = "OPPOSED_FOLLOWER_CAN_ID")
-  public final Set<Integer> OPPOSED_FOLLOWER_CAN_IDS;
+  @Singular(value = "opposedFollowerCANIDs")
+  @NonNull
+  public final Set<Integer> opposedFollowerCANIDs;
 
-  @Builder
+  @Builder(setterPrefix = "with")
   public record Gains(
-      LoggedTunableNumber kP,
-      LoggedTunableNumber kD,
-      LoggedTunableNumber kS,
-      LoggedTunableNumber kG,
-      LoggedTunableNumber kV,
-      LoggedTunableNumber kA) {
+      @NonNull LoggedTunableNumber kP,
+      @NonNull LoggedTunableNumber kD,
+      @NonNull LoggedTunableNumber kS,
+      @NonNull LoggedTunableNumber kG,
+      @NonNull LoggedTunableNumber kV,
+      @NonNull LoggedTunableNumber kA) {
     public Gains(String prefix) {
       this(
           new LoggedTunableNumber(prefix + "/kP"),
@@ -50,15 +53,15 @@ public class ElevatorConstants {
 
   @Builder(setterPrefix = "with")
   public record Constraints(
-      LoggedTunableNumber maxAccelerationMetersPerSecondSquared,
-      LoggedTunableNumber cruisingVelocityMetersPerSecond,
-      LoggedTunableNumber goalToleranceMeters) {}
+      @NonNull LoggedTunableNumber maxAccelerationMetersPerSecondSquared,
+      @NonNull LoggedTunableNumber cruisingVelocityMetersPerSecond,
+      @NonNull LoggedTunableNumber goalToleranceMeters) {}
 
-  @Builder
+  @Builder(setterPrefix = "with")
   public record ElevatorParameters(
-      DCMotor ELEVATOR_MOTOR_CONFIG,
-      double CARRIAGE_MASS_KG,
-      double MIN_HEIGHT_METERS,
-      double MAX_HEIGHT_METERS,
-      int NUM_MOTORS) {}
+      @NonNull DCMotor ELEVATOR_MOTOR_CONFIG,
+      @NonNull Double CARRIAGE_MASS_KG,
+      @NonNull Double MIN_HEIGHT_METERS,
+      @NonNull Double MAX_HEIGHT_METERS,
+      @NonNull Integer NUM_MOTORS) {}
 }

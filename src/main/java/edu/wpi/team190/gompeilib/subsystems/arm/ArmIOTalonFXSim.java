@@ -22,16 +22,16 @@ public class ArmIOTalonFXSim extends ArmIOTalonFX {
     armSim =
         new SingleJointedArmSim(
             LinearSystemId.createSingleJointedArmSystem(
-                constants.ARM_PARAMETERS.MOTOR_CONFIG(),
-                constants.ARM_PARAMETERS.MOMENT_OF_INERTIA(),
-                constants.ARM_PARAMETERS.GEAR_RATIO()),
-            constants.ARM_PARAMETERS.MOTOR_CONFIG(),
-            constants.ARM_PARAMETERS.GEAR_RATIO(),
-            constants.ARM_PARAMETERS.LENGTH_METERS(),
-            constants.ARM_PARAMETERS.MIN_ANGLE().getRadians(),
-            constants.ARM_PARAMETERS.MAX_ANGLE().getRadians(),
+                constants.armParameters.motorConfig(),
+                constants.armParameters.momentOfInertia(),
+                constants.armParameters.gearRatio()),
+            constants.armParameters.motorConfig(),
+            constants.armParameters.gearRatio(),
+            constants.armParameters.lengthMeters(),
+            constants.armParameters.minAngle().getRadians(),
+            constants.armParameters.maxAngle().getRadians(),
             true,
-            constants.ARM_PARAMETERS.MIN_ANGLE().getRadians());
+            constants.armParameters.minAngle().getRadians());
 
     armController = super.talonFX.getSimState();
   }
@@ -47,11 +47,10 @@ public class ArmIOTalonFXSim extends ArmIOTalonFX {
     armSim.update(GompeiLib.getLoopPeriod());
 
     Angle rotorPosition =
-        Angle.ofBaseUnits(armSim.getAngleRads() * constants.ARM_PARAMETERS.GEAR_RATIO(), Radians);
+        Angle.ofBaseUnits(armSim.getAngleRads() * constants.armParameters.gearRatio(), Radians);
     AngularVelocity rotorVelocity =
         AngularVelocity.ofBaseUnits(
-            armSim.getVelocityRadPerSec() * constants.ARM_PARAMETERS.GEAR_RATIO(),
-            RadiansPerSecond);
+            armSim.getVelocityRadPerSec() * constants.armParameters.gearRatio(), RadiansPerSecond);
     armController.setRawRotorPosition(rotorPosition);
     armController.setRotorVelocity(rotorVelocity);
 

@@ -32,11 +32,11 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
   protected GenericRollerConstants constants;
 
   public GenericRollerIOTalonFX(GenericRollerConstants constants) {
-    talonFX = new TalonFX(constants.ROLLER_CAN_ID, constants.CAN_LOOP);
+    talonFX = new TalonFX(constants.rollerCANID, constants.canBus);
 
     config = new TalonFXConfiguration();
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.CurrentLimits.SupplyCurrentLimit = constants.SUPPLY_CURRENT_LIMIT;
+    config.CurrentLimits.SupplyCurrentLimit = constants.supplyCurrentLimit;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
@@ -62,7 +62,7 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
     talonFX.optimizeBusUtilization();
 
     PhoenixUtil.registerSignals(
-        constants.CAN_LOOP.isNetworkFD(),
+        constants.canBus.isNetworkFD(),
         positionRotations,
         velocity,
         appliedVoltage,

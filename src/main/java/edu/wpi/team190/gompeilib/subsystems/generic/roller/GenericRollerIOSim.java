@@ -17,10 +17,10 @@ public class GenericRollerIOSim implements GenericRollerIO {
     sim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                consts.ROLLER_GEARBOX,
-                consts.MOMENT_OF_INERTIA.baseUnitMagnitude(),
-                consts.ROLLER_MOTOR_GEAR_RATIO),
-            consts.ROLLER_GEARBOX);
+                consts.rollerGearbox,
+                consts.momentOfInertia.baseUnitMagnitude(),
+                consts.rollerMotorGearRatio),
+            consts.rollerGearbox);
 
     appliedVolts = 0.0;
   }
