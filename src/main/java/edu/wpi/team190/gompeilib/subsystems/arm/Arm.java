@@ -102,13 +102,13 @@ public class Arm {
 
   public Command sysIdRoutine() {
     return Commands.sequence(
-            Commands.runOnce(() -> currentState = ArmState.IDLE),
+        Commands.runOnce(() -> currentState = ArmState.IDLE),
         characterizationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
         Commands.waitSeconds(1.0),
         characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
-            Commands.waitSeconds(1.0),
-            characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward),
-            Commands.waitSeconds(1.0),
-            characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
   }
 }

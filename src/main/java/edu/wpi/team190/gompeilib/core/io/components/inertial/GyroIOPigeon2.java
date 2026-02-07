@@ -21,14 +21,14 @@ public class GyroIOPigeon2 implements GyroIO {
 
   public GyroIOPigeon2(SwerveDriveConstants driveConstants) {
     Pigeon2 pigeon =
-        new Pigeon2(driveConstants.DRIVE_CONFIG.pigeon2Id(), driveConstants.DRIVE_CONFIG.canBus());
+        new Pigeon2(driveConstants.driveConfig.pigeon2Id(), driveConstants.driveConfig.canBus());
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
     pigeon.getConfigurator().setYaw(0.0);
 
     yaw = pigeon.getYaw();
     yawVelocity = pigeon.getAngularVelocityZWorld();
 
-    yaw.setUpdateFrequency(driveConstants.ODOMETRY_FREQUENCY);
+    yaw.setUpdateFrequency(driveConstants.odometryFrequency);
     yawVelocity.setUpdateFrequency(100.0);
 
     pigeon.optimizeBusUtilization();

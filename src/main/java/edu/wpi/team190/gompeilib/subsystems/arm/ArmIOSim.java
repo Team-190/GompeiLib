@@ -27,40 +27,40 @@ public class ArmIOSim implements ArmIO {
     armSim =
         new SingleJointedArmSim(
             LinearSystemId.createSingleJointedArmSystem(
-                constants.ARM_PARAMETERS.MOTOR_CONFIG(),
-                constants.ARM_PARAMETERS.MOMENT_OF_INERTIA(),
-                constants.ARM_PARAMETERS.GEAR_RATIO()),
-            constants.ARM_PARAMETERS.MOTOR_CONFIG(),
-            constants.ARM_PARAMETERS.GEAR_RATIO(),
-            constants.ARM_PARAMETERS.LENGTH_METERS(),
-            constants.ARM_PARAMETERS.MIN_ANGLE().getRadians(),
-            constants.ARM_PARAMETERS.MAX_ANGLE().getRadians(),
+                constants.armParameters.motorConfig(),
+                constants.armParameters.momentOfInertia(),
+                constants.armParameters.gearRatio()),
+            constants.armParameters.motorConfig(),
+            constants.armParameters.gearRatio(),
+            constants.armParameters.lengthMeters(),
+            constants.armParameters.minAngle().getRadians(),
+            constants.armParameters.maxAngle().getRadians(),
             true,
-            constants.ARM_PARAMETERS.MIN_ANGLE().getRadians());
+            constants.armParameters.minAngle().getRadians());
 
     appliedVolts = 0.0;
 
     feedback =
         new ProfiledPIDController(
-            constants.SLOT0_GAINS.kP().get(),
+            constants.slot0Gains.kP().get(),
             0.0,
-            constants.SLOT0_GAINS.kD().get(),
+            constants.slot0Gains.kD().get(),
             new Constraints(
-                constants.CONSTRAINTS.cruisingVelocityRadiansPerSecond().get(),
-                constants.CONSTRAINTS.maxAccelerationRadiansPerSecondSquared().get()));
-    if (constants.ARM_PARAMETERS.CONTINUOUS_INPUT()) {
+                constants.constraints.cruisingVelocityRadiansPerSecond().get(),
+                constants.constraints.maxAccelerationRadiansPerSecondSquared().get()));
+    if (constants.armParameters.continuousOutput()) {
       feedback.enableContinuousInput(
-          constants.ARM_PARAMETERS.MIN_ANGLE().getRadians(),
-          constants.ARM_PARAMETERS.MAX_ANGLE().getRadians());
+          constants.armParameters.minAngle().getRadians(),
+          constants.armParameters.maxAngle().getRadians());
     }
-    feedback.setTolerance(constants.CONSTRAINTS.goalToleranceRadians().get());
+    feedback.setTolerance(constants.constraints.goalToleranceRadians().get());
 
     feedforward =
         new ArmFeedforward(
-            constants.SLOT0_GAINS.kS().get(),
-            constants.SLOT0_GAINS.kV().get(),
-            constants.SLOT0_GAINS.kA().get(),
-            constants.SLOT0_GAINS.kG().get());
+            constants.slot0Gains.kS().get(),
+            constants.slot0Gains.kV().get(),
+            constants.slot0Gains.kA().get(),
+            constants.slot0Gains.kG().get());
   }
 
   @Override
@@ -78,10 +78,10 @@ public class ArmIOSim implements ArmIO {
     inputs.position = Rotation2d.fromRadians(armSim.getAngleRads());
     inputs.velocityRadiansPerSecond = armSim.getVelocityRadPerSec();
 
-    inputs.appliedVolts = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
-    inputs.supplyCurrentAmps = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
-    inputs.torqueCurrentAmps = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
-    inputs.temperatureCelsius = new double[constants.ARM_PARAMETERS.NUM_MOTORS()];
+    inputs.appliedVolts = new double[constants.armParameters.numMotors()];
+    inputs.supplyCurrentAmps = new double[constants.armParameters.numMotors()];
+    inputs.torqueCurrentAmps = new double[constants.armParameters.numMotors()];
+    inputs.temperatureCelsius = new double[constants.armParameters.numMotors()];
 
     Arrays.fill(inputs.appliedVolts, appliedVolts);
     Arrays.fill(inputs.supplyCurrentAmps, armSim.getCurrentDrawAmps());
@@ -102,13 +102,13 @@ public class ArmIOSim implements ArmIO {
   public void setSlot(GainSlot slot) {
     switch (slot) {
       case ZERO:
-        feedback.setPID(constants.SLOT0_GAINS.kP().get(), 0.0, constants.SLOT0_GAINS.kD().get());
+        feedback.setPID(constants.slot0Gains.kP().get(), 0.0, constants.slot0Gains.kD().get());
         break;
       case ONE:
-        feedback.setPID(constants.SLOT1_GAINS.kP().get(), 0.0, constants.SLOT1_GAINS.kD().get());
+        feedback.setPID(constants.slot1Gains.kP().get(), 0.0, constants.slot1Gains.kD().get());
         break;
       case TWO:
-        feedback.setPID(constants.SLOT2_GAINS.kP().get(), 0.0, constants.SLOT2_GAINS.kD().get());
+        feedback.setPID(constants.slot2Gains.kP().get(), 0.0, constants.slot2Gains.kD().get());
         break;
     }
   }

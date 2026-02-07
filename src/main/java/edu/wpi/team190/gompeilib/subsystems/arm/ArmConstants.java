@@ -5,47 +5,39 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import lombok.Builder;
+import lombok.NonNull;
 
-@Builder
+@Builder(setterPrefix = "with")
 public class ArmConstants {
-  public final int ARM_CAN_ID;
-  @Builder.Default public final CANBus CAN_LOOP = new CANBus();
-  public final ArmParameters ARM_PARAMETERS;
-  public final Gains SLOT0_GAINS;
-  @Builder.Default public final Gains SLOT1_GAINS = new Gains("Arm/Slot1");
-  @Builder.Default public final Gains SLOT2_GAINS = new Gains("Arm/Slot2");
+  @NonNull public final Integer armCANID;
+  @NonNull public final CANBus canBus = CANBus.roboRIO();
+  @NonNull public final ArmParameters armParameters;
+  @NonNull public final Gains slot0Gains;
+  @Builder.Default public final Gains slot1Gains = new Gains("Arm/Slot1");
+  @Builder.Default public final Gains slot2Gains = new Gains("Arm/Slot2");
+  @NonNull public final Constraints constraints;
+  @NonNull public final CurrentLimits currentLimits;
+  @NonNull public final Boolean enableFOC;
 
-  public final Constraints CONSTRAINTS;
-
-  public final CurrentLimits CURRENT_LIMITS;
-
-  @Builder.Default public final boolean ENABLE_FOC = false;
-
-  @Builder
+  @Builder(setterPrefix = "with")
   public record ArmParameters(
-      DCMotor MOTOR_CONFIG,
-      Rotation2d MIN_ANGLE,
-      Rotation2d MAX_ANGLE,
-      Boolean CONTINUOUS_INPUT,
-      int NUM_MOTORS,
-      double GEAR_RATIO,
-      double LENGTH_METERS,
-      double MOMENT_OF_INERTIA) {
-    static class ArmParametersBuilder {
-      ArmParametersBuilder() {
-        CONTINUOUS_INPUT = false;
-      }
-    }
-  }
+      @NonNull DCMotor motorConfig,
+      @NonNull Rotation2d minAngle,
+      @NonNull Rotation2d maxAngle,
+      @NonNull Boolean continuousOutput,
+      @NonNull Integer numMotors,
+      @NonNull Double gearRatio,
+      @NonNull Double lengthMeters,
+      @NonNull Double momentOfInertia) {}
 
-  @Builder
+  @Builder(setterPrefix = "with")
   public record Gains(
-      LoggedTunableNumber kP,
-      LoggedTunableNumber kD,
-      LoggedTunableNumber kS,
-      LoggedTunableNumber kG,
-      LoggedTunableNumber kV,
-      LoggedTunableNumber kA) {
+      @NonNull LoggedTunableNumber kP,
+      @NonNull LoggedTunableNumber kD,
+      @NonNull LoggedTunableNumber kS,
+      @NonNull LoggedTunableNumber kG,
+      @NonNull LoggedTunableNumber kV,
+      @NonNull LoggedTunableNumber kA) {
     public Gains(String prefix) {
       this(
           new LoggedTunableNumber(prefix + "/kP"),
@@ -57,17 +49,15 @@ public class ArmConstants {
     }
   }
 
-  @Builder
+  @Builder(setterPrefix = "with")
   public record CurrentLimits(
-      double ARM_SUPPLY_CURRENT_LIMIT,
-      double ARM_STATOR_CURRENT_LIMIT,
-      double ARM_TORQUE_CURRENT_LIMIT) {}
+      @NonNull Double armSupplyCurrentLimit,
+      @NonNull Double armStatorCurrentLimit,
+      @NonNull Double armTorqueCurrentLimit) {}
 
   @Builder(setterPrefix = "with")
   public record Constraints(
-      LoggedTunableNumber maxAccelerationRadiansPerSecondSquared,
-      LoggedTunableNumber cruisingVelocityRadiansPerSecond,
-      LoggedTunableNumber
-          goalToleranceRadians) {} // Units intentionally apply to arm rotations, not motor
-  // rotations
+      @NonNull LoggedTunableNumber maxAccelerationRadiansPerSecondSquared,
+      @NonNull LoggedTunableNumber cruisingVelocityRadiansPerSecond,
+      @NonNull LoggedTunableNumber goalToleranceRadians) {}
 }
