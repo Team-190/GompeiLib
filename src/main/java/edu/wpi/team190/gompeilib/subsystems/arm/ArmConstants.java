@@ -13,8 +13,8 @@ public class ArmConstants {
   @NonNull public final CANBus canBus = CANBus.roboRIO();
   @NonNull public final ArmParameters armParameters;
   @NonNull public final Gains slot0Gains;
-  public final Gains slot1Gains = new Gains("Arm/Slot1");
-  public final Gains slot2Gains = new Gains("Arm/Slot2");
+  @Builder.Default public final Gains slot1Gains = new Gains("Arm/Slot1");
+  @Builder.Default public final Gains slot2Gains = new Gains("Arm/Slot2");
   @NonNull public final Constraints constraints;
   @NonNull public final CurrentLimits currentLimits;
   @NonNull public final Boolean enableFOC;

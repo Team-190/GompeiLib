@@ -27,11 +27,11 @@ public class GenericFlywheelConstants {
   @NonNull public final Gains gains;
   @NonNull public final Constraints constraints;
 
-  @Singular(value = "alignedFollowerCANIDs")
+  @Singular(value = "alignedFollowerCANID")
   @NonNull
   public final Set<Integer> alignedFollowerCANIDs;
 
-  @Singular(value = "opposedFollowerCANIDs")
+  @Singular(value = "opposedFollowerCANID")
   @NonNull
   public final Set<Integer> opposedFollowerCANIDs;
 
