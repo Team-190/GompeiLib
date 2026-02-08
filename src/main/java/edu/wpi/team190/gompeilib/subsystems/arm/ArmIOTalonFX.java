@@ -111,6 +111,11 @@ public class ArmIOTalonFX implements ArmIO {
                   : MotorAlignmentValue.Opposed));
     }
 
+    appliedVolts = new ArrayList<>();
+    supplyCurrentAmps = new ArrayList<>();
+    torqueCurrentAmps = new ArrayList<>();
+    temperatureCelsius = new ArrayList<>();
+
     positionRotations = talonFX.getPosition();
     velocityRotationsPerSecond = talonFX.getVelocity();
     appliedVolts.add(talonFX.getMotorVoltage());

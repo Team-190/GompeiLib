@@ -21,7 +21,7 @@ public class ArmIOSim implements ArmIO {
 
   private boolean isClosedLoop;
 
-  private ArmConstants constants;
+  private final ArmConstants constants;
 
   public ArmIOSim(ArmConstants constants) {
     this.constants = constants;
