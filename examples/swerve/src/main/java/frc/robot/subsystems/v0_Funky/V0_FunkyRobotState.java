@@ -22,8 +22,7 @@ public class V0_FunkyRobotState {
     fieldZones = List.of(globalZone);
 
     localization =
-        new Localization(
-            fieldZones, V0_FunkyConstants.DRIVE_CONSTANTS.DRIVE_CONFIG.kinematics(), 2);
+        new Localization(fieldZones, V0_FunkyConstants.DRIVE_CONSTANTS.driveConfig.kinematics(), 2);
   }
 
   public static void periodic() {}

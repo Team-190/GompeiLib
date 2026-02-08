@@ -14,27 +14,7 @@ import lombok.NonNull;
 
 @Builder(setterPrefix = "with")
 public class SwerveDriveConstants {
-  @NonNull public final ReentrantLock reentrantLock;
-
-  @NonNull
-  public final SwerveModuleConstants<
-          TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-      frontLeft;
-
-  @NonNull
-  public final SwerveModuleConstants<
-          TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-      frontRight;
-
-  @NonNull
-  public final SwerveModuleConstants<
-          TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-      backLeft;
-
-  @NonNull
-  public final SwerveModuleConstants<
-          TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-      backRight;
+  @Builder.Default public final ReentrantLock reentrantLock = new ReentrantLock();
 
   @NonNull public final DriveConfig driveConfig;
 
