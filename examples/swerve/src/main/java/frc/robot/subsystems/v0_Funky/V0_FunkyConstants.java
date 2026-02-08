@@ -71,14 +71,15 @@ public class V0_FunkyConstants {
   public static final double OPERATOR_DEADBAND = 0.1;
 
   public static final SwerveDriveConstants DRIVE_CONSTANTS =
-      new SwerveDriveConstants(
-          DRIVE_CONFIG,
-          GAINS,
-          AUTO_GAINS,
-          AUTO_ALIGN_NEAR_CONSTANTS,
-          OPERATOR_DEADBAND,
-          ODOMETRY_FREQUENCY,
-          DRIVER_DEADBAND);
+      SwerveDriveConstants.builder()
+          .withDriveConfig(DRIVE_CONFIG)
+          .withGains(GAINS)
+          .withAutoGains(AUTO_GAINS)
+          .withAutoAlignConstants(AUTO_ALIGN_NEAR_CONSTANTS)
+          .withOperatorDeadband(OPERATOR_DEADBAND)
+          .withDriverDeadband(DRIVER_DEADBAND)
+          .withOdometryFrequency(ODOMETRY_FREQUENCY)
+          .build();
 
   public static final LimelightConfig LIMELIGHT_CONFIG =
       LimelightConfig.builder()

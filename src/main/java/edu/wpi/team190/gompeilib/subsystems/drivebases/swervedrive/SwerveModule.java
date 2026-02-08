@@ -77,7 +77,9 @@ public class SwerveModule {
         driveConstants
             .driveConfig
             .driveModel()
-            .getCurrent(wheelTorqueNewtonMeters / driveConstants.frontLeft.DriveMotorGearRatio));
+            .getCurrent(
+                wheelTorqueNewtonMeters
+                    / driveConstants.driveConfig.frontLeft().DriveMotorGearRatio));
     io.setTurnPosition(state.angle);
   }
 

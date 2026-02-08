@@ -259,7 +259,8 @@ public class SwerveDrive extends SubsystemBase {
           VecBuilder.fill(setpointStates[i].angle.getCos(), setpointStates[i].angle.getSin());
       setpointTorques[i] =
           new SwerveModuleState(
-              forces.get(i).dot(wheelDirection) * driveConstants.frontLeft.DriveMotorGearRatio,
+              forces.get(i).dot(wheelDirection)
+                  * driveConstants.driveConfig.frontLeft().DriveMotorGearRatio,
               setpointStates[i].angle);
 
       setpointStates[i].optimize(modules[i].getAngle());
