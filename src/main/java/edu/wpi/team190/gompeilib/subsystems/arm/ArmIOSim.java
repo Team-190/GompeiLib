@@ -24,6 +24,8 @@ public class ArmIOSim implements ArmIO {
   private ArmConstants constants;
 
   public ArmIOSim(ArmConstants constants) {
+    this.constants = constants;
+
     armSim =
         new SingleJointedArmSim(
             LinearSystemId.createSingleJointedArmSystem(
