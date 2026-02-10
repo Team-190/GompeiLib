@@ -52,5 +52,5 @@ public class GenericFlywheelConstants {
 
   @Builder(setterPrefix = "with")
   public record CurrentLimits(
-      @NonNull Double SUPPLY_CURRENT_LIMIT, @NonNull Double STATOR_CURRENT_LIMIT) {}
+      @NonNull Double supplyCurrentLimit, @NonNull Double statorCurrentLimit) {}
 }
