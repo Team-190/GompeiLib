@@ -15,8 +15,8 @@ public class GenericFlywheelConstants {
   @NonNull public final Integer leaderCANID;
   @NonNull public final InvertedValue leaderInversion;
 
-  @NonNull public final CANBus canBus = new CANBus();
-  @NonNull public final Boolean enableFOC = false;
+  @NonNull public final CANBus canBus;
+  @NonNull public final Boolean enableFOC;
 
   @NonNull public final CurrentLimits currentLimit;
   @NonNull public final Double momentOfInertia;
