@@ -92,12 +92,10 @@ public class ArmIOTalonFX implements ArmIO {
         new MotionMagicConfigs()
             .withMotionMagicAcceleration(
                 AngularAcceleration.ofRelativeUnits(
-                    constants.constraints.maxAccelerationRadiansPerSecondSquared().get(),
-                    RadiansPerSecondPerSecond))
+                    constants.constraints.maxAcceleration().get(), RadiansPerSecondPerSecond))
             .withMotionMagicCruiseVelocity(
                 AngularVelocity.ofRelativeUnits(
-                    constants.constraints.cruisingVelocityRadiansPerSecond().get(),
-                    RadiansPerSecond));
+                    constants.constraints.maxVelocity().get(), RadiansPerSecond));
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
@@ -260,6 +258,6 @@ public class ArmIOTalonFX implements ArmIO {
   @Override
   public boolean atGoal() {
     return Math.abs(Units.rotationsToRadians(positionErrorRotations.getValueAsDouble()))
-        < constants.constraints.goalToleranceRadians().get();
+        < constants.constraints.goalTolerance().get();
   }
 }

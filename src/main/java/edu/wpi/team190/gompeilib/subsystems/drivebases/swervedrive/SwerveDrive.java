@@ -116,21 +116,21 @@ public class SwerveDrive extends SubsystemBase {
 
     autoHeadingController =
         new PIDController(
-            driveConstants.autoGains.rotationKp().get(),
+            driveConstants.autoRotationGains.kP().get(),
             0.0,
-            driveConstants.autoGains.rotationKd().get(),
+            driveConstants.autoRotationGains.kD().get(),
             GompeiLib.getLoopPeriod());
     autoXController =
         new PIDController(
-            driveConstants.autoGains.translationKp().get(),
+            driveConstants.autoTranslationGains.kP().get(),
             0.0,
-            driveConstants.autoGains.translationKd().get(),
+            driveConstants.autoTranslationGains.kD().get(),
             GompeiLib.getLoopPeriod());
     autoYController =
         new PIDController(
-            driveConstants.autoGains.translationKp().get(),
+            driveConstants.autoTranslationGains.kP().get(),
             0.0,
-            driveConstants.autoGains.translationKd().get(),
+            driveConstants.autoTranslationGains.kD().get(),
             GompeiLib.getLoopPeriod());
 
     autoHeadingController.enableContinuousInput(-Math.PI, Math.PI);

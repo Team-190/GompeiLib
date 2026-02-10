@@ -7,6 +7,10 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.Unit;
+import edu.wpi.team190.gompeilib.core.utility.Gains;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import java.util.concurrent.locks.ReentrantLock;
 import lombok.Builder;
@@ -18,9 +22,13 @@ public class SwerveDriveConstants {
 
   @NonNull public final DriveConfig driveConfig;
 
-  @NonNull public final Gains gains;
-  @NonNull public final AutoGains autoGains;
-  @NonNull public final AutoAlignNearConstants autoAlignConstants;
+  @NonNull public final Gains driveGains;
+  @NonNull public final Gains turnGains;
+
+  @NonNull public final Gains autoTranslationGains;
+  @NonNull public final Gains autoRotationGains;
+
+  @NonNull public final AutoAlignConstants autoAlignConstants;
 
   @NonNull public final Double odometryFrequency;
   @NonNull public final Double driverDeadband;
@@ -75,32 +83,13 @@ public class SwerveDriveConstants {
   }
 
   @Builder(setterPrefix = "with")
-  public record Gains(
-      @NonNull LoggedTunableNumber driveKs,
-      @NonNull LoggedTunableNumber driveKv,
-      @NonNull LoggedTunableNumber driveKp,
-      @NonNull LoggedTunableNumber driveKd,
-      @NonNull LoggedTunableNumber turnKp,
-      @NonNull LoggedTunableNumber turnKd) {}
+  public record PIDControllerConstants<U extends Unit>(
+      @NonNull Gains gains, @NonNull Constraints<U> constraints) {}
 
   @Builder(setterPrefix = "with")
-  public record AutoGains(
-      @NonNull LoggedTunableNumber translationKp,
-      @NonNull LoggedTunableNumber translationKd,
-      @NonNull LoggedTunableNumber rotationKp,
-      @NonNull LoggedTunableNumber rotationKd) {}
-
-  @Builder(setterPrefix = "with")
-  public record PIDControllerConstants(
-      @NonNull LoggedTunableNumber kP,
-      @NonNull LoggedTunableNumber kD,
-      @NonNull LoggedTunableNumber tolerance,
-      @NonNull LoggedTunableNumber maxVelocity) {}
-
-  @Builder(setterPrefix = "with")
-  public record AutoAlignNearConstants(
-      @NonNull PIDControllerConstants xPIDConstants,
-      @NonNull PIDControllerConstants yPIDConstants,
-      @NonNull PIDControllerConstants omegaPIDConstants,
+  public record AutoAlignConstants(
+      @NonNull PIDControllerConstants<DistanceUnit> xPIDConstants,
+      @NonNull PIDControllerConstants<DistanceUnit> yPIDConstants,
+      @NonNull PIDControllerConstants<AngleUnit> omegaPIDConstants,
       @NonNull LoggedTunableNumber positionThresholdMeters) {}
 }

@@ -3,6 +3,7 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.team190.gompeilib.core.utility.Gains;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import java.util.Set;
 import lombok.Builder;
@@ -34,15 +35,6 @@ public class GenericFlywheelConstants {
   @Singular(value = "opposedFollowerCANID")
   @NonNull
   public final Set<Integer> opposedFollowerCANIDs;
-
-  @Builder(setterPrefix = "with")
-  @NonNull
-  public record Gains(
-      @NonNull LoggedTunableNumber kP,
-      @NonNull LoggedTunableNumber kD,
-      @NonNull LoggedTunableNumber kS,
-      @NonNull LoggedTunableNumber kV,
-      @NonNull LoggedTunableNumber kA) {}
 
   @Builder(setterPrefix = "with")
   public record Constraints(
