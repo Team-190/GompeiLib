@@ -3,8 +3,9 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.control.AngularConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.CurrentLimits;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import java.util.Set;
 import lombok.Builder;
 import lombok.NonNull;
@@ -35,8 +36,4 @@ public class GenericFlywheelConstants {
   @Singular(value = "opposedFollowerCANID")
   @NonNull
   public final Set<Integer> opposedFollowerCANIDs;
-
-  @Builder(setterPrefix = "with")
-  public record CurrentLimits(
-      @NonNull Double supplyCurrentLimit, @NonNull Double statorCurrentLimit) {}
 }

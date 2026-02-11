@@ -1,7 +1,6 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -105,8 +104,8 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
     amps =
         MathUtil.clamp(
             amps,
-            -constants.currentLimit.supplyCurrentLimit(),
-            constants.currentLimit.supplyCurrentLimit());
+            -constants.currentLimit.supplyCurrentLimit().in(Amps),
+            constants.currentLimit.supplyCurrentLimit().in(Amps));
 
     // Amps → volts using motor physics
     var motor = motorSim.getGearbox();

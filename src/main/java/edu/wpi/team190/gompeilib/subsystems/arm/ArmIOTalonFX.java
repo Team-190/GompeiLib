@@ -56,9 +56,9 @@ public class ArmIOTalonFX implements ArmIO {
     config = new TalonFXConfiguration();
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.CurrentLimits.SupplyCurrentLimit = constants.currentLimits.armSupplyCurrentLimit();
+    config.CurrentLimits.SupplyCurrentLimit = constants.currentLimits.supplyCurrentLimit().in(Amps);
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
-    config.CurrentLimits.StatorCurrentLimit = constants.currentLimits.armStatorCurrentLimit();
+    config.CurrentLimits.StatorCurrentLimit = constants.currentLimits.statorCurrentLimit().in(Amps);
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.Feedback.SensorToMechanismRatio = constants.armParameters.gearRatio();
 
