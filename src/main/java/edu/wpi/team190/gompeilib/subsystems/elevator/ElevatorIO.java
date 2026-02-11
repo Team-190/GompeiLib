@@ -1,6 +1,6 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
 
-import edu.wpi.team190.gompeilib.core.utility.GainSlot;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {

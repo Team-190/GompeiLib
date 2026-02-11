@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package edu.wpi.team190.gompeilib.core.utility;
+package edu.wpi.team190.gompeilib.core.utility.control;
 
 import edu.wpi.first.math.geometry.Twist2d;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class LinearProfile {
   /**
    * Creates a new LinearProfile
    *
-   * @param maxAcceleration The max ramp rate in velocity in rpm/sec
+   * @param maxAcceleration The max ramp rate in velocity in rps/sec
    * @param period Period of control loop (0.02)
    */
   public LinearProfile(double maxAcceleration, double period) {

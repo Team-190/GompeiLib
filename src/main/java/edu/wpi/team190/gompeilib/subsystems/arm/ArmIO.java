@@ -1,7 +1,7 @@
 package edu.wpi.team190.gompeilib.subsystems.arm;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.team190.gompeilib.core.utility.GainSlot;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {

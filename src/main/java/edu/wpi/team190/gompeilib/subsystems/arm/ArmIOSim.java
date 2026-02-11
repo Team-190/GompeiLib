@@ -1,5 +1,7 @@
 package edu.wpi.team190.gompeilib.subsystems.arm;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -8,7 +10,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
-import edu.wpi.team190.gompeilib.core.utility.GainSlot;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import java.util.Arrays;
 
 public class ArmIOSim implements ArmIO {
@@ -48,14 +50,14 @@ public class ArmIOSim implements ArmIO {
             0.0,
             constants.slot0Gains.kD().get(),
             new Constraints(
-                constants.constraints.cruisingVelocityRadiansPerSecond().get(),
-                constants.constraints.maxAccelerationRadiansPerSecondSquared().get()));
+                constants.constraints.maxVelocity().get().in(RadiansPerSecond),
+                constants.constraints.maxAcceleration().get().in(RadiansPerSecondPerSecond)));
     if (constants.armParameters.continuousOutput()) {
       feedback.enableContinuousInput(
           constants.armParameters.minAngle().getRadians(),
           constants.armParameters.maxAngle().getRadians());
     }
-    feedback.setTolerance(constants.constraints.goalToleranceRadians().get());
+    feedback.setTolerance(constants.constraints.goalTolerance().get().in(Radians));
 
     feedforward =
         new ArmFeedforward(

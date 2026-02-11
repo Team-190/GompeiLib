@@ -1,7 +1,6 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -15,7 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
-import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil;
 import java.util.ArrayList;
 
 public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
@@ -74,13 +73,9 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     talonFXConfiguration.MotionMagic =
         new MotionMagicConfigs()
             .withMotionMagicAcceleration(
-                AngularAcceleration.ofRelativeUnits(
-                    constants.constraints.maxAccelerationRadiansPerSecondSquared().get(),
-                    RotationsPerSecondPerSecond))
+                constants.constraints.maxAcceleration().get().in(RotationsPerSecondPerSecond))
             .withMotionMagicCruiseVelocity(
-                AngularVelocity.ofRelativeUnits(
-                    constants.constraints.cruisingVelocityRadiansPerSecond().get(),
-                    RotationsPerSecond));
+                constants.constraints.maxVelocity().get().in(RotationsPerSecond));
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
 
@@ -257,7 +252,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   @Override
   public boolean atGoal() {
     return Math.abs(velocityErrorRotationsPerSecond.getValueAsDouble())
-        <= Units.radiansToRotations(constants.constraints.goalToleranceRadiansPerSecond().get());
+        <= constants.constraints.goalTolerance().get().in(Rotations);
   }
 
   @Override

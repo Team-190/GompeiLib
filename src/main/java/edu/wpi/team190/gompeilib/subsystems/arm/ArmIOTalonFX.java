@@ -23,8 +23,8 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
-import edu.wpi.team190.gompeilib.core.utility.GainSlot;
-import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil;
 import java.util.ArrayList;
 
 public class ArmIOTalonFX implements ArmIO {
@@ -56,9 +56,9 @@ public class ArmIOTalonFX implements ArmIO {
     config = new TalonFXConfiguration();
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.CurrentLimits.SupplyCurrentLimit = constants.currentLimits.armSupplyCurrentLimit();
+    config.CurrentLimits.SupplyCurrentLimit = constants.currentLimits.supplyCurrentLimit().in(Amps);
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
-    config.CurrentLimits.StatorCurrentLimit = constants.currentLimits.armStatorCurrentLimit();
+    config.CurrentLimits.StatorCurrentLimit = constants.currentLimits.statorCurrentLimit().in(Amps);
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.Feedback.SensorToMechanismRatio = constants.armParameters.gearRatio();
 
@@ -91,13 +91,9 @@ public class ArmIOTalonFX implements ArmIO {
     config.MotionMagic =
         new MotionMagicConfigs()
             .withMotionMagicAcceleration(
-                AngularAcceleration.ofRelativeUnits(
-                    constants.constraints.maxAccelerationRadiansPerSecondSquared().get(),
-                    RadiansPerSecondPerSecond))
+                constants.constraints.maxAcceleration().get().in(RotationsPerSecondPerSecond))
             .withMotionMagicCruiseVelocity(
-                AngularVelocity.ofRelativeUnits(
-                    constants.constraints.cruisingVelocityRadiansPerSecond().get(),
-                    RadiansPerSecond));
+                constants.constraints.maxVelocity().get().in(RotationsPerSecond));
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
@@ -260,6 +256,6 @@ public class ArmIOTalonFX implements ArmIO {
   @Override
   public boolean atGoal() {
     return Math.abs(Units.rotationsToRadians(positionErrorRotations.getValueAsDouble()))
-        < constants.constraints.goalToleranceRadians().get();
+        < constants.constraints.goalTolerance().get().in(Radians);
   }
 }

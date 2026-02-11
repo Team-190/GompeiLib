@@ -1,4 +1,4 @@
-package edu.wpi.team190.gompeilib.core.utility;
+package edu.wpi.team190.gompeilib.core.utility.phoenix;
 
 /** An Enum class that handles all possible gain slots for motor control */
 public enum GainSlot {

@@ -24,7 +24,7 @@ import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIO;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOInputsAutoLogged;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOPigeon2;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
-import edu.wpi.team190.gompeilib.core.utility.PhoenixOdometryThread;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixOdometryThread;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
@@ -116,21 +116,21 @@ public class SwerveDrive extends SubsystemBase {
 
     autoHeadingController =
         new PIDController(
-            driveConstants.autoGains.rotationKp().get(),
+            driveConstants.autoRotationGains.kP().get(),
             0.0,
-            driveConstants.autoGains.rotationKd().get(),
+            driveConstants.autoRotationGains.kD().get(),
             GompeiLib.getLoopPeriod());
     autoXController =
         new PIDController(
-            driveConstants.autoGains.translationKp().get(),
+            driveConstants.autoTranslationGains.kP().get(),
             0.0,
-            driveConstants.autoGains.translationKd().get(),
+            driveConstants.autoTranslationGains.kD().get(),
             GompeiLib.getLoopPeriod());
     autoYController =
         new PIDController(
-            driveConstants.autoGains.translationKp().get(),
+            driveConstants.autoTranslationGains.kP().get(),
             0.0,
-            driveConstants.autoGains.translationKd().get(),
+            driveConstants.autoTranslationGains.kD().get(),
             GompeiLib.getLoopPeriod());
 
     autoHeadingController.enableContinuousInput(-Math.PI, Math.PI);

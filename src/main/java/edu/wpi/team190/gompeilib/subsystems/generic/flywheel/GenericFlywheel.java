@@ -6,8 +6,8 @@ import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import edu.wpi.team190.gompeilib.core.utility.CustomSysIdRoutine;
-import edu.wpi.team190.gompeilib.core.utility.CustomUnits;
+import edu.wpi.team190.gompeilib.core.utility.sysid.CustomSysIdRoutine;
+import edu.wpi.team190.gompeilib.core.utility.sysid.CustomUnits;
 import org.littletonrobotics.junction.Logger;
 
 public class GenericFlywheel {

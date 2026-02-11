@@ -3,7 +3,9 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
+import edu.wpi.team190.gompeilib.core.utility.control.AngularConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.CurrentLimits;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import java.util.Set;
 import lombok.Builder;
 import lombok.NonNull;
@@ -25,7 +27,7 @@ public class GenericFlywheelConstants {
   @NonNull public final DCMotor motorConfig;
 
   @NonNull public final Gains gains;
-  @NonNull public final Constraints constraints;
+  @NonNull public final AngularConstraints constraints;
 
   @Singular(value = "alignedFollowerCANID")
   @NonNull
@@ -34,23 +36,4 @@ public class GenericFlywheelConstants {
   @Singular(value = "opposedFollowerCANID")
   @NonNull
   public final Set<Integer> opposedFollowerCANIDs;
-
-  @Builder(setterPrefix = "with")
-  @NonNull
-  public record Gains(
-      @NonNull LoggedTunableNumber kP,
-      @NonNull LoggedTunableNumber kD,
-      @NonNull LoggedTunableNumber kS,
-      @NonNull LoggedTunableNumber kV,
-      @NonNull LoggedTunableNumber kA) {}
-
-  @Builder(setterPrefix = "with")
-  public record Constraints(
-      @NonNull LoggedTunableNumber maxAccelerationRadiansPerSecondSquared,
-      @NonNull LoggedTunableNumber cruisingVelocityRadiansPerSecond,
-      @NonNull LoggedTunableNumber goalToleranceRadiansPerSecond) {}
-
-  @Builder(setterPrefix = "with")
-  public record CurrentLimits(
-      @NonNull Double supplyCurrentLimit, @NonNull Double statorCurrentLimit) {}
 }
