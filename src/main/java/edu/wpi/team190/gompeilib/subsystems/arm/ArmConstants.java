@@ -4,6 +4,7 @@ import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.AngleUnit;
+import edu.wpi.team190.gompeilib.core.utility.Constraints;
 import edu.wpi.team190.gompeilib.core.utility.Gains;
 import lombok.Builder;
 import lombok.NonNull;

@@ -1,8 +1,5 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -13,10 +10,15 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.AccelerationUnit;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
+
+import static edu.wpi.first.units.Units.*;
 
 public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   protected final TalonFX talonFX;
@@ -74,13 +76,8 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     talonFXConfiguration.MotionMagic =
         new MotionMagicConfigs()
             .withMotionMagicAcceleration(
-                AngularAcceleration.ofRelativeUnits(
-                    constants.constraints.maxAccelerationRadiansPerSecondSquared().get(),
-                    RotationsPerSecondPerSecond))
-            .withMotionMagicCruiseVelocity(
-                AngularVelocity.ofRelativeUnits(
-                    constants.constraints.cruisingVelocityRadiansPerSecond().get(),
-                    RotationsPerSecond));
+                constants.constraints.maxAcceleration().get().in(RotationsPerSecondPerSecond))
+            .withMotionMagicCruiseVelocity(constants.constraints.maxVelocity().get().in(RotationsPerSecond));
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
 
@@ -257,7 +254,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   @Override
   public boolean atGoal() {
     return Math.abs(velocityErrorRotationsPerSecond.getValueAsDouble())
-        <= Units.radiansToRotations(constants.constraints.goalToleranceRadiansPerSecond().get());
+        <= constants.constraints.goalTolerance().get().in(Rotations);
   }
 
   @Override

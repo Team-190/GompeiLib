@@ -2,8 +2,9 @@ package edu.wpi.team190.gompeilib.subsystems.elevator;
 
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.team190.gompeilib.core.utility.Constraints;
 import edu.wpi.team190.gompeilib.core.utility.Gains;
-import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import java.util.Set;
 import lombok.Builder;
 import lombok.NonNull;
@@ -23,7 +24,7 @@ public class ElevatorConstants {
   @NonNull public final Gains slot0Gains;
   @Builder.Default public final Gains slot1Gains = Gains.builder().withPrefix("").build();
   @Builder.Default public final Gains slot2Gains = Gains.builder().withPrefix("").build();
-  @NonNull public final Constraints constraints;
+  @NonNull public final Constraints<DistanceUnit> constraints;
 
   @Singular(value = "alignedFollowerCANID")
   @NonNull
@@ -32,12 +33,6 @@ public class ElevatorConstants {
   @Singular(value = "opposedFollowerCANID")
   @NonNull
   public final Set<Integer> opposedFollowerCANIDs;
-
-  @Builder(setterPrefix = "with")
-  public record Constraints(
-      @NonNull LoggedTunableNumber maxAccelerationMetersPerSecondSquared,
-      @NonNull LoggedTunableNumber cruisingVelocityMetersPerSecond,
-      @NonNull LoggedTunableNumber goalToleranceMeters) {}
 
   @Builder(setterPrefix = "with")
   public record ElevatorParameters(
