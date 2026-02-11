@@ -9,10 +9,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.DistanceUnit;
-import edu.wpi.first.units.Unit;
-import edu.wpi.team190.gompeilib.core.utility.Constraints;
-import edu.wpi.team190.gompeilib.core.utility.Gains;
-import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
+import edu.wpi.team190.gompeilib.core.utility.tunable.LoggedTunableMeasure;
+import edu.wpi.team190.gompeilib.core.utility.control.AngularConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.LinearConstraints;
 import java.util.concurrent.locks.ReentrantLock;
 import lombok.Builder;
 import lombok.NonNull;
@@ -84,13 +84,13 @@ public class SwerveDriveConstants {
   }
 
   @Builder(setterPrefix = "with")
-  public record PIDControllerConstants<U extends Unit>(
-      @NonNull Gains gains, @NonNull Constraints<U> constraints) {}
-
-  @Builder(setterPrefix = "with")
   public record AutoAlignConstants(
-      @NonNull PIDControllerConstants<DistanceUnit> xPIDConstants,
-      @NonNull PIDControllerConstants<DistanceUnit> yPIDConstants,
-      @NonNull PIDControllerConstants<AngleUnit> omegaPIDConstants,
-      @NonNull LoggedTunableNumber positionThresholdMeters) {}
+      @NonNull Gains xGains,
+      @NonNull LinearConstraints xConstraints,
+      @NonNull Gains yGains,
+      @NonNull LinearConstraints yConstraints,
+      @NonNull Gains rotationGains,
+      @NonNull AngularConstraints rotationConstraints,
+      @NonNull LoggedTunableMeasure<DistanceUnit> linearThreshold,
+      @NonNull LoggedTunableMeasure<AngleUnit> angularThreshold) {}
 }

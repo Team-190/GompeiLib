@@ -1,5 +1,7 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -10,15 +12,10 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.AccelerationUnit;
-import edu.wpi.first.units.AngleUnit;
-import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
-import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil;
 import java.util.ArrayList;
-
-import static edu.wpi.first.units.Units.*;
 
 public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   protected final TalonFX talonFX;
@@ -77,7 +74,8 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
         new MotionMagicConfigs()
             .withMotionMagicAcceleration(
                 constants.constraints.maxAcceleration().get().in(RotationsPerSecondPerSecond))
-            .withMotionMagicCruiseVelocity(constants.constraints.maxVelocity().get().in(RotationsPerSecond));
+            .withMotionMagicCruiseVelocity(
+                constants.constraints.maxVelocity().get().in(RotationsPerSecond));
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
 

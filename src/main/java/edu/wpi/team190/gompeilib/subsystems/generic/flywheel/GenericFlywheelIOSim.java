@@ -1,5 +1,8 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -7,7 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
-import edu.wpi.team190.gompeilib.core.utility.LinearProfile;
+import edu.wpi.team190.gompeilib.core.utility.control.LinearProfile;
 import java.util.Arrays;
 
 public class GenericFlywheelIOSim implements GenericFlywheelIO {
@@ -32,10 +35,10 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
             constants.motorConfig);
 
     feedback = new PIDController(constants.gains.kP().get(), 0.0, constants.gains.kD().get());
-    feedback.setTolerance(constants.constraints.goalToleranceRadiansPerSecond().get());
+    feedback.setTolerance(constants.constraints.goalTolerance().get().in(Radians));
     profile =
         new LinearProfile(
-            constants.constraints.maxAccelerationRadiansPerSecondSquared().get(),
+            constants.constraints.maxAcceleration().get().in(RadiansPerSecondPerSecond),
             1 / GompeiLib.getLoopPeriod());
     feedforward =
         new SimpleMotorFeedforward(constants.gains.kS().get(), constants.gains.kV().get());

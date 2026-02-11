@@ -2,9 +2,8 @@ package edu.wpi.team190.gompeilib.subsystems.elevator;
 
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.DistanceUnit;
-import edu.wpi.team190.gompeilib.core.utility.Constraints;
-import edu.wpi.team190.gompeilib.core.utility.Gains;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
+import edu.wpi.team190.gompeilib.core.utility.control.LinearConstraints;
 import java.util.Set;
 import lombok.Builder;
 import lombok.NonNull;
@@ -24,7 +23,7 @@ public class ElevatorConstants {
   @NonNull public final Gains slot0Gains;
   @Builder.Default public final Gains slot1Gains = Gains.builder().withPrefix("").build();
   @Builder.Default public final Gains slot2Gains = Gains.builder().withPrefix("").build();
-  @NonNull public final Constraints<DistanceUnit> constraints;
+  @NonNull public final LinearConstraints constraints;
 
   @Singular(value = "alignedFollowerCANID")
   @NonNull
