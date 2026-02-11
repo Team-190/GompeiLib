@@ -1,5 +1,6 @@
-package edu.wpi.team190.gompeilib.core.utility;
+package edu.wpi.team190.gompeilib.core.utility.control;
 
+import edu.wpi.team190.gompeilib.core.utility.tunable.LoggedTunableNumber;
 import lombok.Builder;
 import lombok.NonNull;
 

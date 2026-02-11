@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package edu.wpi.team190.gompeilib.core.utility;
+package edu.wpi.team190.gompeilib.core.utility.tunable;
 
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import java.util.Arrays;

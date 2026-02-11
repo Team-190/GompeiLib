@@ -24,7 +24,7 @@ import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIO;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOInputsAutoLogged;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOPigeon2;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
-import edu.wpi.team190.gompeilib.core.utility.PhoenixOdometryThread;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixOdometryThread;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
