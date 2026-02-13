@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.team190.gompeilib.core.utility.CustomSysIdRoutine;
 import edu.wpi.team190.gompeilib.core.utility.CustomUnits;
-import lombok.Getter;
 import java.util.function.DoubleSupplier;
+import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public class GenericFlywheel {
