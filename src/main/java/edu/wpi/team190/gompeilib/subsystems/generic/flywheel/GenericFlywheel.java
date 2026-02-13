@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.team190.gompeilib.core.utility.CustomSysIdRoutine;
 import edu.wpi.team190.gompeilib.core.utility.CustomUnits;
+import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public class GenericFlywheel {
@@ -18,10 +19,10 @@ public class GenericFlywheel {
   private final CustomSysIdRoutine<CurrentUnit> torqueCharacterizationRoutine;
   private final CustomSysIdRoutine<VoltageUnit> voltageCharacterizationRoutine;
 
-  private GenericFlywheelState currentState;
+  @Getter private GenericFlywheelState currentState;
 
-  private double velocityGoalRadiansPerSecond;
-  private double voltageGoalVolts;
+  @Getter private double velocityGoalRadiansPerSecond;
+  @Getter private double voltageGoalVolts;
 
   public GenericFlywheel(GenericFlywheelIO io, Subsystem subsystem, String name) {
     this.io = io;
@@ -125,10 +126,6 @@ public class GenericFlywheel {
         maxAccelerationRadiansPerSecondSquared,
         cruisingVelocityRadiansPerSecond,
         goalToleranceRadiansPerSecond);
-  }
-
-  public double getFlywheelVelocityGoal() {
-    return velocityGoalRadiansPerSecond;
   }
 
   public Command sysIdRoutine() {
