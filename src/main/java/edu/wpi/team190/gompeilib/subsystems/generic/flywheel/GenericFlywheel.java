@@ -127,6 +127,10 @@ public class GenericFlywheel {
         goalToleranceRadiansPerSecond);
   }
 
+  public double getFlywheelVelocityGoal() {
+    return velocityGoalRadiansPerSecond;
+  }
+
   public Command sysIdRoutine() {
     return Commands.sequence(
         Commands.runOnce(() -> currentState = GenericFlywheelState.IDLE),
