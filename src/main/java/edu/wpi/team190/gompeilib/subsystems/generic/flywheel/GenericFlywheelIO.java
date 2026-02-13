@@ -47,6 +47,10 @@ public interface GenericFlywheelIO {
       double goalToleranceRadiansPerSecond) {}
   ;
 
+  public default double getFlywheelVelocityGoal() {
+    return 0;
+  }
+
   public default boolean atGoal() {
     return false;
   }
