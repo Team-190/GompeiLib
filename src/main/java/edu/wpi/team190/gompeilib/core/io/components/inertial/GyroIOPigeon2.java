@@ -17,7 +17,11 @@ import lombok.Getter;
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
   @Getter private final StatusSignal<Angle> yaw;
+  @Getter private final StatusSignal<Angle> roll;
+  @Getter private final StatusSignal<Angle> pitch;
   private final StatusSignal<AngularVelocity> yawVelocity;
+  private final StatusSignal<AngularVelocity> rollVelocity;
+  private final StatusSignal<AngularVelocity> pitchVelocity;
 
   public GyroIOPigeon2(SwerveDriveConstants driveConstants) {
     Pigeon2 pigeon =
@@ -31,18 +35,36 @@ public class GyroIOPigeon2 implements GyroIO {
     yaw.setUpdateFrequency(driveConstants.odometryFrequency);
     yawVelocity.setUpdateFrequency(100.0);
 
+    roll = pigeon.getRoll();
+    rollVelocity = pigeon.getAngularVelocityZWorld();
+
+    roll.setUpdateFrequency(driveConstants.odometryFrequency);
+    rollVelocity.setUpdateFrequency(100.0);
+
+    pitch = pigeon.getRoll();
+    pitchVelocity = pigeon.getAngularVelocityZWorld();
+
+    pitch.setUpdateFrequency(driveConstants.odometryFrequency);
+    pitchVelocity.setUpdateFrequency(100.0);
+
     pigeon.optimizeBusUtilization();
 
-    PhoenixUtil.registerSignals(true, yaw, yawVelocity);
+    PhoenixUtil.registerSignals(true, yaw, yawVelocity, roll, rollVelocity, pitch, pitchVelocity);
   }
 
   @Trace
   @Override
   public void updateInputs(
       GyroIOInputs inputs, Queue<Double> yawTimestampQueue, Queue<Double> yawPositionQueue) {
-    inputs.connected = BaseStatusSignal.isAllGood(yaw, yawVelocity);
+    inputs.connected = BaseStatusSignal.isAllGood(yaw, yawVelocity, roll, rollVelocity, pitch, pitchVelocity);
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
+
+    inputs.rollPosition = Rotation2d.fromDegrees(roll.getValueAsDouble());
+    inputs.rollVelocityRadPerSec = Units.degreesToRadians(rollVelocity.getValueAsDouble());
+
+    inputs.pitchPosition = Rotation2d.fromDegrees(pitch.getValueAsDouble());
+    inputs.pitchVelocityRadPerSec = Units.degreesToRadians(pitchVelocity.getValueAsDouble());
 
     inputs.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
