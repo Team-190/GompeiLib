@@ -5,7 +5,6 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -35,7 +34,7 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
     talonFX = new TalonFX(constants.rollerCANID, constants.canBus);
 
     config = new TalonFXConfiguration();
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.MotorOutput.NeutralMode = constants.neutralMode;
     config.CurrentLimits.SupplyCurrentLimit = constants.supplyCurrentLimit;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
