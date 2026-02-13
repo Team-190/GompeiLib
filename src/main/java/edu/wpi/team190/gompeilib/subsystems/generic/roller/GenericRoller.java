@@ -12,8 +12,7 @@ public class GenericRoller {
   private final GenericRollerIOInputsAutoLogged inputs;
   private final String aKitTopic;
 
-  @Getter
-  private double voltageGoalVolts;
+  @Getter private double voltageGoalVolts;
 
   public GenericRoller(GenericRollerIO io, Subsystem subsystem, String name) {
     this.io = io;

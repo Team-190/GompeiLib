@@ -19,11 +19,9 @@ public class Arm {
 
   private final SysIdRoutine characterizationRoutine;
 
-  @Getter
-  private ArmState currentState;
+  @Getter private ArmState currentState;
 
-  @Getter
-  private double voltageGoalVolts;
+  @Getter private double voltageGoalVolts;
   @Getter private Rotation2d positionGoal;
 
   public Arm(ArmIO io, Subsystem subsystem, int index) {
