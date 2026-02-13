@@ -16,7 +16,7 @@ public class GenericRoller {
   public GenericRoller(GenericRollerIO io, Subsystem subsystem, String name) {
     this.io = io;
     inputs = new GenericRollerIOInputsAutoLogged();
-    aKitTopic = subsystem.getName() + "/" + name + " Rollers";
+    aKitTopic = subsystem.getName() + "/Roller" + name;
   }
 
   @Trace
@@ -24,13 +24,12 @@ public class GenericRoller {
     io.updateInputs(inputs);
     Logger.processInputs(aKitTopic, inputs);
 
+    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts);
+
     io.setVoltage(voltageGoalVolts);
   }
 
   public Command setVoltage(double volts) {
-    return Commands.runOnce(
-        () -> {
-          voltageGoalVolts = volts;
-        });
+    return Commands.runOnce(() -> voltageGoalVolts = volts);
   }
 }
