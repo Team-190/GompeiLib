@@ -36,6 +36,7 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
     profile =
         new LinearProfile(
             constants.constraints.maxAccelerationRadiansPerSecondSquared().get(),
+            constants.constraints.cruisingVelocityRadiansPerSecond().get(),
             1 / GompeiLib.getLoopPeriod());
     feedforward =
         new SimpleMotorFeedforward(constants.gains.kS().get(), constants.gains.kV().get());
@@ -127,9 +128,10 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
   @Override
   public void setProfile(
       double maxAccelerationRadiansPerSecondSquared,
-      double cruisingVelocity,
+      double cruisingVelocityRadiansPerSecond,
       double goalToleranceRadiansPerSecond) {
     profile.setMaxAcceleration(maxAccelerationRadiansPerSecondSquared);
+    profile.setMaxVelocity(cruisingVelocityRadiansPerSecond);
     feedback.setTolerance(goalToleranceRadiansPerSecond);
   }
 
