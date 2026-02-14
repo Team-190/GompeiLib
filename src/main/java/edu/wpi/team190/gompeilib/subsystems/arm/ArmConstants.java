@@ -10,7 +10,7 @@ import lombok.NonNull;
 @Builder(setterPrefix = "with")
 public class ArmConstants {
   @NonNull public final Integer armCANID;
-  @NonNull public final CANBus canBus = CANBus.roboRIO();
+  @NonNull public final CANBus canBus;
   @NonNull public final ArmParameters armParameters;
   @NonNull public final Gains slot0Gains;
   @Builder.Default public final Gains slot1Gains = new Gains("Arm/Slot1");

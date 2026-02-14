@@ -44,7 +44,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   protected GenericFlywheelConstants constants;
 
   public GenericFlywheelIOTalonFX(GenericFlywheelConstants constants) {
-    talonFX = new TalonFX(constants.leaderCANID);
+    talonFX = new TalonFX(constants.leaderCANID, constants.canBus);
     followerTalonFX =
         new TalonFX
             [constants.alignedFollowerCANIDs.size() + constants.opposedFollowerCANIDs.size()];
