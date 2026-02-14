@@ -50,7 +50,7 @@ public class ArmIOTalonFX implements ArmIO {
   protected final ArmConstants constants;
 
   public ArmIOTalonFX(ArmConstants constants) {
-    talonFX = new TalonFX(constants.armCANID);
+    talonFX = new TalonFX(constants.armCANID, constants.canBus);
     followTalonFX = new TalonFX[constants.armParameters.numMotors() - 1];
 
     config = new TalonFXConfiguration();
@@ -101,16 +101,6 @@ public class ArmIOTalonFX implements ArmIO {
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
-    for (TalonFX follower : followTalonFX) {
-      PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config));
-      follower.setControl(
-          new Follower(
-              talonFX.getDeviceID(),
-              (follower.getDeviceID() % 2 == 1)
-                  ? MotorAlignmentValue.Aligned
-                  : MotorAlignmentValue.Opposed));
-    }
-
     appliedVolts = new ArrayList<>();
     supplyCurrentAmps = new ArrayList<>();
     torqueCurrentAmps = new ArrayList<>();
@@ -157,7 +147,7 @@ public class ArmIOTalonFX implements ArmIO {
 
     talonFX.optimizeBusUtilization();
 
-    PhoenixUtil.registerSignals(false, statusSignals);
+    PhoenixUtil.registerSignals(constants.canBus.isNetworkFD(), statusSignals);
 
     talonFX.setPosition(0);
 
