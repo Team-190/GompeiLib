@@ -1,7 +1,6 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -240,14 +239,14 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   @Override
   public void setProfile(
       double maxAccelerationRadiansPerSecondSquared,
-      double cruisingVelocity,
+      double cruisingVelocityRadiansPerSecond,
       double goalToleranceRadiansPerSecond) {
     talonFXConfiguration
         .MotionMagic
         .withMotionMagicAcceleration(
             Units.radiansToRotations(maxAccelerationRadiansPerSecondSquared))
         .withMotionMagicCruiseVelocity(
-            AngularVelocity.ofRelativeUnits(cruisingVelocity, RotationsPerSecond));
+            AngularVelocity.ofRelativeUnits(cruisingVelocityRadiansPerSecond, RadiansPerSecond));
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
     for (TalonFX follower : followerTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
