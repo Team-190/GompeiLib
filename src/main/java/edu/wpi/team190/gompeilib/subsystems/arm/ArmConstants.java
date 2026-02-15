@@ -1,6 +1,7 @@
 package edu.wpi.team190.gompeilib.subsystems.arm;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
@@ -18,6 +19,7 @@ public class ArmConstants {
   @NonNull public final Constraints constraints;
   @NonNull public final CurrentLimits currentLimits;
   @NonNull public final Boolean enableFOC;
+  @NonNull public final InvertedValue invertedValue;
 
   @Builder(setterPrefix = "with")
   public record ArmParameters(

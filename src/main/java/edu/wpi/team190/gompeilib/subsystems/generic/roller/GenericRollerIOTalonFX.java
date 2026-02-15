@@ -37,6 +37,7 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
     config.MotorOutput.NeutralMode = constants.neutralMode;
     config.CurrentLimits.SupplyCurrentLimit = constants.supplyCurrentLimit;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
+    config.MotorOutput.Inverted = constants.invertedValue;
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
