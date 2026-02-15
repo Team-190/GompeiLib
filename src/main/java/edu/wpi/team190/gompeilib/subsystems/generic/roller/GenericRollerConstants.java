@@ -5,17 +5,20 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.MomentOfInertia;
+import java.util.Set;
 import lombok.Builder;
 import lombok.NonNull;
 
 @Builder(setterPrefix = "with")
 public class GenericRollerConstants {
-  @NonNull public final Integer rollerCANID;
+  @NonNull public final Integer leaderCANID;
+  @NonNull public final InvertedValue leaderInvertedValue;
+  @NonNull public final Set<Integer> alignedFollowerCANIDs;
+  @NonNull public final Set<Integer> opposedFollowerCANIDs;
   @NonNull public final Double supplyCurrentLimit;
   @NonNull public final DCMotor rollerGearbox;
   @NonNull public final Double rollerMotorGearRatio;
   @NonNull public final MomentOfInertia momentOfInertia;
   @NonNull public final NeutralModeValue neutralMode;
   @NonNull public final CANBus canBus;
-  @NonNull public final InvertedValue invertedValue;
 }
