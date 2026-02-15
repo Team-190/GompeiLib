@@ -31,7 +31,6 @@ import java.util.Queue;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import lombok.Getter;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class SwerveDrive extends SubsystemBase {
@@ -135,6 +134,8 @@ public class SwerveDrive extends SubsystemBase {
 
     autoHeadingController.enableContinuousInput(-Math.PI, Math.PI);
     autoHeadingController.setTolerance(Units.degreesToRadians(1.0));
+
+    measuredChassisSpeeds = new ChassisSpeeds();
   }
 
   @Trace
@@ -170,6 +171,9 @@ public class SwerveDrive extends SubsystemBase {
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
+
+    Logger.recordOutput("SwerveStates/Measured", getModuleStates());
+    Logger.recordOutput("SwerveChassisSpeeds/Measured", measuredChassisSpeeds);
 
     // Update odometry
     double[] sampleTimestamps =
@@ -304,7 +308,6 @@ public class SwerveDrive extends SubsystemBase {
 
   /** Returns the module states (turn angles and drive velocities) for all of the modules. */
   @Trace
-  @AutoLogOutput(key = "SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (int i = 0; i < 4; i++) {
@@ -325,7 +328,6 @@ public class SwerveDrive extends SubsystemBase {
 
   /** Returns the measured chassis speeds of the robot. */
   @Trace
-  @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
   private ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
