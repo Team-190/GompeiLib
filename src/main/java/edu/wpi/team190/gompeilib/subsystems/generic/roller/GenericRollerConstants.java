@@ -8,13 +8,21 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import java.util.Set;
 import lombok.Builder;
 import lombok.NonNull;
+import lombok.Singular;
 
 @Builder(setterPrefix = "with")
 public class GenericRollerConstants {
   @NonNull public final Integer leaderCANID;
   @NonNull public final InvertedValue leaderInvertedValue;
-  @NonNull public final Set<Integer> alignedFollowerCANIDs;
-  @NonNull public final Set<Integer> opposedFollowerCANIDs;
+
+  @Singular(value = "alignedFollowerCANID")
+  @NonNull
+  public final Set<Integer> alignedFollowerCANIDs;
+
+  @Singular(value = "opposedFollowerCANID")
+  @NonNull
+  public final Set<Integer> opposedFollowerCANIDs;
+
   @NonNull public final Double supplyCurrentLimit;
   @NonNull public final DCMotor rollerGearbox;
   @NonNull public final Double rollerMotorGearRatio;

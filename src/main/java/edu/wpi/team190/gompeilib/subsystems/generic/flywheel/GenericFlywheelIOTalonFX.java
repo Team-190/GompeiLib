@@ -38,7 +38,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   private final NeutralOut neutralControlRequest;
   private final VoltageOut voltageControlRequest;
   private final TorqueCurrentFOC torqueCurrentFOCRequest;
-  private final VelocityVoltage velocityControlRequest;
+  private final MotionMagicVelocityVoltage velocityControlRequest;
   private final MotionMagicVelocityTorqueCurrentFOC velocityTorqueCurrentRequest;
 
   protected GenericFlywheelConstants constants;
@@ -160,7 +160,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     voltageControlRequest = new VoltageOut(0.0);
     torqueCurrentFOCRequest = new TorqueCurrentFOC(0.0);
 
-    velocityControlRequest = new VelocityVoltage(0);
+    velocityControlRequest = new MotionMagicVelocityVoltage(0);
     velocityTorqueCurrentRequest = new MotionMagicVelocityTorqueCurrentFOC(0.0);
 
     this.constants = constants;
@@ -255,8 +255,10 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public boolean atGoal() {
-    return Math.abs(velocityErrorRotationsPerSecond.getValueAsDouble())
-        <= Units.radiansToRotations(constants.constraints.goalToleranceRadiansPerSecond().get());
+    return Math.abs(
+            velocityGoalRadiansPerSecond
+                - velocityRotationsPerSecond.getValue().baseUnitMagnitude())
+        <= (constants.constraints.goalToleranceRadiansPerSecond().get());
   }
 
   @Override
