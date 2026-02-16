@@ -75,10 +75,13 @@ public class GenericFlywheel {
     switch (currentState) {
       case VELOCITY_VOLTAGE_CONTROL:
         io.setVelocity(velocityGoalRadiansPerSecond);
+        break;
       case VELOCITY_TORQUE_CONTROL:
         io.setVelocityTorque(velocityGoalRadiansPerSecond);
+        break;
       case VOLTAGE_CONTROL:
         io.setVoltage(voltageGoalVolts);
+        break;
       case IDLE:
         break;
     }
