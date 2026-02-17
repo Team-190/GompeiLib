@@ -25,7 +25,10 @@ public class GenericFlywheel {
   @Getter private double velocityGoalRadiansPerSecond;
   @Getter private double voltageGoalVolts;
 
-  public GenericFlywheel(GenericFlywheelIO io, Subsystem subsystem, String name) {
+  private final DoubleSupplier velocityGoalOffset;
+
+  public GenericFlywheel(
+      GenericFlywheelIO io, Subsystem subsystem, DoubleSupplier velocityGoalOffset, String name) {
     this.io = io;
     inputs = new GenericFlywheelIOInputsAutoLogged();
 
@@ -60,6 +63,8 @@ public class GenericFlywheel {
     velocityGoalRadiansPerSecond = 0;
     voltageGoalVolts = 0;
 
+    this.velocityGoalOffset = velocityGoalOffset;
+
     currentState = GenericFlywheelState.IDLE;
   }
 
@@ -74,10 +79,10 @@ public class GenericFlywheel {
 
     switch (currentState) {
       case VELOCITY_VOLTAGE_CONTROL:
-        io.setVelocity(velocityGoalRadiansPerSecond);
+        io.setVelocity(velocityGoalRadiansPerSecond + velocityGoalOffset.getAsDouble()*Math.signum(velocityGoalRadiansPerSecond));
         break;
       case VELOCITY_TORQUE_CONTROL:
-        io.setVelocityTorque(velocityGoalRadiansPerSecond);
+        io.setVelocityTorque(velocityGoalRadiansPerSecond + velocityGoalOffset.getAsDouble()*Math.signum(velocityGoalRadiansPerSecond));
         break;
       case VOLTAGE_CONTROL:
         io.setVoltage(voltageGoalVolts);
