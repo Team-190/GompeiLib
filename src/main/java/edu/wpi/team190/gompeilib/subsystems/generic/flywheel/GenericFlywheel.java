@@ -32,7 +32,7 @@ public class GenericFlywheel {
     this.io = io;
     inputs = new GenericFlywheelIOInputsAutoLogged();
 
-    aKitTopic = subsystem.getName() + "/" + " Flywheel" + name;
+    aKitTopic = subsystem.getName() + "/" + "Flywheel" + name;
 
     torqueCharacterizationRoutine =
         new CustomSysIdRoutine<>(
