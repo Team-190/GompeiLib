@@ -16,6 +16,7 @@ import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
+import org.littletonrobotics.junction.Logger;
 
 public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   protected final TalonFX talonFX;
@@ -38,7 +39,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   private final NeutralOut neutralControlRequest;
   private final VoltageOut voltageControlRequest;
   private final TorqueCurrentFOC torqueCurrentFOCRequest;
-  private final MotionMagicVelocityVoltage velocityControlRequest;
+  private final VelocityVoltage velocityControlRequest;
   private final MotionMagicVelocityTorqueCurrentFOC velocityTorqueCurrentRequest;
 
   protected GenericFlywheelConstants constants;
@@ -160,7 +161,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     voltageControlRequest = new VoltageOut(0.0);
     torqueCurrentFOCRequest = new TorqueCurrentFOC(0.0);
 
-    velocityControlRequest = new MotionMagicVelocityVoltage(0);
+    velocityControlRequest = new VelocityVoltage(0);
     velocityTorqueCurrentRequest = new MotionMagicVelocityTorqueCurrentFOC(0.0);
 
     this.constants = constants;
@@ -189,6 +190,9 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
         Units.rotationsToRadians(velocitySetpointRotationsPerSecond.getValueAsDouble());
     inputs.velocityErrorRadiansPerSecond =
         Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());
+
+    Logger.recordOutput("Flywheel/velocityCTRE", velocityRotationsPerSecond.getValueAsDouble());
+    Logger.recordOutput("Flywheel/positionCTRE", positionRotations.getValueAsDouble());
   }
 
   @Override

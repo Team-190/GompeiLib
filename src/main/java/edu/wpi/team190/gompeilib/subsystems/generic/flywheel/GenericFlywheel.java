@@ -48,8 +48,8 @@ public class GenericFlywheel {
         new CustomSysIdRoutine<>(
             new CustomSysIdRoutine.Config<VoltageUnit>(
                 CustomUnits.voltsPerSecond.ofNative(0.5),
-                Volts.of(3.5),
-                Seconds.of(10),
+                Volts.of(8),
+                Seconds.of(24),
                 (state) ->
                     Logger.recordOutput(aKitTopic + "/Voltage SysID State", state.toString()),
                 Volts),
@@ -81,6 +81,9 @@ public class GenericFlywheel {
         break;
       case VOLTAGE_CONTROL:
         io.setVoltage(voltageGoalVolts);
+        break;
+      case STOP:
+        io.stop();
         break;
       case IDLE:
         break;
@@ -114,6 +117,13 @@ public class GenericFlywheel {
         () -> {
           currentState = GenericFlywheelState.VOLTAGE_CONTROL;
           this.voltageGoalVolts = volts;
+        });
+  }
+
+  public Command stop() {
+    return Commands.runOnce(
+        () -> {
+          currentState = GenericFlywheelState.STOP;
         });
   }
 
