@@ -190,9 +190,6 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
         Units.rotationsToRadians(velocitySetpointRotationsPerSecond.getValueAsDouble());
     inputs.velocityErrorRadiansPerSecond =
         Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());
-
-    Logger.recordOutput("Flywheel/velocityCTRE", velocityRotationsPerSecond.getValueAsDouble());
-    Logger.recordOutput("Flywheel/positionCTRE", positionRotations.getValueAsDouble());
   }
 
   @Override
