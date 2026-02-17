@@ -16,7 +16,6 @@ import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
 import java.util.ArrayList;
-import org.littletonrobotics.junction.Logger;
 
 public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   protected final TalonFX talonFX;

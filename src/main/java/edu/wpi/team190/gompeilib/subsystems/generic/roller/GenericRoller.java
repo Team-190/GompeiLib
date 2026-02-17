@@ -34,8 +34,8 @@ public class GenericRoller {
 
     Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts);
 
-    io.setVoltage(voltageGoalVolts
-            + voltageGoalOffset.getAsDouble() * Math.signum(voltageGoalVolts));
+    io.setVoltage(
+        voltageGoalVolts + voltageGoalOffset.getAsDouble() * Math.signum(voltageGoalVolts));
   }
 
   public Command setVoltage(double volts) {
