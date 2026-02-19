@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.team190.gompeilib.core.utility.GeometryUtil;
 import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionMultiTxTyObservation;
 import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionPoseObservation;
 import java.util.List;
@@ -57,6 +58,7 @@ public class Localization {
             poseObservations.stream()
                 .filter(
                     observation -> zone.getAprilTags().keySet().containsAll(observation.tagIds()))
+                .filter(observation -> !GeometryUtil.isNaN(observation.pose()))
                 .forEach(zone::addPoseObservation));
   }
 

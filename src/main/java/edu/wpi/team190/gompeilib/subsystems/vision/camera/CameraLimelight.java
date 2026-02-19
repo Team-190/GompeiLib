@@ -69,7 +69,7 @@ public class CameraLimelight extends Camera {
     LimelightHelpers.setCameraPose_RobotSpace(
         name,
         currentCameraPose.getX(),
-        -currentCameraPose.getY(),
+        currentCameraPose.getY(),
         currentCameraPose.getZ(),
         currentCameraPose.getRotation().getMeasureX().in(Degrees),
         currentCameraPose.getRotation().getMeasureY().in(Degrees),
@@ -91,29 +91,38 @@ public class CameraLimelight extends Camera {
 
     allTagPoses.clear();
 
-    double xyStdDev =
-        config.megatagXYStdev()
-            * Math.pow(
-                inputs.mt1PoseEstimate.avgTagDist(), VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
-            / Math.pow(
-                inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
-    double thetaStdev =
-        inputs.mt1PoseEstimate.tagCount() > 1
-            ? config.metatagThetaStdev()
-                * Math.pow(
-                    inputs.mt1PoseEstimate.avgTagDist(), VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
-                / Math.pow(
-                    inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT)
-            : Double.POSITIVE_INFINITY;
+    double xyStdDev = config.megatagXYStdev();
+    double thetaStdev = config.metatagThetaStdev();
 
-    poseObservationList.add(
-        new VisionPoseObservation(
-            inputs.mt1PoseEstimate.pose(),
-            Arrays.stream(inputs.mt1PoseEstimate.rawFiducials())
-                .map(CameraIO.RawFiducial::id)
-                .collect(Collectors.toSet()),
-            inputs.mt1PoseEstimate.timestampSeconds(),
-            VecBuilder.fill(xyStdDev, xyStdDev, thetaStdev)));
+    if (inputs.mt1PoseEstimate.tagCount() != 0) {
+      xyStdDev =
+          config.megatagXYStdev()
+              * Math.pow(
+                  inputs.mt1PoseEstimate.avgTagDist(), VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
+              / Math.pow(
+                  inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
+      thetaStdev =
+          inputs.mt1PoseEstimate.tagCount() > 1
+              ? config.metatagThetaStdev()
+                  * Math.pow(
+                      inputs.mt1PoseEstimate.avgTagDist(),
+                      VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
+                  / Math.pow(
+                      inputs.mt1PoseEstimate.tagCount(),
+                      VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT)
+              : Double.POSITIVE_INFINITY;
+    }
+
+    if (inputs.mt1PoseEstimate.tagCount() != 0) {
+      poseObservationList.add(
+          new VisionPoseObservation(
+              inputs.mt1PoseEstimate.pose(),
+              Arrays.stream(inputs.mt1PoseEstimate.rawFiducials())
+                  .map(CameraIO.RawFiducial::id)
+                  .collect(Collectors.toSet()),
+              inputs.mt1PoseEstimate.timestampSeconds(),
+              VecBuilder.fill(xyStdDev, xyStdDev, thetaStdev)));
+    }
 
     xyStdDev =
         config.megatag2XYStdev()
@@ -123,26 +132,30 @@ public class CameraLimelight extends Camera {
                 inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
     thetaStdev = Double.POSITIVE_INFINITY;
 
-    poseObservationList.add(
-        new VisionPoseObservation(
-            inputs.mt2PoseEstimate.pose(),
-            Arrays.stream(inputs.mt2PoseEstimate.rawFiducials())
-                .map(CameraIO.RawFiducial::id)
-                .collect(Collectors.toSet()),
-            inputs.mt2PoseEstimate.timestampSeconds(),
-            VecBuilder.fill(xyStdDev, xyStdDev, thetaStdev)));
+    if (inputs.mt2PoseEstimate.tagCount() != 0) {
+      poseObservationList.add(
+          new VisionPoseObservation(
+              inputs.mt2PoseEstimate.pose(),
+              Arrays.stream(inputs.mt2PoseEstimate.rawFiducials())
+                  .map(CameraIO.RawFiducial::id)
+                  .collect(Collectors.toSet()),
+              inputs.mt2PoseEstimate.timestampSeconds(),
+              VecBuilder.fill(xyStdDev, xyStdDev, thetaStdev)));
+    }
 
-    Arrays.stream(inputs.rawFiducials)
-        .forEach(
-            fiducial ->
-                singleTxTyObservationList.add(
-                    new VisionSingleTxTyObservation(
-                        fiducial.id(),
-                        fiducial.txnc(),
-                        fiducial.tync(),
-                        fiducial.distToCamera(),
-                        inputs.mt1PoseEstimate.timestampSeconds(),
-                        currentCameraPose)));
+    if (inputs.rawFiducials.length != 0) {
+      Arrays.stream(inputs.rawFiducials)
+          .forEach(
+              fiducial ->
+                  singleTxTyObservationList.add(
+                      new VisionSingleTxTyObservation(
+                          fiducial.id(),
+                          fiducial.txnc(),
+                          fiducial.tync(),
+                          fiducial.distToCamera(),
+                          inputs.mt1PoseEstimate.timestampSeconds(),
+                          currentCameraPose)));
+    }
 
     super.sendObservers();
   }

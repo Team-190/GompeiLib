@@ -67,4 +67,19 @@ public class GeometryUtil {
   public static final boolean isZero(Rotation2d rotation) {
     return rotation.getDegrees() == 0.0;
   }
+
+  public static final boolean isNaN(Pose2d pose) {
+    return Double.isNaN(pose.getX())
+        && Double.isNaN(pose.getY())
+        && Double.isNaN(pose.getRotation().getDegrees());
+  }
+
+  public static final boolean isNaN(Pose2d[] pose) {
+    for (Pose2d p : pose) {
+      if (!isNaN(p)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
