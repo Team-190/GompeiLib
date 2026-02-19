@@ -80,11 +80,19 @@ public class GenericFlywheel {
     switch (currentState) {
       case VELOCITY_VOLTAGE_CONTROL:
         io.setVelocity(
-                Math.max(0, (velocityGoalRadiansPerSecond + velocityGoalOffset.getAsDouble()) * Math.signum(velocityGoalRadiansPerSecond)) * Math.signum(velocityGoalRadiansPerSecond));
+            Math.max(
+                    0,
+                    (velocityGoalRadiansPerSecond + velocityGoalOffset.getAsDouble())
+                        * Math.signum(velocityGoalRadiansPerSecond))
+                * Math.signum(velocityGoalRadiansPerSecond));
         break;
       case VELOCITY_TORQUE_CONTROL:
         io.setVelocityTorque(
-                Math.max(0, (velocityGoalRadiansPerSecond + velocityGoalOffset.getAsDouble()) * Math.signum(velocityGoalRadiansPerSecond)) * Math.signum(velocityGoalRadiansPerSecond));
+            Math.max(
+                    0,
+                    (velocityGoalRadiansPerSecond + velocityGoalOffset.getAsDouble())
+                        * Math.signum(velocityGoalRadiansPerSecond))
+                * Math.signum(velocityGoalRadiansPerSecond));
         break;
       case VOLTAGE_CONTROL:
         io.setVoltage(voltageGoalVolts);
