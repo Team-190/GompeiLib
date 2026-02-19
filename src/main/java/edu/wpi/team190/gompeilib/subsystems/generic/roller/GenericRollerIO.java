@@ -3,21 +3,18 @@ package edu.wpi.team190.gompeilib.subsystems.generic.roller;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface GenericRollerIO {
   @AutoLog
   public static class GenericRollerIOInputs {
-    public Rotation2d position = new Rotation2d();
-    public AngularVelocity velocity = RadiansPerSecond.zero();
-    public Voltage appliedVolts = Volts.zero();
-    public Current supplyCurrent = Amps.zero();
-    public Current torqueCurrent = Amps.zero();
-    public Temperature temperature = Celsius.zero();
+    public Rotation2d positionRadians = new Rotation2d();
+    public double velocityRadiansPerSecond = 0.0;
+
+    public double[] appliedVolts = new double[] {};
+    public double[] supplyCurrentAmps = new double[] {};
+    public double[] torqueCurrentAmps = new double[] {};
+    public double[] temperatureCelsius = new double[] {};
   }
 
   public default void updateInputs(GenericRollerIOInputs inputs) {}

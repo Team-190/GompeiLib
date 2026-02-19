@@ -274,10 +274,18 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
   @Override
   @Trace
   public void setDriveVelocity(double velocityRadiansPerSecond, double currentFeedforward) {
-    driveTalonFX.setControl(
-        velocityTorqueCurrentRequest
-            .withVelocity(Units.radiansToRotations(velocityRadiansPerSecond))
-            .withFeedForward(currentFeedforward));
+    if (driveClosedLoopOutputType.equals(SwerveModuleConstants.ClosedLoopOutputType.Voltage)) {
+      driveTalonFX.setControl(
+          velocityVoltageRequest
+              .withVelocity(Units.radiansToRotations(velocityRadiansPerSecond))
+              .withFeedForward(currentFeedforward));
+    } else if (driveClosedLoopOutputType.equals(
+        SwerveModuleConstants.ClosedLoopOutputType.TorqueCurrentFOC)) {
+      driveTalonFX.setControl(
+          velocityTorqueCurrentRequest
+              .withVelocity(Units.radiansToRotations(velocityRadiansPerSecond))
+              .withFeedForward(currentFeedforward));
+    }
   }
 
   @Override

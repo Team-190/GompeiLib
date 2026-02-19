@@ -4,5 +4,6 @@ public enum GenericFlywheelState {
   VELOCITY_VOLTAGE_CONTROL,
   VELOCITY_TORQUE_CONTROL,
   VOLTAGE_CONTROL,
-  IDLE
+  IDLE,
+  STOP
 }

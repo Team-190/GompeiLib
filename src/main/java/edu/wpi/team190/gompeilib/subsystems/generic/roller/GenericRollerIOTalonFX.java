@@ -3,83 +3,147 @@ package edu.wpi.team190.gompeilib.subsystems.generic.roller;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
+import java.util.ArrayList;
 
 public class GenericRollerIOTalonFX implements GenericRollerIO {
   protected final TalonFX talonFX;
-
-  private final TalonFXConfiguration config;
+  private final TalonFX[] followerTalonFX;
 
   private final StatusSignal<Angle> positionRotations;
-  private final StatusSignal<AngularVelocity> velocity;
-  private final StatusSignal<Voltage> appliedVoltage;
-  private final StatusSignal<Current> supplyCurrent;
-  private final StatusSignal<Current> torqueCurrent;
-  private final StatusSignal<Temperature> temperature;
+  private final StatusSignal<AngularVelocity> velocityRotationsPerSecond;
+  private final ArrayList<StatusSignal<Voltage>> appliedVolts;
+  private final ArrayList<StatusSignal<Current>> supplyCurrentAmps;
+  private final ArrayList<StatusSignal<Current>> torqueCurrentAmps;
+  private final ArrayList<StatusSignal<Temperature>> temperatureCelsius;
+
+  private StatusSignal<?>[] statusSignals;
+
+  private final TalonFXConfiguration talonFXConfiguration;
 
   private final VoltageOut voltageRequest;
 
   protected GenericRollerConstants constants;
 
   public GenericRollerIOTalonFX(GenericRollerConstants constants) {
-    talonFX = new TalonFX(constants.rollerCANID, constants.canBus);
+    talonFX = new TalonFX(constants.leaderCANID, constants.canBus);
+    followerTalonFX =
+        new TalonFX
+            [constants.alignedFollowerCANIDs.size() + constants.opposedFollowerCANIDs.size()];
 
-    config = new TalonFXConfiguration();
-    config.MotorOutput.NeutralMode = constants.neutralMode;
-    config.CurrentLimits.SupplyCurrentLimit = constants.supplyCurrentLimit;
-    config.CurrentLimits.SupplyCurrentLimitEnable = true;
+    talonFXConfiguration = new TalonFXConfiguration();
 
-    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
+    talonFXConfiguration.MotorOutput.withInverted(constants.leaderInvertedValue);
+
+    talonFXConfiguration
+        .CurrentLimits
+        .withSupplyCurrentLimit(constants.supplyCurrentLimit)
+        .withSupplyCurrentLimitEnable(true)
+        .withStatorCurrentLimit(constants.supplyCurrentLimit)
+        .withStatorCurrentLimitEnable(true);
+
+    talonFXConfiguration.Feedback.SensorToMechanismRatio = constants.rollerMotorGearRatio;
+
+    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
+
+    final int[] indexHolder = {0}; // mutable index for array insertion
+
+    constants.alignedFollowerCANIDs.forEach(
+        id -> {
+          TalonFX follower = new TalonFX(id, talonFX.getNetwork());
+          followerTalonFX[indexHolder[0]++] = follower;
+
+          PhoenixUtil.tryUntilOk(
+              5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
+
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Aligned));
+        });
+
+    constants.opposedFollowerCANIDs.forEach(
+        id -> {
+          TalonFX follower = new TalonFX(id, talonFX.getNetwork());
+          followerTalonFX[indexHolder[0]++] = follower;
+
+          PhoenixUtil.tryUntilOk(
+              5, () -> follower.getConfigurator().apply(talonFXConfiguration, 0.25));
+
+          follower.setControl(new Follower(talonFX.getDeviceID(), MotorAlignmentValue.Opposed));
+        });
 
     positionRotations = talonFX.getPosition();
-    velocity = talonFX.getVelocity();
-    appliedVoltage = talonFX.getMotorVoltage();
-    supplyCurrent = talonFX.getSupplyCurrent();
-    torqueCurrent = talonFX.getTorqueCurrent();
-    temperature = talonFX.getDeviceTemp();
+    velocityRotationsPerSecond = talonFX.getVelocity();
 
-    voltageRequest = new VoltageOut(0);
+    appliedVolts = new ArrayList<>();
+    supplyCurrentAmps = new ArrayList<>();
+    torqueCurrentAmps = new ArrayList<>();
+    temperatureCelsius = new ArrayList<>();
 
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        1 / GompeiLib.getLoopPeriod(),
-        positionRotations,
-        velocity,
-        appliedVoltage,
-        supplyCurrent,
-        torqueCurrent,
-        temperature);
+    appliedVolts.add(talonFX.getMotorVoltage());
+    supplyCurrentAmps.add(talonFX.getSupplyCurrent());
+    torqueCurrentAmps.add(talonFX.getTorqueCurrent());
+    temperatureCelsius.add(talonFX.getDeviceTemp());
+
+    for (TalonFX follower : followerTalonFX) {
+      appliedVolts.add(follower.getMotorVoltage());
+      supplyCurrentAmps.add(follower.getSupplyCurrent());
+      torqueCurrentAmps.add(follower.getTorqueCurrent());
+      temperatureCelsius.add(follower.getDeviceTemp());
+    }
+
+    var signalsList = new ArrayList<StatusSignal<?>>();
+
+    signalsList.add(positionRotations);
+    signalsList.add(velocityRotationsPerSecond);
+    signalsList.addAll(appliedVolts);
+    signalsList.addAll(supplyCurrentAmps);
+    signalsList.addAll(torqueCurrentAmps);
+    signalsList.addAll(temperatureCelsius);
+
+    statusSignals = new StatusSignal[signalsList.size()];
+
+    for (int i = 0; i < signalsList.size(); i++) {
+      statusSignals[i] = signalsList.get(i);
+    }
+
+    BaseStatusSignal.setUpdateFrequencyForAll(1 / GompeiLib.getLoopPeriod(), statusSignals);
+
+    PhoenixUtil.registerSignals(constants.canBus.isNetworkFD(), statusSignals);
 
     talonFX.optimizeBusUtilization();
+    for (TalonFX follower : followerTalonFX) {
+      follower.optimizeBusUtilization();
+    }
 
-    PhoenixUtil.registerSignals(
-        constants.canBus.isNetworkFD(),
-        positionRotations,
-        velocity,
-        appliedVoltage,
-        supplyCurrent,
-        torqueCurrent,
-        temperature);
+    voltageRequest = new VoltageOut(0.0);
 
     this.constants = constants;
   }
 
   @Override
   public void updateInputs(GenericRollerIOInputs inputs) {
-    inputs.position = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
-    inputs.velocity = velocity.getValue();
-    inputs.appliedVolts = appliedVoltage.getValue();
-    inputs.supplyCurrent = supplyCurrent.getValue();
-    inputs.torqueCurrent = torqueCurrent.getValue();
-    inputs.temperature = temperature.getValue();
+    inputs.positionRadians = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
+    inputs.velocityRadiansPerSecond =
+        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());
+
+    inputs.appliedVolts = new double[appliedVolts.size()];
+    inputs.supplyCurrentAmps = new double[supplyCurrentAmps.size()];
+    inputs.torqueCurrentAmps = new double[torqueCurrentAmps.size()];
+    inputs.temperatureCelsius = new double[temperatureCelsius.size()];
+
+    for (int i = 0; i <= followerTalonFX.length; i++) {
+      inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
+      inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
+      inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValueAsDouble();
+      inputs.temperatureCelsius[i] = temperatureCelsius.get(i).getValueAsDouble();
+    }
   }
 
   @Override

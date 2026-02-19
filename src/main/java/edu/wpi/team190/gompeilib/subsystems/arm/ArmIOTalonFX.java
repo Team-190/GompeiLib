@@ -59,6 +59,7 @@ public class ArmIOTalonFX implements ArmIO {
     config.CurrentLimits.StatorCurrentLimit = constants.currentLimits.armStatorCurrentLimit();
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.Feedback.SensorToMechanismRatio = constants.armParameters.gearRatio();
+    config.MotorOutput.Inverted = constants.invertedValue;
 
     config.Slot0.withKP(constants.slot0Gains.kP().get())
         .withKD(constants.slot0Gains.kD().get())
