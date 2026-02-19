@@ -49,10 +49,12 @@ public class Localization {
   }
 
   public void addPoseObservations(List<VisionPoseObservation> poseObservations) {
-    poseObservations.forEach(
-        observation ->
-            globalPoseEstimator.addVisionMeasurement(
-                observation.pose(), observation.timestamp(), observation.stddevs()));
+    poseObservations.stream()
+        .filter(observation -> !GeometryUtil.isNaN(observation.pose()))
+        .forEach(
+            observation ->
+                globalPoseEstimator.addVisionMeasurement(
+                    observation.pose(), observation.timestamp(), observation.stddevs()));
     estimationRegions.forEach(
         zone ->
             poseObservations.stream()
