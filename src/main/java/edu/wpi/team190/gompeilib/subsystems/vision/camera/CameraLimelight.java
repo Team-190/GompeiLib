@@ -1,10 +1,13 @@
 package edu.wpi.team190.gompeilib.subsystems.vision.camera;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.team190.gompeilib.core.utility.LimelightHelpers;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants.LimelightConfig;
 import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionPoseObservation;
@@ -62,6 +65,15 @@ public class CameraLimelight extends Camera {
         new Pose3d(
             config.robotToCameraTransform().getTranslation(),
             config.robotToCameraTransform().getRotation());
+
+    LimelightHelpers.setCameraPose_RobotSpace(
+        name,
+        currentCameraPose.getX(),
+        -currentCameraPose.getY(),
+        currentCameraPose.getZ(),
+        currentCameraPose.getRotation().getMeasureX().in(Degrees),
+        currentCameraPose.getRotation().getMeasureY().in(Degrees),
+        currentCameraPose.getRotation().getMeasureZ().in(Degrees));
   }
 
   @Override
