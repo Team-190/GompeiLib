@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
+import java.util.function.DoubleSupplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
@@ -14,10 +15,16 @@ public class GenericRoller {
 
   @Getter private double voltageGoalVolts;
 
-  public GenericRoller(GenericRollerIO io, Subsystem subsystem, String name) {
+  private final DoubleSupplier voltageGoalOffset;
+
+  public GenericRoller(
+      GenericRollerIO io, Subsystem subsystem, DoubleSupplier voltageGoalOffset, String name) {
     this.io = io;
     inputs = new GenericRollerIOInputsAutoLogged();
     aKitTopic = subsystem.getName() + "/Roller" + name;
+
+    voltageGoalVolts = 0;
+    this.voltageGoalOffset = voltageGoalOffset;
   }
 
   @Trace
@@ -27,7 +34,8 @@ public class GenericRoller {
 
     Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts);
 
-    io.setVoltage(voltageGoalVolts);
+    io.setVoltage(
+        voltageGoalVolts + voltageGoalOffset.getAsDouble() * Math.signum(voltageGoalVolts));
   }
 
   public Command setVoltage(double volts) {

@@ -51,7 +51,7 @@ public class Arm {
 
     switch (currentState) {
       case OPEN_LOOP_VOLTAGE_CONTROL -> io.setVoltage(voltageGoalVolts);
-      case CLOSED_LOOP_POSITION_CONTROL -> io.setPosition(positionGoal);
+      case CLOSED_LOOP_POSITION_CONTROL -> io.setPositionGoal(positionGoal);
     }
   }
 

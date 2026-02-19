@@ -255,8 +255,10 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public boolean atGoal() {
-    return Math.abs(velocityErrorRotationsPerSecond.getValueAsDouble())
-        <= Units.radiansToRotations(constants.constraints.goalToleranceRadiansPerSecond().get());
+    return Math.abs(
+            velocityGoalRadiansPerSecond
+                - velocityRotationsPerSecond.getValue().in(RadiansPerSecond))
+        <= (constants.constraints.goalToleranceRadiansPerSecond().get());
   }
 
   @Override

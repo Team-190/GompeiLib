@@ -9,7 +9,7 @@ public class CameraIOLimelight implements CameraIO {
   @Getter private final String name;
 
   public CameraIOLimelight(VisionConstants.LimelightConfig config) {
-    this.name = config.key();
+    this.name = "limelight-" + config.key();
   }
 
   @Override
