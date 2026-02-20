@@ -35,6 +35,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class SwerveDrive extends SubsystemBase {
   private final SwerveDriveConstants driveConstants;
+
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs;
   private final SwerveModule[] modules;
