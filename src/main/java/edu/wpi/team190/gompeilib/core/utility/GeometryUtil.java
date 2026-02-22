@@ -70,8 +70,8 @@ public class GeometryUtil {
 
   public static final boolean isNaN(Pose2d pose) {
     return Double.isNaN(pose.getX())
-        && Double.isNaN(pose.getY())
-        && Double.isNaN(pose.getRotation().getDegrees());
+        || Double.isNaN(pose.getY())
+        || Double.isNaN(pose.getRotation().getDegrees());
   }
 
   public static final boolean isNaN(Pose2d[] pose) {
