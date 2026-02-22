@@ -50,7 +50,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     this.constants = constants;
 
     // Create lead motor
-    talonFX = new TalonFX(constants.leaderCANID);
+    talonFX = new TalonFX(constants.leaderCANID, constants.canBus);
 
     // Create follower motor array (define length)
     followTalonFX = new TalonFX[constants.elevatorParameters.NUM_MOTORS() - 1];

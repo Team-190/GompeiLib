@@ -7,6 +7,7 @@
 
 package edu.wpi.team190.gompeilib.core.utility.control;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Twist2d;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import lombok.Setter;
 /** Ramps up and down to setpoint for velocity closed loop control */
 public class LinearProfile {
   private double dv;
+  private double maxVelocity;
   @Getter private final double period;
   @Getter private double currentSetpoint = 0;
   @Getter @Setter private double goal = 0;
@@ -24,7 +26,7 @@ public class LinearProfile {
    * @param maxAcceleration The max ramp rate in velocity in rps/sec
    * @param period Period of control loop (0.02)
    */
-  public LinearProfile(double maxAcceleration, double period) {
+  public LinearProfile(double maxAcceleration, double maxVelocity, double period) {
     this.period = period;
     setMaxAcceleration(maxAcceleration);
   }
@@ -32,6 +34,10 @@ public class LinearProfile {
   /** Set the max acceleration constraint in rpm/sec */
   public void setMaxAcceleration(double maxAcceleration) {
     dv = maxAcceleration * period;
+  }
+
+  public void setMaxVelocity(double maxVelocity) {
+    this.maxVelocity = maxVelocity;
   }
 
   /**
@@ -71,7 +77,7 @@ public class LinearProfile {
         currentSetpoint = goal;
       }
     }
-    return currentSetpoint;
+    return MathUtil.clamp(currentSetpoint, -maxVelocity, maxVelocity);
   }
 
   public class EqualsUtil {

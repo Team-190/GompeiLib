@@ -1,6 +1,7 @@
 package edu.wpi.team190.gompeilib.subsystems.arm;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.control.AngularConstraints;
@@ -12,7 +13,7 @@ import lombok.NonNull;
 @Builder(setterPrefix = "with")
 public class ArmConstants {
   @NonNull public final Integer armCANID;
-  @NonNull public final CANBus canBus = CANBus.roboRIO();
+  @NonNull public final CANBus canBus;
   @NonNull public final ArmParameters armParameters;
   @NonNull public final Gains slot0Gains;
   @Builder.Default public final Gains slot1Gains = Gains.builder().withPrefix("").build();
@@ -20,6 +21,7 @@ public class ArmConstants {
   @NonNull public final AngularConstraints constraints;
   @NonNull public final CurrentLimits currentLimits;
   @NonNull public final Boolean enableFOC;
+  @NonNull public final InvertedValue invertedValue;
 
   @Builder(setterPrefix = "with")
   public record ArmParameters(

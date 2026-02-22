@@ -6,13 +6,11 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -50,7 +48,7 @@ public class ArmIOTalonFX implements ArmIO {
   protected final ArmConstants constants;
 
   public ArmIOTalonFX(ArmConstants constants) {
-    talonFX = new TalonFX(constants.armCANID);
+    talonFX = new TalonFX(constants.armCANID, constants.canBus);
     followTalonFX = new TalonFX[constants.armParameters.numMotors() - 1];
 
     config = new TalonFXConfiguration();
@@ -61,6 +59,7 @@ public class ArmIOTalonFX implements ArmIO {
     config.CurrentLimits.StatorCurrentLimit = constants.currentLimits.statorCurrentLimit().in(Amps);
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.Feedback.SensorToMechanismRatio = constants.armParameters.gearRatio();
+    config.MotorOutput.Inverted = constants.invertedValue;
 
     config.Slot0.withKP(constants.slot0Gains.kP().get())
         .withKD(constants.slot0Gains.kD().get())
@@ -96,16 +95,6 @@ public class ArmIOTalonFX implements ArmIO {
                 constants.constraints.maxVelocity().get().in(RotationsPerSecond));
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
-
-    for (TalonFX follower : followTalonFX) {
-      PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config));
-      follower.setControl(
-          new Follower(
-              talonFX.getDeviceID(),
-              (follower.getDeviceID() % 2 == 1)
-                  ? MotorAlignmentValue.Aligned
-                  : MotorAlignmentValue.Opposed));
-    }
 
     appliedVolts = new ArrayList<>();
     supplyCurrentAmps = new ArrayList<>();
@@ -153,7 +142,7 @@ public class ArmIOTalonFX implements ArmIO {
 
     talonFX.optimizeBusUtilization();
 
-    PhoenixUtil.registerSignals(false, statusSignals);
+    PhoenixUtil.registerSignals(constants.canBus.isNetworkFD(), statusSignals);
 
     talonFX.setPosition(0);
 

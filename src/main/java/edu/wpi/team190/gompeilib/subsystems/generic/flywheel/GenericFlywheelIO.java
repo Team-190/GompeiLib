@@ -43,7 +43,7 @@ public interface GenericFlywheelIO {
 
   public default void setProfile(
       double maxAccelerationRadiansPerSecondSquared,
-      double cruisingVelocity,
+      double cruisingVelocityRadiansPerSecond,
       double goalToleranceRadiansPerSecond) {}
   ;
 

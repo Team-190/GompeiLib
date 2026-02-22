@@ -44,7 +44,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   protected GenericFlywheelConstants constants;
 
   public GenericFlywheelIOTalonFX(GenericFlywheelConstants constants) {
-    talonFX = new TalonFX(constants.leaderCANID);
+    talonFX = new TalonFX(constants.leaderCANID, constants.canBus);
     followerTalonFX =
         new TalonFX
             [constants.alignedFollowerCANIDs.size() + constants.opposedFollowerCANIDs.size()];
@@ -235,14 +235,14 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   @Override
   public void setProfile(
       double maxAccelerationRadiansPerSecondSquared,
-      double cruisingVelocity,
+      double cruisingVelocityRadiansPerSecond,
       double goalToleranceRadiansPerSecond) {
     talonFXConfiguration
         .MotionMagic
         .withMotionMagicAcceleration(
             Units.radiansToRotations(maxAccelerationRadiansPerSecondSquared))
         .withMotionMagicCruiseVelocity(
-            AngularVelocity.ofRelativeUnits(cruisingVelocity, RotationsPerSecond));
+            AngularVelocity.ofRelativeUnits(cruisingVelocityRadiansPerSecond, RadiansPerSecond));
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
     for (TalonFX follower : followerTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));

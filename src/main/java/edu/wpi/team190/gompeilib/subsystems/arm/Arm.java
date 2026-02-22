@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
+import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public class Arm {
@@ -18,10 +19,10 @@ public class Arm {
 
   private final SysIdRoutine characterizationRoutine;
 
-  private ArmState currentState;
+  @Getter private ArmState currentState;
 
-  private double voltageGoalVolts;
-  private Rotation2d positionGoal;
+  @Getter private double voltageGoalVolts;
+  @Getter private Rotation2d positionGoal;
 
   public Arm(ArmIO io, Subsystem subsystem, int index) {
     this.io = io;
@@ -50,7 +51,7 @@ public class Arm {
 
     switch (currentState) {
       case OPEN_LOOP_VOLTAGE_CONTROL -> io.setVoltage(voltageGoalVolts);
-      case CLOSED_LOOP_POSITION_CONTROL -> io.setPosition(positionGoal);
+      case CLOSED_LOOP_POSITION_CONTROL -> io.setPositionGoal(positionGoal);
     }
   }
 

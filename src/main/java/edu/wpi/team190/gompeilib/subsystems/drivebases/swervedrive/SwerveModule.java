@@ -41,7 +41,6 @@ public class SwerveModule {
   @Trace
   public void updateInputs() {
     io.updateInputs(inputs);
-
     Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
   }
 
