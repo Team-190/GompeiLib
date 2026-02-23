@@ -1,4 +1,3 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
 
-public class ElevatorStateTest {
-}
+public class ElevatorStateTest {}

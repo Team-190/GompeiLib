@@ -1,4 +1,3 @@
 package edu.wpi.team190.gompeilib.core.logging;
 
-public class TracerAspectTest {
-}
+public class TracerAspectTest {}

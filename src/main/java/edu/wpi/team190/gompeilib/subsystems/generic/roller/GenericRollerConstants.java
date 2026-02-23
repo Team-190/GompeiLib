@@ -5,6 +5,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.team190.gompeilib.core.utility.control.CurrentLimits;
 import java.util.Set;
 import lombok.Builder;
 import lombok.NonNull;
@@ -23,7 +24,7 @@ public class GenericRollerConstants {
   @NonNull
   public final Set<Integer> opposedFollowerCANIDs;
 
-  @NonNull public final Double supplyCurrentLimit;
+  @NonNull public final CurrentLimits currentLimits;
   @NonNull public final DCMotor rollerGearbox;
   @NonNull public final Double rollerMotorGearRatio;
   @NonNull public final MomentOfInertia momentOfInertia;

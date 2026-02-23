@@ -45,9 +45,9 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
 
     talonFXConfiguration
         .CurrentLimits
-        .withSupplyCurrentLimit(constants.supplyCurrentLimit)
+        .withSupplyCurrentLimit(constants.currentLimits.supplyCurrentLimit())
         .withSupplyCurrentLimitEnable(true)
-        .withStatorCurrentLimit(constants.supplyCurrentLimit)
+        .withStatorCurrentLimit(constants.currentLimits.statorCurrentLimit())
         .withStatorCurrentLimitEnable(true);
 
     talonFXConfiguration.Feedback.SensorToMechanismRatio = constants.rollerMotorGearRatio;

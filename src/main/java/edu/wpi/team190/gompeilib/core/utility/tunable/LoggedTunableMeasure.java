@@ -31,20 +31,18 @@ public class LoggedTunableMeasure<U extends Unit> implements Supplier<Measure<U>
    * @param defaultValue Default measure value
    */
   public LoggedTunableMeasure(String dashboardKey, Measure<U> defaultValue) {
-    this.key = tableKey + "/" + dashboardKey;
+    this.key = tableKey + "/" + dashboardKey + " " + defaultValue.unit();
     this.unit = defaultValue.unit();
     initDefault(defaultValue);
   }
 
   /** Set the default value. The default value can only be set once. */
   private void initDefault(Measure<U> defaultValue) {
-    if (!hasDefault) {
-      hasDefault = true;
-      this.defaultValue = defaultValue;
-      if (GompeiLib.isTuning()) {
-        // We store the raw double value in the base unit
-        dashboardNumber = new LoggedNetworkNumber(key, defaultValue.in(unit));
-      }
+    hasDefault = true;
+    this.defaultValue = defaultValue;
+    if (GompeiLib.isTuning()) {
+      // We store the raw double value in the base unit
+      dashboardNumber = new LoggedNetworkNumber(key, defaultValue.in(unit));
     }
   }
 
@@ -64,7 +62,7 @@ public class LoggedTunableMeasure<U extends Unit> implements Supplier<Measure<U>
   public boolean hasChanged(int id) {
     Measure<U> currentValue = get();
     Measure<U> lastValue = lastHasChangedValues.get(id);
-    if (!currentValue.equals(lastValue) || lastValue == null) {
+    if (!currentValue.equals(lastValue)) {
       lastHasChangedValues.put(id, currentValue);
       return true;
     }

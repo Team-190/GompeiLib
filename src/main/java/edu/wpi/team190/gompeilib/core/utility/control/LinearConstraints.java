@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.NonNull;
 
 /** Specifically for Angular constraints (Degrees, Radians, Rotations). */
+@Builder(setterPrefix = "with")
 public record LinearConstraints(
     LoggedTunableMeasure<DistanceUnit> goalTolerance,
     LoggedTunableMeasure<LinearVelocityUnit> maxVelocity,

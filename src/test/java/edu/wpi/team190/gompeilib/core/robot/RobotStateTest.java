@@ -1,4 +1,3 @@
 package edu.wpi.team190.gompeilib.core.robot;
 
-public class RobotStateTest {
-}
+public class RobotStateTest {}

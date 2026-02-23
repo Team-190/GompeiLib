@@ -4,6 +4,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Current;
 import lombok.Builder;
 
+@Builder(setterPrefix = "with")
 public record CurrentLimits(Current supplyCurrentLimit, Current statorCurrentLimit) {
   @Builder(setterPrefix = "with")
   public CurrentLimits(double supplyCurrentLimit, double statorCurrentLimit) {

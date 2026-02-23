@@ -4,6 +4,7 @@ import edu.wpi.team190.gompeilib.core.utility.tunable.LoggedTunableNumber;
 import lombok.Builder;
 import lombok.NonNull;
 
+@Builder(setterPrefix = "with")
 public record Gains(
     LoggedTunableNumber kP,
     LoggedTunableNumber kI,

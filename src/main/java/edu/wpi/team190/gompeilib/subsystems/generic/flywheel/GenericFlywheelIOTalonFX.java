@@ -73,9 +73,9 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     talonFXConfiguration.MotionMagic =
         new MotionMagicConfigs()
             .withMotionMagicAcceleration(
-                constants.constraints.maxAcceleration().get().in(RotationsPerSecondPerSecond))
+                (AngularAcceleration) constants.constraints.maxAcceleration().get())
             .withMotionMagicCruiseVelocity(
-                constants.constraints.maxVelocity().get().in(RotationsPerSecond));
+                (AngularVelocity) constants.constraints.maxVelocity().get());
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration, 0.25));
 

@@ -1,2 +1,4 @@
 rootProject.name = 'gompeilib'
-includeBuild("examples/swerve") // folder containing the robot build.gradle
+
+include(":swerve")
+project(":swerve").projectDir = file("examples/swerve")
