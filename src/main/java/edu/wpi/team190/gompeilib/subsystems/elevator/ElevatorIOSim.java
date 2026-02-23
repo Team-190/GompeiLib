@@ -1,12 +1,14 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.team190.gompeilib.core.utility.GainSlot;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import java.util.Arrays;
 
 public class ElevatorIOSim implements ElevatorIO {
@@ -40,8 +42,8 @@ public class ElevatorIOSim implements ElevatorIO {
             0,
             constants.slot0Gains.kD().get(),
             new TrapezoidProfile.Constraints(
-                constants.constraints.cruisingVelocityMetersPerSecond().get(),
-                constants.constraints.maxAccelerationMetersPerSecondSquared().get()));
+                constants.constraints.maxVelocity().get().in(MetersPerSecond),
+                constants.constraints.maxAcceleration().get().in(MetersPerSecondPerSecond)));
 
     feedforward =
         new ElevatorFeedforward(

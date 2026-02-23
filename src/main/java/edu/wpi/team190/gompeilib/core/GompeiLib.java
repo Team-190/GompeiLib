@@ -31,6 +31,19 @@ public final class GompeiLib {
     initialized = true;
   }
 
+  public static void deinit() {
+    if (!initialized) {
+      System.err.println("GompeiLib has already been deinitialized!");
+      return;
+    }
+
+    currentMode = null;
+    tuningMode = false;
+    loopPeriod = 0.0;
+
+    initialized = false;
+  }
+
   /** Throws an exception if the library has not been initialized. */
   private static void checkInitialized() {
     if (!initialized) {
