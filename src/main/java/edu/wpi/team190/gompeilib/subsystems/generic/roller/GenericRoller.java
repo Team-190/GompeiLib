@@ -1,5 +1,6 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.roller;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -35,7 +36,14 @@ public class GenericRoller {
     Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts);
 
     io.setVoltage(
-        voltageGoalVolts + voltageGoalOffset.getAsDouble() * Math.signum(voltageGoalVolts));
+        MathUtil.clamp(
+            Math.max(
+                    0,
+                    (voltageGoalVolts + voltageGoalOffset.getAsDouble())
+                        * Math.signum(voltageGoalVolts))
+                * Math.signum(voltageGoalVolts),
+            -12.0,
+            12.0));
   }
 
   public Command setVoltage(double volts) {

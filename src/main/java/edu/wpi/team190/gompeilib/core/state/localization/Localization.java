@@ -15,8 +15,6 @@ public class Localization {
 
   private final SwerveDrivePoseEstimator globalPoseEstimator;
 
-  private Rotation2d headingOffset;
-
   public Localization(
       List<FieldZone> estimationZones,
       SwerveDriveKinematics kinematics,
@@ -37,8 +35,6 @@ public class Localization {
         estimationZones.stream()
             .map(zone -> new EstimationRegion(zone.aprilTags(), kinematics))
             .toList();
-
-    headingOffset = new Rotation2d();
   }
 
   public void addOdometryObservation(
@@ -49,10 +45,12 @@ public class Localization {
   }
 
   public void addPoseObservations(List<VisionPoseObservation> poseObservations) {
-    poseObservations.forEach(
-        observation ->
-            globalPoseEstimator.addVisionMeasurement(
-                observation.pose(), observation.timestamp(), observation.stddevs()));
+    poseObservations.stream()
+        .filter(observation -> !GeometryUtil.isNaN(observation.pose()))
+        .forEach(
+            observation ->
+                globalPoseEstimator.addVisionMeasurement(
+                    observation.pose(), observation.timestamp(), observation.stddevs()));
     estimationRegions.forEach(
         zone ->
             poseObservations.stream()
@@ -80,11 +78,10 @@ public class Localization {
   }
 
   public Rotation2d getHeading() {
-    return globalPoseEstimator.getEstimatedPosition().getRotation().minus(headingOffset);
+    return globalPoseEstimator.getEstimatedPosition().getRotation();
   }
 
   public void resetPose(Pose2d pose) {
-    headingOffset = getHeading().minus(pose.getRotation());
     for (EstimationRegion region : estimationRegions) {
       region.resetPose(pose);
     }
