@@ -286,8 +286,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   @Override
   public boolean atGoal() {
-    return Math.abs(
-            positionErrorRotations.getValueAsDouble())
+    return Math.abs(positionErrorRotations.getValueAsDouble())
         <= constants.constraints.goalTolerance().get().in(Meters);
   }
 }
