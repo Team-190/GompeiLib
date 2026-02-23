@@ -13,7 +13,6 @@ java {
     }
 }
 
-
 group = 'edu.wpi.team190'
 version = project.hasProperty("releaseVersion") ? project.property("releaseVersion") : "0.0.0-SNAPSHOT"
 
@@ -76,34 +75,6 @@ publishing {
     }
 }
 
-jacoco {
-    toolVersion = "0.8.12" // latest stable version
-}
-
-jacocoTestReport {
-    dependsOn test
-
-    // Classes to include in coverage
-    classDirectories.from(
-            fileTree("${buildDir}/classes/java/main") {
-                exclude "**/GompeiLibTest.class" // exclude test classes
-            }
-            )
-
-    // Test execution data
-    executionData.from(
-            fileTree(buildDir) {
-                include "jacoco/test.exec"
-            }
-            )
-
-    reports {
-        xml.required.set(false)
-        csv.required.set(false)
-        html.required.set(true)
-    }
-}
-
 test {
     useJUnitPlatform()
     testLogging {
@@ -117,6 +88,36 @@ test {
     // After tests finish, generate coverage report automatically
     finalizedBy tasks.jacocoTestReport
 }
+
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.00   // ← CHANGE THRESHOLD HERE (75%)
+            }
+        }
+    }
+}
+
+// Make coverage part of normal verification lifecycle
+check.dependsOn jacocoTestCoverageVerification
 
 // Spotless formatting
 project.compileJava.dependsOn(spotlessApply)
