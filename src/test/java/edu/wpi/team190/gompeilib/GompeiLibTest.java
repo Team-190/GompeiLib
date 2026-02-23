@@ -25,8 +25,18 @@ public class GompeiLibTest {
               .withLoopPeriodSecs(0.02)
               .build(),
           GompeiLibTestParameters.builder()
+              .withMode(RobotMode.REAL)
+              .withIsTuning(false)
+              .withLoopPeriodSecs(0.02)
+              .build(),
+          GompeiLibTestParameters.builder()
               .withMode(RobotMode.SIM)
               .withIsTuning(true)
+              .withLoopPeriodSecs(0.02)
+              .build(),
+          GompeiLibTestParameters.builder()
+              .withMode(RobotMode.SIM)
+              .withIsTuning(false)
               .withLoopPeriodSecs(0.02)
               .build(),
           GompeiLibTestParameters.builder()
@@ -35,12 +45,7 @@ public class GompeiLibTest {
               .withLoopPeriodSecs(0.02)
               .build(),
           GompeiLibTestParameters.builder()
-              .withMode(RobotMode.REAL)
-              .withIsTuning(true)
-              .withLoopPeriodSecs(0.02)
-              .build(),
-          GompeiLibTestParameters.builder()
-              .withMode(RobotMode.SIM)
+              .withMode(RobotMode.REPLAY)
               .withIsTuning(false)
               .withLoopPeriodSecs(0.02)
               .build());
