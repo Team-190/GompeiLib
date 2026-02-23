@@ -1,5 +1,7 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -11,8 +13,8 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
-import edu.wpi.team190.gompeilib.core.utility.GainSlot;
-import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil;
 import java.util.ArrayList;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
@@ -93,9 +95,9 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         .withReverseSoftLimitEnable(true);
 
     config.MotionMagic.withMotionMagicAcceleration(
-            constants.constraints.maxAccelerationMetersPerSecondSquared().getAsDouble())
+            constants.constraints.maxAcceleration().get().in(MetersPerSecondPerSecond))
         .withMotionMagicCruiseVelocity(
-            constants.constraints.cruisingVelocityMetersPerSecond().getAsDouble());
+            constants.constraints.maxVelocity().get().in(MetersPerSecond));
 
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config));
 
@@ -285,6 +287,6 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   @Override
   public boolean atGoal() {
     return Math.abs(positionErrorRotations.getValueAsDouble())
-        <= constants.constraints.goalToleranceMeters().get();
+        <= constants.constraints.goalTolerance().get().in(Meters);
   }
 }

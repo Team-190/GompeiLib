@@ -4,6 +4,7 @@ plugins {
     id "com.diffplug.spotless" version "6.25.0"
     id "io.freefair.lombok" version "8.4"
     id "io.freefair.aspectj.post-compile-weaving" version "8.4"
+    id "jacoco"
 }
 
 java {
@@ -11,7 +12,6 @@ java {
         languageVersion = JavaLanguageVersion.of(17)
     }
 }
-
 
 group = 'edu.wpi.team190'
 version = project.hasProperty("releaseVersion") ? project.property("releaseVersion") : "0.0.0-SNAPSHOT"
@@ -43,7 +43,7 @@ dependencies {
     annotationProcessor libs.advantagekit.autolog
 
     // Tests
-    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation platform('org.junit:junit-bom:5.11.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -53,7 +53,7 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
             groupId = group
-            artifactId = "gompeilib" // or whatever you want the artifact name to be
+            artifactId = "gompeilib"
             version = version
         }
     }
@@ -75,11 +75,49 @@ publishing {
     }
 }
 
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+        showStandardStreams = true
+    }
+    jacoco {
+        enabled = true
+    }
 
+    // After tests finish, generate coverage report automatically
+    finalizedBy tasks.jacocoTestReport
+}
+
+jacoco {
+    toolVersion = "0.8.10"
+}
 
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.00   // ← CHANGE THRESHOLD HERE (75%)
+            }
+        }
+    }
+}
+
+// Make coverage part of normal verification lifecycle
+check.dependsOn jacocoTestCoverageVerification
 
 // Spotless formatting
 project.compileJava.dependsOn(spotlessApply)
@@ -121,8 +159,4 @@ spotless {
         indentWithSpaces(2)
         endWithNewline()
     }
-}
-
-tasks.named("build") {
-    dependsOn(gradle.includedBuild("swerve").task(":build"))
 }

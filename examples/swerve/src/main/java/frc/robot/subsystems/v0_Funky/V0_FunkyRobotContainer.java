@@ -20,8 +20,9 @@ import edu.wpi.team190.gompeilib.subsystems.vision.camera.CameraLimelight;
 import edu.wpi.team190.gompeilib.subsystems.vision.io.CameraIOLimelight;
 import frc.robot.Constants;
 import frc.robot.RobotConfig;
-import frc.robot.commands.CompositeCommands.SharedCommands;
-import frc.robot.commands.DriveCommands;
+import frc.robot.commands.shared.DriveCommands;
+import frc.robot.commands.shared.SharedCompositeCommands;
+import frc.robot.util.input.XKeysInput;
 import java.util.List;
 
 public class V0_FunkyRobotContainer implements RobotContainer {
@@ -31,6 +32,8 @@ public class V0_FunkyRobotContainer implements RobotContainer {
   private final CommandXboxController driver = new CommandXboxController(0);
 
   private final AutoChooser autoChooser = new AutoChooser();
+
+  private final XKeysInput xkeys = new XKeysInput(1);
 
   public V0_FunkyRobotContainer() {
     if (Constants.getMode() != RobotMode.REPLAY) {
@@ -88,6 +91,7 @@ public class V0_FunkyRobotContainer implements RobotContainer {
           vision =
               new Vision(
                   () -> AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark));
+
           break;
 
         default:
@@ -120,15 +124,26 @@ public class V0_FunkyRobotContainer implements RobotContainer {
         DriveCommands.joystickDrive(
             drive,
             V0_FunkyConstants.DRIVE_CONSTANTS,
-            () -> -driver.getLeftY(),
-            () -> -driver.getLeftX(),
-            () -> -driver.getRightX(),
-            drive::getRawGyroRotation));
+            driver::getLeftY,
+            driver::getLeftX,
+            driver::getRightX,
+            V0_FunkyRobotState::getHeading));
 
     driver
         .povDown()
         .onTrue(
-            SharedCommands.resetHeading(
+            SharedCompositeCommands.resetHeading(
+                drive,
+                V0_FunkyRobotState::resetPose,
+                () -> V0_FunkyRobotState.getGlobalPose().getTranslation()));
+
+    xkeys
+        .a1()
+        .or(xkeys.a2())
+        .or(xkeys.a3())
+        .or(xkeys.a4())
+        .onTrue(
+            SharedCompositeCommands.resetHeading(
                 drive,
                 V0_FunkyRobotState::resetPose,
                 () -> V0_FunkyRobotState.getGlobalPose().getTranslation()));
@@ -140,7 +155,7 @@ public class V0_FunkyRobotContainer implements RobotContainer {
 
   @Override
   public void robotPeriodic() {
-    V0_FunkyRobotState.periodic();
+    V0_FunkyRobotState.periodic(drive.getRawGyroRotation(), drive.getModulePositions());
   }
 
   @Override

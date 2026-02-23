@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
-import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil;
 import java.util.ArrayList;
 
 public class GenericRollerIOTalonFX implements GenericRollerIO {
@@ -45,9 +45,9 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
 
     talonFXConfiguration
         .CurrentLimits
-        .withSupplyCurrentLimit(constants.supplyCurrentLimit)
+        .withSupplyCurrentLimit(constants.currentLimits.supplyCurrentLimit())
         .withSupplyCurrentLimitEnable(true)
-        .withStatorCurrentLimit(constants.supplyCurrentLimit)
+        .withStatorCurrentLimit(constants.currentLimits.statorCurrentLimit())
         .withStatorCurrentLimitEnable(true);
 
     talonFXConfiguration.Feedback.SensorToMechanismRatio = constants.rollerMotorGearRatio;
