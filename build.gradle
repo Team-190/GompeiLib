@@ -4,6 +4,7 @@ plugins {
     id "com.diffplug.spotless" version "6.25.0"
     id "io.freefair.lombok" version "8.4"
     id "io.freefair.aspectj.post-compile-weaving" version "8.4"
+    id "jacoco"
 }
 
 java {
@@ -43,7 +44,7 @@ dependencies {
     annotationProcessor libs.advantagekit.autolog
 
     // Tests
-    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation platform('org.junit:junit-bom:5.11.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -53,7 +54,7 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
             groupId = group
-            artifactId = "gompeilib" // or whatever you want the artifact name to be
+            artifactId = "gompeilib"
             version = version
         }
     }
@@ -75,10 +76,46 @@ publishing {
     }
 }
 
+jacoco {
+    toolVersion = "0.8.12" // latest stable version
+}
 
+jacocoTestReport {
+    dependsOn test
+
+    // Classes to include in coverage
+    classDirectories.from(
+            fileTree("${buildDir}/classes/java/main") {
+                exclude "**/GompeiLibTest.class" // exclude test classes
+            }
+            )
+
+    // Test execution data
+    executionData.from(
+            fileTree(buildDir) {
+                include "jacoco/test.exec"
+            }
+            )
+
+    reports {
+        xml.required.set(false)
+        csv.required.set(false)
+        html.required.set(true)
+    }
+}
 
 test {
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+        showStandardStreams = true
+    }
+    jacoco {
+        enabled = true
+    }
+
+    // After tests finish, generate coverage report automatically
+    finalizedBy tasks.jacocoTestReport
 }
 
 // Spotless formatting
