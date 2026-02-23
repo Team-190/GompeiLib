@@ -244,7 +244,7 @@ public class ArmIOTalonFX implements ArmIO {
 
   @Override
   public boolean atGoal() {
-    return Math.abs(Units.rotationsToRadians(positionErrorRotations.getValueAsDouble()))
-        < constants.constraints.goalTolerance().get().in(Radians);
+    return Math.abs(positionErrorRotations.getValueAsDouble())
+        < constants.constraints.goalTolerance().get().in(Rotations);
   }
 }
