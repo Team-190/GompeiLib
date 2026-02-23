@@ -1,0 +1,33 @@
+{
+  "NTProvider": {
+    "types": {
+      "/AdvantageKit/RealOutputs/Alerts": "Alerts",
+      "/AdvantageKit/RealOutputs/Choreo Alerts": "Alerts",
+      "/AdvantageKit/RealOutputs/Intake/Linkage0/LinkageMechanism": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/Mechamism": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/Mechanism": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/V1_DoomSpiralIntake/Linkage0/LinkageMechanism": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/V1_GammaIntake/Linkage0/LinkageMechanism": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/V1_GammaIntake/Linkage0LinkageMechanism": "Mechanism2d",
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Autonomous Modes": "String Chooser",
+      "/SmartDashboard/Choreo Alerts": "Alerts"
+    },
+    "windows": {
+      "/SmartDashboard/Autonomous Modes": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Choreo Alerts": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "visible": true
+  }
+}
