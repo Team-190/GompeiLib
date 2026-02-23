@@ -7,7 +7,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
-import edu.wpi.team190.gompeilib.core.utility.LoggedTunableNumber;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
@@ -41,27 +40,7 @@ public class SwerveModule {
 
   @Trace
   public void updateInputs() {
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () -> {
-          io.setPID(
-              driveConstants.gains.driveKp().get(),
-              driveConstants.gains.driveKd().get(),
-              driveConstants.gains.turnKp().get(),
-              driveConstants.gains.turnKd().get());
-
-          io.setFeedforward(
-              driveConstants.gains.driveKs().get(), driveConstants.gains.driveKv().get());
-        },
-        driveConstants.gains.driveKp(),
-        driveConstants.gains.driveKd(),
-        driveConstants.gains.turnKp(),
-        driveConstants.gains.turnKd(),
-        driveConstants.gains.driveKv(),
-        driveConstants.gains.driveKs());
-
     io.updateInputs(inputs);
-
     Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
   }
 

@@ -101,16 +101,17 @@ public class CameraLimelight extends Camera {
                   inputs.mt1PoseEstimate.avgTagDist(), VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
               / Math.pow(
                   inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
-      thetaStdev =
-          inputs.mt1PoseEstimate.tagCount() > 1
-              ? config.metatagThetaStdev()
-                  * Math.pow(
-                      inputs.mt1PoseEstimate.avgTagDist(),
-                      VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
-                  / Math.pow(
-                      inputs.mt1PoseEstimate.tagCount(),
-                      VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT)
-              : Double.POSITIVE_INFINITY;
+      //      thetaStdev =
+      //          inputs.mt1PoseEstimate.tagCount() > 1
+      //              ? config.metatagThetaStdev()
+      //                  * Math.pow(
+      //                      inputs.mt1PoseEstimate.avgTagDist(),
+      //                      VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
+      //                  / Math.pow(
+      //                      inputs.mt1PoseEstimate.tagCount(),
+      //                      VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT)
+      //              : Double.POSITIVE_INFINITY;
+      thetaStdev = Double.POSITIVE_INFINITY;
     }
 
     if (inputs.mt1PoseEstimate.tagCount() != 0) {
@@ -124,13 +125,15 @@ public class CameraLimelight extends Camera {
               VecBuilder.fill(xyStdDev, xyStdDev, thetaStdev)));
     }
 
-    xyStdDev =
-        config.megatag2XYStdev()
-            * Math.pow(
-                inputs.mt1PoseEstimate.avgTagDist(), VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
-            / Math.pow(
-                inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
-    thetaStdev = Double.POSITIVE_INFINITY;
+    if (inputs.mt1PoseEstimate.tagCount() != 0) {
+      xyStdDev =
+          config.megatag2XYStdev()
+              * Math.pow(
+                  inputs.mt1PoseEstimate.avgTagDist(), VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
+              / Math.pow(
+                  inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
+      thetaStdev = Double.POSITIVE_INFINITY;
+    }
 
     if (inputs.mt2PoseEstimate.tagCount() != 0) {
       poseObservationList.add(

@@ -1,6 +1,6 @@
 package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
-import static edu.wpi.team190.gompeilib.core.utility.PhoenixUtil.tryUntilOk;
+import static edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -22,8 +22,8 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
-import edu.wpi.team190.gompeilib.core.utility.PhoenixOdometryThread;
-import edu.wpi.team190.gompeilib.core.utility.PhoenixUtil;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixOdometryThread;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil;
 import java.util.Queue;
 
 /**

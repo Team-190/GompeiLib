@@ -4,28 +4,48 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.team190.gompeilib.core.state.localization.FieldZone;
 import edu.wpi.team190.gompeilib.core.state.localization.Localization;
+import frc.robot.util.NTPrefixes;
 import java.util.HashSet;
 import java.util.List;
+import lombok.Getter;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class V0_FunkyRobotState {
-  private static AprilTagFieldLayout fieldLayout;
-  private static List<FieldZone> fieldZones;
-  private static Localization localization;
+  private static final AprilTagFieldLayout fieldLayout;
+  private static final Localization localization;
+
+  @AutoLogOutput(key = NTPrefixes.ROBOT_STATE + "Hood/Score Angle")
+  @Getter
+  private static final Rotation2d scoreAngle;
+
+  @AutoLogOutput(key = NTPrefixes.ROBOT_STATE + "Hood/Feed Angle")
+  @Getter
+  private static final Rotation2d feedAngle;
+
+  private static final FieldZone globalZone;
 
   static {
-    fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+    fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
-    FieldZone globalZone = new FieldZone(new HashSet<>(fieldLayout.getTags()));
-
-    fieldZones = List.of(globalZone);
+    globalZone = new FieldZone(new HashSet<>(fieldLayout.getTags()));
 
     localization =
-        new Localization(fieldZones, V0_FunkyConstants.DRIVE_CONSTANTS.driveConfig.kinematics(), 2);
+        new Localization(
+            List.of(globalZone), V0_FunkyConstants.DRIVE_CONSTANTS.driveConfig.kinematics(), 2);
+    scoreAngle = Rotation2d.kZero;
+    feedAngle = Rotation2d.kZero;
   }
 
-  public static void periodic() {}
+  public static void periodic(Rotation2d heading, SwerveModulePosition[] modulePositions) {
+
+    localization.addOdometryObservation(Timer.getTimestamp(), heading, modulePositions);
+    Logger.recordOutput(NTPrefixes.ROBOT_STATE + "/Global Pose", getGlobalPose());
+  }
 
   public static void resetPose(Pose2d pose) {
     localization.resetPose(pose);
@@ -36,6 +56,6 @@ public class V0_FunkyRobotState {
   }
 
   public static Pose2d getGlobalPose() {
-    return localization.getEstimatedPose(fieldZones.get(0));
+    return localization.getEstimatedPose(globalZone);
   }
 }

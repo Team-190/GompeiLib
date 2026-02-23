@@ -41,3 +41,5 @@ bin/
 ### Mac OS ###
 .DS_Store
 examples/swerve/src/main/java/frc/robot/BuildConstants.java
+
+examples/swerve/ctre_sim
