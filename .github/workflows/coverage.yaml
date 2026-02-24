@@ -1,9 +1,8 @@
 name: Coverage
 
-# Trigger when the Test workflow completes
 on:
   workflow_run:
-    workflows: ["Test"]   # Must match the name of your Test workflow
+    workflows: ["Test"]
     types:
       - completed
 
