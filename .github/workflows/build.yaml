@@ -29,6 +29,6 @@ jobs:
       - name: Trigger Test workflow
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: test.yml
+          workflow: test.yaml
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.head_ref }}
