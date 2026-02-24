@@ -6,7 +6,7 @@ on:
     types: [completed]
 
 jobs:
-  test:
+  Test:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     container: wpilib/roborio-cross-ubuntu:2024-22.04
