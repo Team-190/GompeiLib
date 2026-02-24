@@ -47,39 +47,39 @@ public class GeometryUtil {
     return new Transform2d(pose.getTranslation(), pose.getRotation());
   }
 
-  public static final boolean isZero(Pose2d pose) {
+  public static boolean isZero(Pose2d pose) {
     return pose.getX() == 0.0 && pose.getY() == 0.0 && pose.getRotation().getDegrees() == 0.0;
   }
 
-  public static final boolean isZero(Pose2d[] pose) {
+  public static boolean isZero(Pose2d[] pose) {
     for (Pose2d p : pose) {
-      if (!isZero(p)) {
-        return false;
+      if (isZero(p)) {
+        return true;
       }
     }
-    return true;
+    return false;
   }
 
-  public static final boolean isZero(Translation2d translation) {
+  public static boolean isZero(Translation2d translation) {
     return translation.getX() == 0.0 && translation.getY() == 0.0;
   }
 
-  public static final boolean isZero(Rotation2d rotation) {
+  public static boolean isZero(Rotation2d rotation) {
     return rotation.getDegrees() == 0.0;
   }
 
-  public static final boolean isNaN(Pose2d pose) {
+  public static boolean isNaN(Pose2d pose) {
     return Double.isNaN(pose.getX())
         || Double.isNaN(pose.getY())
         || Double.isNaN(pose.getRotation().getDegrees());
   }
 
-  public static final boolean isNaN(Pose2d[] pose) {
+  public static boolean isNaN(Pose2d[] pose) {
     for (Pose2d p : pose) {
-      if (!isNaN(p)) {
-        return false;
+      if (isNaN(p)) {
+        return true;
       }
     }
-    return true;
+    return false;
   }
 }
