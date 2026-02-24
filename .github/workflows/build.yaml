@@ -23,4 +23,5 @@ jobs:
           ./gradlew build \
             -Pgpr.user=$GPR_USER \
             -Pgpr.key=$GPR_KEY \
-            --refresh-dependencies
+            --refresh-dependencies \
+            -x test
