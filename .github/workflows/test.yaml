@@ -13,9 +13,9 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Run tests
+      - name: Run tests with coverage check
         run: |
-          ./gradlew clean test \
+          ./gradlew clean test jacocoTestCoverageVerification \
             -Pgpr.user=$GPR_USER \
             -Pgpr.key=$GPR_KEY \
             --refresh-dependencies \
