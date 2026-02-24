@@ -84,82 +84,131 @@ public class GeometryUtilTest {
 
   @Test
   @Order(6)
-  void testSinglePose2dsAreZero() {
-    Pose2d zeroedPose2d = Pose2d.kZero;
-    Pose2d nonZeroedPose2d1 = new Pose2d(1.0, 0.0, Rotation2d.fromDegrees(0.0));
-    Pose2d nonZeroedPose2d2 = new Pose2d(0.0, 1.0, Rotation2d.fromDegrees(0.0));
-    Pose2d nonZeroedPose2d3 = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(1.0));
-
-    assertTrue(GeometryUtil.isZero(zeroedPose2d));
-    assertFalse(GeometryUtil.isZero(nonZeroedPose2d1));
-    assertFalse(GeometryUtil.isZero(nonZeroedPose2d2));
-    assertFalse(GeometryUtil.isZero(nonZeroedPose2d3));
+  void testPose2dIsZero() {
+    assertTrue(GeometryUtil.isZero(Pose2d.kZero));
   }
 
   @Test
   @Order(7)
+  void testPose2dThetaIsNotZero() {
+    Pose2d pose2d = new Pose2d(0.0, 0.0, Rotation2d.kPi);
+    assertFalse(GeometryUtil.isZero(pose2d));
+  }
+
+  @Test
+  @Order(8)
+  void testPose2dYIsNotZero() {
+    Pose2d pose2d = new Pose2d(0.0, 42.0, Rotation2d.kZero);
+    assertFalse(GeometryUtil.isZero(pose2d));
+  }
+
+  @Test
+  @Order(9)
+  void testPose2dThetaIsZero() {
+    Pose2d pose2d = new Pose2d(42.0, 0, Rotation2d.kZero);
+    assertFalse(GeometryUtil.isZero(pose2d));
+  }
+
+  @Test
+  @Order(10)
   void testAnyPose2dsAreZero() {
     Pose2d[] cases = new Pose2d[] {POSE2D_CASES[0], POSE2D_CASES[1], POSE2D_CASES[2]};
     assertTrue(GeometryUtil.isZero(cases));
   }
 
   @Test
-  @Order(8)
+  @Order(11)
   void testAnyPose2dsAreNotZero() {
     Pose2d[] cases = new Pose2d[] {POSE2D_CASES[1], POSE2D_CASES[2]};
     assertFalse(GeometryUtil.isZero(cases));
   }
 
   @Test
-  @Order(9)
-  void testSingleTranslation2dsAreZero() {
-    Translation2d zeroedTranslation2d = Translation2d.kZero;
-    Translation2d nonZeroedTranslation2d1 = new Translation2d(1.0, 0.0);
-    Translation2d nonZeroedTranslation2d2 = new Translation2d(0.0, 1.0);
-
-    assertTrue(GeometryUtil.isZero(zeroedTranslation2d));
-    assertFalse(GeometryUtil.isZero(nonZeroedTranslation2d1));
-    assertFalse(GeometryUtil.isZero(nonZeroedTranslation2d2));
-  }
-
-  @Test
-  @Order(10)
-  void testSingleRotation2dsAreZero() {
-    Rotation2d zeroedRotation2d = Rotation2d.kZero;
-    Rotation2d nonZeroedTranslation2d1 = Rotation2d.fromDegrees(190.0);
-    Rotation2d nonZeroedTranslation2d2 = Rotation2d.fromDegrees(42.0);
-
-    assertTrue(GeometryUtil.isZero(zeroedRotation2d));
-    assertFalse(GeometryUtil.isZero(nonZeroedTranslation2d1));
-    assertFalse(GeometryUtil.isZero(nonZeroedTranslation2d2));
-  }
-
-  @Test
-  @Order(11)
-  void testSinglePose2dsAreNAN() {
-    Pose2d zeroedPose2d = Pose2d.kZero;
-    Pose2d nanPose2d1 = new Pose2d(Double.NaN, 0.0, Rotation2d.fromDegrees(0.0));
-    Pose2d nanPose2d2 = new Pose2d(0.0, Double.NaN, Rotation2d.fromDegrees(0.0));
-    Pose2d nanPose2d3 = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(Double.NaN));
-
-    assertFalse(GeometryUtil.isNaN(zeroedPose2d));
-    assertTrue(GeometryUtil.isNaN(nanPose2d1));
-    assertTrue(GeometryUtil.isNaN(nanPose2d2));
-    assertTrue(GeometryUtil.isNaN(nanPose2d3));
-  }
-
-  @Test
   @Order(12)
-  void testAnyPose2dsAreNAN() {
+  void testEmptyPose2dsAreNotZero() {
+    Pose2d[] cases = new Pose2d[] {};
+    assertFalse(GeometryUtil.isZero(cases));
+  }
+
+  @Test
+  @Order(13)
+  void testTranslation2dIsZero() {
+    assertTrue(GeometryUtil.isZero(Translation2d.kZero));
+  }
+
+  @Test
+  @Order(14)
+  void testTranslation2dXIsNotZero() {
+    Translation2d translation2d = new Translation2d(42.0, 0.0);
+    assertFalse(GeometryUtil.isZero(translation2d));
+  }
+
+  @Test
+  @Order(15)
+  void testTranslation2dYIsNotZero() {
+    Translation2d translation2d = new Translation2d(0.0, 42.0);
+    assertFalse(GeometryUtil.isZero(translation2d));
+  }
+
+  @Test
+  @Order(16)
+  void testRotation2dIsZero() {
+    assertTrue(GeometryUtil.isZero(Rotation2d.kZero));
+  }
+
+  @Test
+  @Order(17)
+  void testRotation2dIsNotZero() {
+    Rotation2d rotation2d = new Rotation2d(Math.PI);
+    assertFalse(GeometryUtil.isZero(rotation2d));
+  }
+
+  @Test
+  @Order(18)
+  void testPose2dIsNotNaN() {
+    assertFalse(GeometryUtil.isNaN(Pose2d.kZero));
+  }
+
+  @Test
+  @Order(19)
+  void testPose2dXIsNaN() {
+    Pose2d pose2d = new Pose2d(Double.NaN, 0.0, Rotation2d.kZero);
+    assertTrue(GeometryUtil.isNaN(pose2d));
+  }
+
+  @Test
+  @Order(20)
+  void testPose2dYIsNaN() {
+    Pose2d pose2d = new Pose2d(0.0, Double.NaN, Rotation2d.kZero);
+    assertTrue(GeometryUtil.isNaN(pose2d));
+  }
+
+  @Test
+  @Order(21)
+  void testPose2dThetaIsNaN() {
+    Pose2d pose2d = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(Double.NaN));
+    assertTrue(GeometryUtil.isNaN(pose2d));
+  }
+
+  @Test
+  @Order(22)
+  void testAnyPose2dsAreNaN() {
     Pose2d nanPose = new Pose2d(Double.NaN, 190.0, Rotation2d.fromDegrees(190.0));
     Pose2d[] cases = new Pose2d[] {nanPose, POSE2D_CASES[0], POSE2D_CASES[1], POSE2D_CASES[2]};
     assertTrue(GeometryUtil.isNaN(cases));
   }
 
   @Test
-  @Order(13)
-  void testAnyPose2dsAreNotNAN() {
+  @Order(23)
+  void testAnyPose2dsAreNotNaN() {
     Pose2d[] cases = new Pose2d[] {POSE2D_CASES[0], POSE2D_CASES[1], POSE2D_CASES[2]};
+    assertFalse(GeometryUtil.isNaN(cases));
+  }
+
+  @Test
+  @Order(24)
+  void testEmptyPose2dsAreNotNaN() {
+    Pose2d[] cases = new Pose2d[] {};
     assertFalse(GeometryUtil.isNaN(cases));
   }
 }

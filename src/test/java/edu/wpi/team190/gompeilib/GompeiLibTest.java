@@ -63,7 +63,7 @@ public class GompeiLibTest {
 
   @Test
   @Order(2)
-  void testNotInitialized() throws Exception {
+  void testInitializationWhenNotInitialized() throws Exception {
     Method checkInitializedMethod = GompeiLib.class.getDeclaredMethod("checkInitialized");
     checkInitializedMethod.setAccessible(true);
     InvocationTargetException ex =
@@ -77,7 +77,7 @@ public class GompeiLibTest {
 
   @Test
   @Order(3)
-  void testAlreadyInitialized() {
+  void testInitializationWhenAlreadyInitialized() {
     // Initialize once
     GompeiLib.init(RobotMode.SIM, true, 0.02);
 
@@ -97,9 +97,37 @@ public class GompeiLibTest {
     assertTrue(output.contains("GompeiLib has already been initialized!"));
   }
 
+  @Test
+  @Order(4)
+  void testDeinitializationFlow() {
+    GompeiLib.init(RobotMode.SIM, true, 0.02);
+    GompeiLib.deinit();
+
+    // The getters should throw IllegalStateException now because we are deinitialized
+    assertThrows(IllegalStateException.class, GompeiLib::getMode);
+  }
+
+  @Test
+  @Order(5)
+  void testDoubleDeinitWarning() {
+    GompeiLib.deinit(); // Ensure it is already deinitialized
+
+    ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+    PrintStream originalErr = System.err;
+    System.setErr(new PrintStream(errContent));
+
+    try {
+      GompeiLib.deinit(); // Call it while the stream is redirected
+    } finally {
+      System.setErr(originalErr); // Always restore in a finally block for safety
+    }
+
+    assertTrue(errContent.toString().contains("GompeiLib has already been deinitialized!"));
+  }
+
   @ParameterizedTest
   @FieldSource("TEST_PARAMETERS")
-  @Order(4)
+  @Order(6)
   void testGompeiLib(GompeiLibTestParameters params) {
     GompeiLib.init(params.mode, params.isTuning, params.loopPeriodSecs);
 
