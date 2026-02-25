@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil;
 import java.util.ArrayList;
 
@@ -62,11 +63,19 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     talonFXConfiguration.MotorOutput.withNeutralMode(NeutralModeValue.Coast);
     talonFXConfiguration
         .Slot0
-        .withKP(constants.gains.kP().getAsDouble())
-        .withKD(constants.gains.kD().getAsDouble())
-        .withKS(constants.gains.kS().getAsDouble())
-        .withKV(constants.gains.kV().getAsDouble())
-        .withKA(constants.gains.kA().getAsDouble());
+        .withKP(constants.voltageGains.kP().getAsDouble())
+        .withKD(constants.voltageGains.kD().getAsDouble())
+        .withKS(constants.voltageGains.kS().getAsDouble())
+        .withKV(constants.voltageGains.kV().getAsDouble())
+        .withKA(constants.voltageGains.kA().getAsDouble());
+
+    talonFXConfiguration
+        .Slot1
+        .withKP(constants.torqueGains.kP().getAsDouble())
+        .withKD(constants.torqueGains.kD().getAsDouble())
+        .withKS(constants.torqueGains.kS().getAsDouble())
+        .withKV(constants.torqueGains.kV().getAsDouble())
+        .withKA(constants.torqueGains.kA().getAsDouble());
 
     talonFXConfiguration.Feedback.SensorToMechanismRatio = constants.gearRatio;
 
@@ -156,8 +165,8 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     voltageControlRequest = new VoltageOut(0.0);
     torqueCurrentFOCRequest = new TorqueCurrentFOC(0.0);
 
-    velocityControlRequest = new VelocityVoltage(0);
-    velocityTorqueCurrentRequest = new MotionMagicVelocityTorqueCurrentFOC(0.0);
+    velocityControlRequest = new VelocityVoltage(0).withSlot(0);
+    velocityTorqueCurrentRequest = new MotionMagicVelocityTorqueCurrentFOC(0.0).withSlot(1);
 
     this.constants = constants;
   }
@@ -198,7 +207,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   }
 
   @Override
-  public void setVelocity(double velocityRadiansPerSecond) {
+  public void setVelocityVoltage(double velocityRadiansPerSecond) {
     velocityGoalRadiansPerSecond = velocityRadiansPerSecond;
     talonFX.setControl(
         velocityControlRequest
@@ -207,16 +216,20 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   }
 
   @Override
-  public void setVelocityTorque(double velocityRadiansPerSecond) {
+  public void setVelocityTorque(double velocityRadiansPerSecond, double feedforward) {
     velocityGoalRadiansPerSecond = velocityRadiansPerSecond;
     talonFX.setControl(
-        velocityTorqueCurrentRequest.withVelocity(
-            Units.radiansToRotations(velocityGoalRadiansPerSecond)));
+        velocityTorqueCurrentRequest
+            .withVelocity(Units.radiansToRotations(velocityGoalRadiansPerSecond))
+            .withFeedForward(feedforward));
   }
 
   @Override
-  public void setPID(double kP, double kI, double kD) {
-    talonFXConfiguration.Slot0.withKP(kP).withKI(kI).withKD(kD);
+  public void setPID(GainSlot slot, double kP, double kI, double kD) {
+    switch (slot) {
+      case ONE -> talonFXConfiguration.Slot1.withKP(kP).withKI(kI).withKD(kD);
+      default -> talonFXConfiguration.Slot0.withKP(kP).withKI(kI).withKD(kD);
+    }
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
     for (TalonFX follower : followerTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
@@ -224,8 +237,11 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   }
 
   @Override
-  public void setFeedforward(double kS, double kV, double kA) {
-    talonFXConfiguration.Slot0.withKS(kS).withKV(kV).withKA(kA);
+  public void setFeedforward(GainSlot slot, double kS, double kV, double kA) {
+    switch (slot) {
+      case ONE -> talonFXConfiguration.Slot1.withKS(kS).withKV(kV).withKA(kA);
+      default -> talonFXConfiguration.Slot0.withKS(kS).withKV(kV).withKA(kA);
+    }
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
     for (TalonFX follower : followerTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
