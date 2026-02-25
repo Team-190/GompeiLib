@@ -12,7 +12,10 @@ public record LinearConstraints(
     LoggedTunableMeasure<LinearVelocityUnit> maxVelocity,
     LoggedTunableMeasure<LinearAccelerationUnit> maxAcceleration) {
 
-  @Builder(setterPrefix = "with", builderMethodName = "fromMeasures")
+  @Builder(
+      setterPrefix = "with",
+      builderMethodName = "fromMeasures",
+      builderClassName = "FromMeasures")
   public LinearConstraints(
       @NonNull String prefix,
       Measure<DistanceUnit> goalTolerance,

@@ -6,7 +6,10 @@ import lombok.Builder;
 
 @Builder(setterPrefix = "with")
 public record CurrentLimits(Current supplyCurrentLimit, Current statorCurrentLimit) {
-  @Builder(setterPrefix = "with", builderMethodName = "fromDoubles")
+  @Builder(
+      setterPrefix = "with",
+      builderClassName = "FromDoubles",
+      builderMethodName = "fromDoubles")
   public CurrentLimits(double supplyCurrentLimit, double statorCurrentLimit) {
     this(
         Current.ofBaseUnits(supplyCurrentLimit, Units.Amps),

@@ -12,7 +12,10 @@ public record AngularConstraints(
     LoggedTunableMeasure<AngularVelocityUnit> maxVelocity,
     LoggedTunableMeasure<AngularAccelerationUnit> maxAcceleration) {
 
-  @Builder(setterPrefix = "with", builderMethodName = "fromMeasures")
+  @Builder(
+      setterPrefix = "with",
+      builderClassName = "FromMeasures",
+      builderMethodName = "fromMeasures")
   public AngularConstraints(
       @NonNull String prefix,
       Measure<AngleUnit> goalTolerance,
