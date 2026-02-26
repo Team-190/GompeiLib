@@ -1,7 +1,5 @@
 package edu.wpi.team190.gompeilib.core.logging;
 
-// --- 1. IMPORT THE TRACER ANNOTATION ---
-// This allows you to refer to it by its simple name, @Tracer.
 import edu.wpi.first.wpilibj.Timer;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

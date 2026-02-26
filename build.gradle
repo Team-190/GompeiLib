@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
     id "com.diffplug.spotless" version "6.25.0"
     id "io.freefair.lombok" version "8.4"
-    id "io.freefair.aspectj.post-compile-weaving" version "8.4"
+    id "io.freefair.aspectj.post-compile-weaving" version "8.6"
     id "jacoco"
 }
 
@@ -44,6 +44,7 @@ dependencies {
 
     // Tests
     testImplementation platform('org.junit:junit-bom:5.11.0')
+    testImplementation "org.mockito:mockito-inline:5.2.0"
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
@@ -111,6 +112,14 @@ jacocoTestReport {
     reports {
         xml.required = true
         html.required = true
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                '**/*Aspect.class',
+                '**/*Tracer.class'   // exclude Tracer classes too
+            ])
+        }))
     }
 }
 
