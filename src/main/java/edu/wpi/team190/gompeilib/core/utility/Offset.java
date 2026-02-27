@@ -1,46 +1,84 @@
 package edu.wpi.team190.gompeilib.core.utility;
 
-import lombok.Setter;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
 
-public class Offset {
-
-    private double initialSetpoint;
-    @Setter
+public class Offset<U extends Unit, M extends Measure<U>> {
+    private final double setpoint;
     private double offset;
+    private double step;
+    private final double min;
+    private final double max;
+    private final U unit;
 
-    private double min;
-    private double max;
-
-    public Offset(double initialSetpoint, double offset, double min, double max) {
-        this.initialSetpoint = initialSetpoint;
-        this.offset = offset;
-        this.min = min;
-        this.max = max;
+    /**
+     * @param setpoint the base setpoint to be modified
+     * @param step     the amount to increment/decrement by
+     * @param min      the minimum value
+     * @param max      the maximum value
+     * @param unit     the base unit for the measures to be handled in
+     */
+    public Offset(M setpoint, M step, M min, M max, U unit) {
+        this.setpoint = setpoint.baseUnitMagnitude();
+        this.offset = 0;
+        this.step = step.baseUnitMagnitude();
+        this.min = min.baseUnitMagnitude();
+        this.max = max.baseUnitMagnitude();
+        this.unit = unit;
     }
 
     /**
-     * Returns whether the calculated setpoint (initialSetpoint + offset) is within
-     * the valid range of [min, max]
-     * 
-     * @return true if the calculated setpoint is within the valid range, false
-     *         otherwise
+     * @param setpoint the base setpoint to be modified
+     * @param step     the amount to increment/decrement by
+     * @param unit     the base unit for the measures to be handled in
      */
-    public boolean inRange() {
-        return initialSetpoint + offset >= min && initialSetpoint + offset <= max;
+    public Offset(M setpoint, M step, U unit) {
+        this.setpoint = setpoint.baseUnitMagnitude();
+        this.offset = 0;
+        this.step = step.baseUnitMagnitude();
+        this.min = Double.NEGATIVE_INFINITY;
+        this.max = Double.POSITIVE_INFINITY;
+        this.unit = unit;
     }
 
-    /**
-     * Returns the setpoint to send to motors, taking into account the min and max
-     * bounds
-     * if the offset is outside of the valid range, returns the closest bound.
-     * If the offset is within the valid range, returns the offset from the initial
-     * setpoint.
-     *
-     * @return setpoint to send to motors
-     */
-    public double getSetpoint() {
-        return inRange()
-                ? initialSetpoint + offset
-                : Math.max(min, Math.min(max, initialSetpoint + offset));
+    public Measure<?> applyOffset() {
+        return unit.of(setpoint + offset);
+    }
+
+    public void increment() {
+        if (offset + step > max) {
+            offset = max;
+        } else {
+            offset += step;
+        }
+    }
+
+    public void decrement() {
+        if (offset - step < min) {
+            offset = min;
+        } else {
+            offset -= step;
+        }
+    }
+
+    public void increment(M step) {
+        if (offset + step.baseUnitMagnitude() > max) {
+            offset = max;
+        } else {
+            offset += step.baseUnitMagnitude();
+        }
+    }
+
+    public void decrement(M step) {
+        if (offset - step.baseUnitMagnitude() < min) {
+            offset = min;
+        } else {
+            offset -= step.baseUnitMagnitude();
+        }
+    }
+
+    public void reset() {
+        offset = 0;
     }
 }
