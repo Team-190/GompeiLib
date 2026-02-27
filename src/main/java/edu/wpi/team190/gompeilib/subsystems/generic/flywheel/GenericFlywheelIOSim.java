@@ -10,6 +10,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.control.LinearProfile;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import java.util.Arrays;
 
 public class GenericFlywheelIOSim implements GenericFlywheelIO {
@@ -33,7 +34,9 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
                 constants.motorConfig, constants.momentOfInertia, constants.gearRatio),
             constants.motorConfig);
 
-    feedback = new PIDController(constants.gains.kP().get(), 0.0, constants.gains.kD().get());
+    feedback =
+        new PIDController(
+            constants.voltageGains.kP().get(), 0.0, constants.voltageGains.kD().get());
     feedback.setTolerance(constants.constraints.goalTolerance().get().in(Radians));
     profile =
         new LinearProfile(
@@ -41,7 +44,8 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
             constants.constraints.maxVelocity().get().in(RadiansPerSecond),
             1 / GompeiLib.getLoopPeriod());
     feedforward =
-        new SimpleMotorFeedforward(constants.gains.kS().get(), constants.gains.kV().get());
+        new SimpleMotorFeedforward(
+            constants.voltageGains.kS().get(), constants.voltageGains.kV().get());
 
     appliedVolts = 0.0;
 
@@ -71,7 +75,7 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
   }
 
   @Override
-  public void setVelocity(double velocityRadiansPerSecond) {
+  public void setVelocityVoltage(double velocityRadiansPerSecond) {
     profile.setGoal(velocityRadiansPerSecond, motorSim.getAngularVelocityRadPerSec());
     appliedVolts =
         feedback.calculate(motorSim.getAngularVelocityRadPerSec(), profile.calculateSetpoint())
@@ -91,7 +95,7 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
   }
 
   @Override
-  public void setVelocityTorque(double velocityRadiansPerSecond) {
+  public void setVelocityTorque(double velocityRadiansPerSecond, double feedForward) {
     // Motion profile stays the same
     profile.setGoal(velocityRadiansPerSecond, motorSim.getAngularVelocityRadPerSec());
 
@@ -99,7 +103,8 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
     double setpoint = profile.calculateSetpoint();
 
     // Velocity PID → amps (torque)
-    double amps = feedback.calculate(omega, setpoint);
+    double amps =
+        feedback.calculate(omega, setpoint) + feedForward / motorSim.getGearbox().KtNMPerAmp;
 
     // Optional current limit
     amps =
@@ -118,12 +123,12 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
   }
 
   @Override
-  public void setPID(double kP, double kI, double kD) {
+  public void setPID(GainSlot slot, double kP, double kI, double kD) {
     feedback.setPID(kP, kI, kD);
   }
 
   @Override
-  public void setFeedforward(double kS, double kV, double kA) {
+  public void setFeedforward(GainSlot slot, double kS, double kV, double kA) {
     feedforward = new SimpleMotorFeedforward(kS, kV, kA);
   }
 
