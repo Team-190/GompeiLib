@@ -23,8 +23,8 @@ public class Offset<U extends Unit, M extends Measure<U>> {
         this.setpoint = setpoint.baseUnitMagnitude();
         this.offset = 0;
         this.step = step.baseUnitMagnitude();
-        this.min = min.baseUnitMagnitude();
-        this.max = max.baseUnitMagnitude();
+        this.min = min.baseUnitMagnitude() - this.setpoint;
+        this.max = max.baseUnitMagnitude() - this.setpoint;
         this.unit = unit;
     }
 
@@ -42,10 +42,17 @@ public class Offset<U extends Unit, M extends Measure<U>> {
         this.unit = unit;
     }
 
+    /**
+     * Returns the offset measurement.
+     * @return
+     */
     public Measure<?> applyOffset() {
         return unit.of(setpoint + offset);
     }
 
+    /**
+     * Increases the offset by one step. If the offset would be out of range, it sets the offset to the maximum value.
+     */
     public void increment() {
         if (offset + step > max) {
             offset = max;
@@ -54,6 +61,9 @@ public class Offset<U extends Unit, M extends Measure<U>> {
         }
     }
 
+    /**
+     * Decreases the offset by one step. If the offset would be out of range, it sets the offset to the minimum value.
+     */
     public void decrement() {
         if (offset - step < min) {
             offset = min;
@@ -62,6 +72,10 @@ public class Offset<U extends Unit, M extends Measure<U>> {
         }
     }
 
+    /**
+     * Increases the offset value by a specified step value. If the offset would be out of range, it sets the offset to the maximum value.
+     * @param step
+     */
     public void increment(M step) {
         if (offset + step.baseUnitMagnitude() > max) {
             offset = max;
@@ -70,6 +84,10 @@ public class Offset<U extends Unit, M extends Measure<U>> {
         }
     }
 
+    /**
+     * Decreases the offset value by a specified step value. If the offset would be out of range, it sets the offset to the minimum value.
+     * @param step
+     */
     public void decrement(M step) {
         if (offset - step.baseUnitMagnitude() < min) {
             offset = min;
@@ -78,6 +96,9 @@ public class Offset<U extends Unit, M extends Measure<U>> {
         }
     }
 
+    /**
+     * Sets the offset to zero.
+     */
     public void reset() {
         offset = 0;
     }
