@@ -76,6 +76,7 @@ public class GenericFlywheel {
     Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts);
     Logger.recordOutput(aKitTopic + "/Current State", currentState.name());
     Logger.recordOutput(aKitTopic + "/At Goal", io.atGoal());
+    Logger.recordOutput(aKitTopic + "/Flywheel Velocity Offset", velocityGoalOffset.getAsDouble());
 
     switch (currentState) {
       case VELOCITY_VOLTAGE_CONTROL:
