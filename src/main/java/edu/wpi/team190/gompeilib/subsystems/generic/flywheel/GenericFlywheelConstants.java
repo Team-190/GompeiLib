@@ -26,7 +26,8 @@ public class GenericFlywheelConstants {
 
   @NonNull public final DCMotor motorConfig;
 
-  @NonNull public final Gains gains;
+  @NonNull public final Gains voltageGains;
+  @NonNull public final Gains torqueGains;
   @NonNull public final AngularConstraints constraints;
 
   @Singular(value = "alignedFollowerCANID")

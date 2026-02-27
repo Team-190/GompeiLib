@@ -31,7 +31,7 @@ public class LoggedTunableMeasure<U extends Unit> implements Supplier<Measure<U>
    * @param defaultValue Default measure value
    */
   public LoggedTunableMeasure(String dashboardKey, Measure<U> defaultValue) {
-    this.key = tableKey + "/" + dashboardKey + " " + defaultValue.unit();
+    this.key = tableKey + "/" + dashboardKey + " (" + defaultValue.unit() + ")";
     this.unit = defaultValue.unit();
     initDefault(defaultValue);
   }
@@ -50,11 +50,26 @@ public class LoggedTunableMeasure<U extends Unit> implements Supplier<Measure<U>
   @Override
   @SuppressWarnings("unchecked") // safe
   public Measure<U> get() {
+    return (Measure<U>) unit.of(getRawValue());
+  }
+
+  /**
+   * Get the current value converted to the specified unit. The unit must be of the same dimension
+   * (e.g., CurrentUnit for current values).
+   *
+   * @param targetUnit The unit to convert the value to (must be compatible with the base unit)
+   * @return The current value in the specified unit
+   */
+  @SuppressWarnings("unchecked")
+  public double get(Unit targetUnit) {
+    return get().in((U) targetUnit);
+  }
+
+  public double getRawValue() {
     if (!hasDefault) {
-      return (Measure<U>) unit.zero();
+      return 0;
     } else {
-      double rawValue = GompeiLib.isTuning() ? dashboardNumber.get() : defaultValue.in(unit);
-      return (Measure<U>) unit.of(rawValue);
+      return GompeiLib.isTuning() ? dashboardNumber.get() : defaultValue.in(unit);
     }
   }
 
