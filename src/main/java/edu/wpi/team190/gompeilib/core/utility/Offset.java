@@ -11,6 +11,7 @@ public class Offset<U extends Unit> {
   private final double max;
   private final U unit;
 
+<<<<<<< 0ffsets-feb-22
   /**
    * @param setpoint the base setpoint to be modified
    * @param step the amount to increment/decrement by
@@ -105,5 +106,28 @@ public class Offset<U extends Unit> {
   /** Sets the offset to zero. */
   public void reset() {
     offset = 0;
+=======
+  private double initialSetpoint;
+  @Setter private double offset;
+
+  private double min;
+  private double max;
+
+  public Offset(double initialSetpoint, double offset, double min, double max) {
+    this.initialSetpoint = initialSetpoint;
+    this.offset = offset;
+    this.min = min;
+    this.max = max;
+  }
+
+  public boolean inRange() {
+    return initialSetpoint + offset >= min && initialSetpoint + offset <= max;
+  }
+
+  public double getSetpoint() {
+    return inRange()
+        ? initialSetpoint + offset
+        : Math.max(min, Math.min(max, initialSetpoint + offset));
+>>>>>>> feature-generic-offset
   }
 }
