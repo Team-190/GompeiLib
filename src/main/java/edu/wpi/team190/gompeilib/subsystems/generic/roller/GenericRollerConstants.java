@@ -5,6 +5,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.team190.gompeilib.core.utility.control.CurrentLimits;
 import java.util.Set;
 import lombok.Builder;
@@ -30,4 +31,6 @@ public class GenericRollerConstants {
   @NonNull public final MomentOfInertia momentOfInertia;
   @NonNull public final NeutralModeValue neutralMode;
   @NonNull public final CANBus canBus;
+
+  @NonNull public final Voltage voltageOffsetStep;
 }
