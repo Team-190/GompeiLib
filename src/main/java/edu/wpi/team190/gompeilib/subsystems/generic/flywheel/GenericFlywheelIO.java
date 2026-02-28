@@ -1,6 +1,7 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface GenericFlywheelIO {
@@ -29,16 +30,16 @@ public interface GenericFlywheelIO {
   public default void setAmps(double amps) {}
   ;
 
-  public default void setVelocity(double velocityRadiansPerSecond) {}
+  public default void setVelocityVoltage(double velocityRadiansPerSecond) {}
   ;
 
-  public default void setVelocityTorque(double velocityRadiansPerSecond) {}
+  public default void setVelocityTorque(double velocityRadiansPerSecond, double feedForward) {}
   ;
 
-  public default void setPID(double kP, double kI, double kD) {}
+  public default void setPID(GainSlot slot, double kP, double kI, double kD) {}
   ;
 
-  public default void setFeedforward(double kS, double kV, double kA) {}
+  public default void setFeedforward(GainSlot slot, double kS, double kV, double kA) {}
   ;
 
   public default void setProfile(
