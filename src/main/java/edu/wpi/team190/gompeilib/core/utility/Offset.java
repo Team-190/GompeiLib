@@ -4,106 +4,69 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
 
 public class Offset<U extends Unit> {
-  private final double setpoint;
-  private double offset;
-  private double step;
-  private final double min;
-  private final double max;
-  private final U unit;
+  private final Measure<U> setpoint;
+  private Measure<U> offset;
+  private Measure<U> step;
+  private final Measure<U> min;
+  private final Measure<U> max;
 
-  /**
-   * @param setpoint the base setpoint to be modified
-   * @param step the amount to increment/decrement by
-   * @param min the minimum value
-   * @param max the maximum value
-   * @param unit the base unit for the measures to be handled in
-   */
-  public Offset(Measure<U> setpoint, Measure<U> step, Measure<U> min, Measure<U> max, U unit) {
-    this.setpoint = setpoint.baseUnitMagnitude();
-    this.offset = 0;
-    this.step = step.baseUnitMagnitude();
-    this.min = min.baseUnitMagnitude() - this.setpoint;
-    this.max = max.baseUnitMagnitude() - this.setpoint;
-    this.unit = unit;
+  public Offset(Measure<U> setpoint, Measure<U> step, Measure<U> min, Measure<U> max) {
+    this.setpoint = setpoint;
+    this.offset = setpoint.times(0);
+    this.step = step;
+    this.min = min.minus(setpoint);
+    this.max = max.minus(setpoint);
   }
 
-  /**
-   * @param setpoint the base setpoint to be modified
-   * @param step the amount to increment/decrement by
-   * @param unit the base unit for the measures to be handled in
-   */
-  public Offset(Measure<U> setpoint, Measure<U> step, U unit) {
-    this.setpoint = setpoint.baseUnitMagnitude();
-    this.offset = 0;
-    this.step = step.baseUnitMagnitude();
-    this.min = Double.NEGATIVE_INFINITY;
-    this.max = Double.POSITIVE_INFINITY;
-    this.unit = unit;
+  public Offset(Measure<U> setpoint, Measure<U> step) {
+    this.setpoint = setpoint;
+    this.offset = setpoint.times(0);
+    this.step = step;
+    this.min = step.times(Double.NEGATIVE_INFINITY);
+    this.max = step.times(Double.POSITIVE_INFINITY);
   }
 
-  /**
-   * Returns the offset measurement.
-   *
-   * @return
-   */
-  public Measure<?> applyOffset() {
-    return unit.of(setpoint + offset);
+  public Measure<U> getNewSetpoint() {
+    return setpoint.plus(offset);
   }
 
-  /**
-   * Increases the offset by one step. If the offset would be out of range, it sets the offset to
-   * the maximum value.
-   */
   public void increment() {
-    if (offset + step > max) {
+    Measure<U> next = offset.plus(step);
+    if (next.gt(max)) {
       offset = max;
     } else {
-      offset += step;
+      offset = next;
     }
   }
 
-  /**
-   * Decreases the offset by one step. If the offset would be out of range, it sets the offset to
-   * the minimum value.
-   */
   public void decrement() {
-    if (offset - step < min) {
+    Measure<U> next = offset.minus(step);
+    if (next.lt(min)) {
       offset = min;
     } else {
-      offset -= step;
+      offset = next;
     }
   }
 
-  /**
-   * Increases the offset value by a specified step value. If the offset would be out of range, it
-   * sets the offset to the maximum value.
-   *
-   * @param step
-   */
   public void increment(Measure<U> step) {
-    if (offset + step.baseUnitMagnitude() > max) {
+    Measure<U> next = offset.plus(step);
+    if (next.gt(max)) {
       offset = max;
     } else {
-      offset += step.baseUnitMagnitude();
+      offset = next;
     }
   }
 
-  /**
-   * Decreases the offset value by a specified step value. If the offset would be out of range, it
-   * sets the offset to the minimum value.
-   *
-   * @param step
-   */
   public void decrement(Measure<U> step) {
-    if (offset - step.baseUnitMagnitude() < min) {
+    Measure<U> next = offset.minus(step);
+    if (next.lt(min)) {
       offset = min;
     } else {
-      offset -= step.baseUnitMagnitude();
+      offset = next;
     }
   }
 
-  /** Sets the offset to zero. */
   public void reset() {
-    offset = 0;
+    offset = offset.times(0);
   }
 }
