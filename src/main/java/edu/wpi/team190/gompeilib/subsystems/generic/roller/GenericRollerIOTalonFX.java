@@ -129,6 +129,7 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
 
   @Override
   public void updateInputs(GenericRollerIOInputs inputs) {
+
     inputs.positionRadians = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
     inputs.velocityRadiansPerSecond =
         Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());

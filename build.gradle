@@ -117,7 +117,12 @@ jacocoTestReport {
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it, exclude: [
                 '**/*Aspect.class',
-                '**/*Tracer.class'   // exclude Tracer classes too
+                '**/*$AjcClosure*',
+                '**/ajc$*',
+                '**/*Tracer.class',
+                '**/*AutoLogged.class',
+                '**/*AutoLogged$*.class',
+                '**/*Tracing*'
             ])
         }))
     }
