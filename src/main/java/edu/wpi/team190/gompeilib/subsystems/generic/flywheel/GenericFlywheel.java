@@ -6,6 +6,7 @@ import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.team190.gompeilib.core.utility.Offset;
 import edu.wpi.team190.gompeilib.core.utility.sysid.CustomSysIdRoutine;
 import edu.wpi.team190.gompeilib.core.utility.sysid.CustomUnits;
 import java.util.function.DoubleSupplier;
@@ -22,13 +23,11 @@ public class GenericFlywheel {
 
   @Getter private GenericFlywheelState currentState;
 
-  @Getter private double velocityGoalRadiansPerSecond;
-  @Getter private double voltageGoalVolts;
-
-  private final DoubleSupplier velocityGoalOffset;
+  @Getter private Offset<AngularVelocityUnit> velocityGoalRadiansPerSecond;
+  @Getter private Offset<VoltageUnit> voltageGoalVolts;
 
   public GenericFlywheel(
-      GenericFlywheelIO io, Subsystem subsystem, DoubleSupplier velocityGoalOffset, String name) {
+      GenericFlywheelIO io, GenericFlywheelConstants constants, Subsystem subsystem, String name) {
     this.io = io;
     inputs = new GenericFlywheelIOInputsAutoLogged();
 
@@ -60,10 +59,14 @@ public class GenericFlywheel {
                 (volts) -> io.setVoltage(volts.in(Volts)), subsystem),
             Volts.mutable(0));
 
-    velocityGoalRadiansPerSecond = 0;
-    voltageGoalVolts = 0;
-
-    this.velocityGoalOffset = velocityGoalOffset;
+    velocityGoalRadiansPerSecond =
+        new Offset<>(
+            RadiansPerSecond.of(0),
+            constants.velocityOffsetStep,
+            RadiansPerSecond.of(-constants.gearRatio * constants.motorConfig.freeSpeedRadPerSec),
+            RadiansPerSecond.of(constants.gearRatio * constants.motorConfig.freeSpeedRadPerSec));
+    voltageGoalVolts =
+        new Offset<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12));
 
     currentState = GenericFlywheelState.IDLE;
   }
@@ -72,30 +75,21 @@ public class GenericFlywheel {
     io.updateInputs(inputs);
     Logger.processInputs(aKitTopic, inputs);
 
-    Logger.recordOutput(aKitTopic + "/Velocity Goal", velocityGoalRadiansPerSecond);
-    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts);
+    Logger.recordOutput(
+        aKitTopic + "/Velocity Goal", velocityGoalRadiansPerSecond.getNewSetpoint());
+    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts.getNewSetpoint());
     Logger.recordOutput(aKitTopic + "/Current State", currentState.name());
     Logger.recordOutput(aKitTopic + "/At Goal", io.atGoal());
 
     switch (currentState) {
       case VELOCITY_VOLTAGE_CONTROL:
-        io.setVelocity(
-            Math.max(
-                    0,
-                    (velocityGoalRadiansPerSecond + velocityGoalOffset.getAsDouble())
-                        * Math.signum(velocityGoalRadiansPerSecond))
-                * Math.signum(velocityGoalRadiansPerSecond));
+        io.setVelocity(velocityGoalRadiansPerSecond.getNewSetpoint().in(RadiansPerSecond));
         break;
       case VELOCITY_TORQUE_CONTROL:
-        io.setVelocityTorque(
-            Math.max(
-                    0,
-                    (velocityGoalRadiansPerSecond + velocityGoalOffset.getAsDouble())
-                        * Math.signum(velocityGoalRadiansPerSecond))
-                * Math.signum(velocityGoalRadiansPerSecond));
+        io.setVelocityTorque(velocityGoalRadiansPerSecond.getNewSetpoint().in(RadiansPerSecond));
         break;
       case VOLTAGE_CONTROL:
-        io.setVoltage(voltageGoalVolts);
+        io.setVoltage(voltageGoalVolts.getNewSetpoint().baseUnitMagnitude());
         break;
       case STOP:
         io.stop();
@@ -112,7 +106,8 @@ public class GenericFlywheel {
               torqueControl
                   ? GenericFlywheelState.VELOCITY_TORQUE_CONTROL
                   : GenericFlywheelState.VELOCITY_VOLTAGE_CONTROL;
-          this.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond;
+          this.velocityGoalRadiansPerSecond.setSetpoint(
+              RadiansPerSecond.of(velocityGoalRadiansPerSecond));
         });
   }
 
@@ -123,7 +118,8 @@ public class GenericFlywheel {
               torqueControl
                   ? GenericFlywheelState.VELOCITY_TORQUE_CONTROL
                   : GenericFlywheelState.VELOCITY_VOLTAGE_CONTROL;
-          this.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond.getAsDouble();
+          this.velocityGoalRadiansPerSecond.setSetpoint(
+              RadiansPerSecond.of(velocityGoalRadiansPerSecond.getAsDouble()));
         });
   }
 
@@ -131,7 +127,7 @@ public class GenericFlywheel {
     return Commands.runOnce(
         () -> {
           currentState = GenericFlywheelState.VOLTAGE_CONTROL;
-          this.voltageGoalVolts = volts;
+          this.voltageGoalVolts.setSetpoint(Volts.of(volts));
         });
   }
 
