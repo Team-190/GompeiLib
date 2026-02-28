@@ -21,8 +21,8 @@ public class ElevatorConstants {
 
   @NonNull public final ElevatorParameters elevatorParameters;
   @NonNull public final Gains slot0Gains;
-  @Builder.Default public final Gains slot1Gains = Gains.builder().withPrefix("").build();
-  @Builder.Default public final Gains slot2Gains = Gains.builder().withPrefix("").build();
+  @Builder.Default public final Gains slot1Gains = Gains.builder().build();
+  @Builder.Default public final Gains slot2Gains = Gains.builder().build();
   @NonNull public final LinearConstraints constraints;
 
   @Singular(value = "alignedFollowerCANID")

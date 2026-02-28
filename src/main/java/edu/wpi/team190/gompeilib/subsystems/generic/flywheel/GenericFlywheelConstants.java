@@ -3,6 +3,8 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.team190.gompeilib.core.utility.control.AngularConstraints;
 import edu.wpi.team190.gompeilib.core.utility.control.CurrentLimits;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
@@ -26,7 +28,8 @@ public class GenericFlywheelConstants {
 
   @NonNull public final DCMotor motorConfig;
 
-  @NonNull public final Gains gains;
+  @NonNull public final Gains voltageGains;
+  @NonNull public final Gains torqueGains;
   @NonNull public final AngularConstraints constraints;
 
   @Singular(value = "alignedFollowerCANID")
@@ -36,4 +39,8 @@ public class GenericFlywheelConstants {
   @Singular(value = "opposedFollowerCANID")
   @NonNull
   public final Set<Integer> opposedFollowerCANIDs;
+
+  @NonNull public final AngularVelocity velocityOffsetStep;
+
+  @NonNull public final Voltage voltageOffsetStep;
 }

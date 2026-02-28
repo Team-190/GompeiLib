@@ -14,7 +14,10 @@ public record Gains(
     LoggedTunableNumber kA,
     LoggedTunableNumber kG) {
 
-  @Builder(setterPrefix = "with")
+  @Builder(
+      setterPrefix = "with",
+      builderMethodName = "fromDoubles",
+      builderClassName = "FromDoubles")
   public Gains(
       @NonNull String prefix,
       double kP,
