@@ -8,8 +8,8 @@ public class Offset<U extends Unit> {
   @Getter private Measure<U> setpoint;
   @Getter private Measure<U> offset;
   private Measure<U> step;
-  private Measure<U> min;
-  private Measure<U> max;
+  public Measure<U> min;
+  public Measure<U> max;
 
   public Offset(Measure<U> setpoint, Measure<U> step, Measure<U> min, Measure<U> max) {
     this.setpoint = setpoint;
@@ -31,10 +31,14 @@ public class Offset<U extends Unit> {
     this.min = min.plus(this.setpoint).minus(setpoint);
     this.max = max.plus(this.setpoint).minus(setpoint);
     this.setpoint = setpoint;
+    offset = clamp(offset);
   }
 
   public Measure<U> getNewSetpoint() {
-    return setpoint.plus(offset);
+
+    double setpointSign = Math.signum(setpoint.magnitude());
+    return Measure.max(setpoint.times(0), (setpoint.plus(offset)).times(setpointSign))
+        .times(setpointSign);
   }
 
   public void increment() {
@@ -75,5 +79,15 @@ public class Offset<U extends Unit> {
 
   public void reset() {
     offset = offset.times(0);
+  }
+
+  public Measure<U> clamp(Measure<U> value) {
+    if (value.gt(max)) {
+      return max;
+    } else if (value.lt(min)) {
+      return min;
+    } else {
+      return value;
+    }
   }
 }

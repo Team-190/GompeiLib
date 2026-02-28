@@ -1,10 +1,11 @@
 package edu.wpi.team190.gompeilib.core.utility;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import org.junit.jupiter.api.*;
 
@@ -130,5 +131,20 @@ class OffsetTests {
     offset.decrement(s);
     offset.increment(s);
     assertEquals(d, offset.getNewSetpoint());
+  }
+
+  @Test
+  public void testUpdateSetpoint() {
+    Angle a = Degree.of(10);
+    Angle s = Degree.of(0.5);
+    Angle min = Degree.of(0);
+    Angle max = Degree.of(20);
+    Offset<AngleUnit> offset = new Offset(a, s, min, max);
+    offset.increment();
+    assertEquals(Degree.of(10.5), offset.getNewSetpoint());
+    offset.setSetpoint(Degree.of(15));
+    assertEquals(Degree.of(15.5), offset.getNewSetpoint());
+    offset.setSetpoint(Degree.of(0));
+    assertEquals(Degree.of(0.5), offset.getNewSetpoint());
   }
 }
