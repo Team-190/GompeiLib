@@ -2,13 +2,14 @@ package edu.wpi.team190.gompeilib.core.utility;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
+import lombok.Getter;
 
 public class Offset<U extends Unit> {
-  private final Measure<U> setpoint;
-  private Measure<U> offset;
+  @Getter private Measure<U> setpoint;
+  @Getter private Measure<U> offset;
   private Measure<U> step;
-  private final Measure<U> min;
-  private final Measure<U> max;
+  private Measure<U> min;
+  private Measure<U> max;
 
   public Offset(Measure<U> setpoint, Measure<U> step, Measure<U> min, Measure<U> max) {
     this.setpoint = setpoint;
@@ -24,6 +25,12 @@ public class Offset<U extends Unit> {
     this.step = step;
     this.min = step.times(Double.NEGATIVE_INFINITY);
     this.max = step.times(Double.POSITIVE_INFINITY);
+  }
+
+  public void setSetpoint(Measure<U> setpoint) {
+    this.min = min.plus(this.setpoint).minus(setpoint);
+    this.max = max.plus(this.setpoint).minus(setpoint);
+    this.setpoint = setpoint;
   }
 
   public Measure<U> getNewSetpoint() {
