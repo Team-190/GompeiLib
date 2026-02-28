@@ -16,8 +16,8 @@ public class ArmConstants {
   @NonNull public final CANBus canBus;
   @NonNull public final ArmParameters armParameters;
   @NonNull public final Gains slot0Gains;
-  @Builder.Default public final Gains slot1Gains = Gains.builder().withPrefix("").build();
-  @Builder.Default public final Gains slot2Gains = Gains.builder().withPrefix("").build();
+  @Builder.Default public final Gains slot1Gains = Gains.builder().build();
+  @Builder.Default public final Gains slot2Gains = Gains.builder().build();
   @NonNull public final AngularConstraints constraints;
   @NonNull public final CurrentLimits currentLimits;
   @NonNull public final Boolean enableFOC;

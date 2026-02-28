@@ -6,6 +6,7 @@ import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import edu.wpi.team190.gompeilib.core.utility.sysid.CustomSysIdRoutine;
 import edu.wpi.team190.gompeilib.core.utility.sysid.CustomUnits;
 import java.util.function.DoubleSupplier;
@@ -23,6 +24,7 @@ public class GenericFlywheel {
   @Getter private GenericFlywheelState currentState;
 
   @Getter private double velocityGoalRadiansPerSecond;
+  @Getter private double currentFeedforward;
   @Getter private double voltageGoalVolts;
 
   private final DoubleSupplier velocityGoalOffset;
@@ -61,6 +63,7 @@ public class GenericFlywheel {
             Volts.mutable(0));
 
     velocityGoalRadiansPerSecond = 0;
+    currentFeedforward = 0;
     voltageGoalVolts = 0;
 
     this.velocityGoalOffset = velocityGoalOffset;
@@ -76,10 +79,13 @@ public class GenericFlywheel {
     Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts);
     Logger.recordOutput(aKitTopic + "/Current State", currentState.name());
     Logger.recordOutput(aKitTopic + "/At Goal", io.atGoal());
+    Logger.recordOutput(aKitTopic + "/Flywheel Velocity Offset", velocityGoalOffset.getAsDouble());
+    Logger.recordOutput(
+        aKitTopic + "/Flywheel Velocity Magnitude", Math.abs(velocityGoalRadiansPerSecond));
 
     switch (currentState) {
       case VELOCITY_VOLTAGE_CONTROL:
-        io.setVelocity(
+        io.setVelocityVoltage(
             Math.max(
                     0,
                     (velocityGoalRadiansPerSecond + velocityGoalOffset.getAsDouble())
@@ -92,7 +98,8 @@ public class GenericFlywheel {
                     0,
                     (velocityGoalRadiansPerSecond + velocityGoalOffset.getAsDouble())
                         * Math.signum(velocityGoalRadiansPerSecond))
-                * Math.signum(velocityGoalRadiansPerSecond));
+                * Math.signum(velocityGoalRadiansPerSecond),
+            currentFeedforward);
         break;
       case VOLTAGE_CONTROL:
         io.setVoltage(voltageGoalVolts);
@@ -105,25 +112,38 @@ public class GenericFlywheel {
     }
   }
 
-  public Command setGoal(double velocityGoalRadiansPerSecond, boolean torqueControl) {
+  public Command setVelocityGoal(double velocityGoalRadiansPerSecond) {
     return Commands.runOnce(
         () -> {
-          currentState =
-              torqueControl
-                  ? GenericFlywheelState.VELOCITY_TORQUE_CONTROL
-                  : GenericFlywheelState.VELOCITY_VOLTAGE_CONTROL;
+          currentState = GenericFlywheelState.VELOCITY_VOLTAGE_CONTROL;
           this.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond;
         });
   }
 
-  public Command setGoal(DoubleSupplier velocityGoalRadiansPerSecond, boolean torqueControl) {
+  public Command setVelocityGoal(DoubleSupplier velocityGoalRadiansPerSecond) {
     return Commands.run(
         () -> {
-          currentState =
-              torqueControl
-                  ? GenericFlywheelState.VELOCITY_TORQUE_CONTROL
-                  : GenericFlywheelState.VELOCITY_VOLTAGE_CONTROL;
+          currentState = GenericFlywheelState.VELOCITY_VOLTAGE_CONTROL;
           this.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond.getAsDouble();
+        });
+  }
+
+  public Command setVelocityGoal(double velocityGoalRadiansPerSecond, double feedforward) {
+    return Commands.runOnce(
+        () -> {
+          currentState = GenericFlywheelState.VELOCITY_TORQUE_CONTROL;
+          this.currentFeedforward = feedforward;
+          this.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond;
+        });
+  }
+
+  public Command setVelocityGoal(
+      DoubleSupplier velocityGoalRadiansPerSecond, DoubleSupplier feedforward) {
+    return Commands.run(
+        () -> {
+          currentState = GenericFlywheelState.VELOCITY_TORQUE_CONTROL;
+          this.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond.getAsDouble();
+          this.currentFeedforward = feedforward.getAsDouble();
         });
   }
 
@@ -150,12 +170,12 @@ public class GenericFlywheel {
     return Commands.waitUntil(io::atGoal);
   }
 
-  public void setPID(double kP, double kD) {
-    io.setPID(kP, 0.0, kD);
+  public void setPID(GainSlot slot, double kP, double kD) {
+    io.setPID(slot, kP, 0.0, kD);
   }
 
-  public void setFeedForward(double kS, double kV, double kA) {
-    io.setFeedforward(kS, kV, kA);
+  public void setFeedForward(GainSlot slot, double kS, double kV, double kA) {
+    io.setFeedforward(slot, kS, kV, kA);
   }
 
   public void setProfile(
