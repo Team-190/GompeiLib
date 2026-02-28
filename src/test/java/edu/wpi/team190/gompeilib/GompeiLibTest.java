@@ -57,6 +57,12 @@ public class GompeiLibTest {
 
   @Test
   @Order(1)
+  void testConstruction() {
+    new GompeiLib();
+  }
+
+  @Test
+  @Order(2)
   void testNotInitialized() throws Exception {
     Method checkInitializedMethod = GompeiLib.class.getDeclaredMethod("checkInitialized");
     checkInitializedMethod.setAccessible(true);
@@ -70,7 +76,7 @@ public class GompeiLibTest {
   }
 
   @Test
-  @Order(2)
+  @Order(3)
   void testAlreadyInitialized() {
     // Initialize once
     GompeiLib.init(RobotMode.SIM, true, 0.02);
@@ -93,7 +99,7 @@ public class GompeiLibTest {
 
   @ParameterizedTest
   @FieldSource("TEST_PARAMETERS")
-  @Order(3)
+  @Order(4)
   void testGompeiLib(GompeiLibTestParameters params) {
     GompeiLib.init(params.mode, params.isTuning, params.loopPeriodSecs);
 
