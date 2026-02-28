@@ -35,10 +35,18 @@ public class Offset<U extends Unit> {
   }
 
   public Measure<U> getNewSetpoint() {
+    double sign = Math.signum(setpoint.magnitude());
 
-    double setpointSign = Math.signum(setpoint.magnitude());
-    return Measure.max(setpoint.times(0), (setpoint.plus(offset)).times(setpointSign))
-        .times(setpointSign);
+    // Apply offset in the direction of the setpoint's sign
+    // positive offset always increases magnitude, negative always decreases
+    var newMagnitude = setpoint.plus(offset.times(sign));
+
+    // Clamp to zero if we've crossed zero (don't flip sign)
+    if (Math.signum(newMagnitude.magnitude()) != sign && sign != 0) {
+      return setpoint.times(0); // return zero in same unit
+    }
+
+    return newMagnitude;
   }
 
   public void increment() {

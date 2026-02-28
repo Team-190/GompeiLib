@@ -79,9 +79,9 @@ public class GenericFlywheel {
     io.updateInputs(inputs);
     Logger.processInputs(aKitTopic, inputs);
 
-    Logger.recordOutput(
-        aKitTopic + "/Velocity Goal", velocityGoalRadiansPerSecond.getNewSetpoint());
-    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts.getNewSetpoint());
+    Logger.recordOutput(aKitTopic + "/Velocity Goal", velocityGoalRadiansPerSecond.getSetpoint());
+    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts.getSetpoint());
+    Logger.recordOutput(aKitTopic + "/Velocity Offset", velocityGoalRadiansPerSecond.getOffset());
     Logger.recordOutput(aKitTopic + "/Current State", currentState.name());
     Logger.recordOutput(aKitTopic + "/At Goal", io.atGoal());
 

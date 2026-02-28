@@ -145,6 +145,8 @@ class OffsetTests {
     offset.setSetpoint(Degree.of(15));
     assertEquals(Degree.of(15.5), offset.getNewSetpoint());
     offset.setSetpoint(Degree.of(0));
-    assertEquals(Degree.of(0.5), offset.getNewSetpoint());
+    assertEquals(Degree.of(0.0), offset.getNewSetpoint());
+    offset.setSetpoint(Degree.of(10));
+    assertEquals(Degree.of(10.5), offset.getNewSetpoint());
   }
 }
