@@ -32,5 +32,5 @@ public class GenericRollerConstants {
   @NonNull public final NeutralModeValue neutralMode;
   @NonNull public final CANBus canBus;
 
-  @NonNull public final Voltage offsetVoltageStep;
+  @NonNull public final Voltage voltageOffsetStep;
 }

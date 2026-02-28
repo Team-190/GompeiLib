@@ -26,7 +26,7 @@ public class GenericRoller {
     aKitTopic = subsystem.getName() + "/Roller" + name;
 
     voltageGoalVolts =
-        new Offset<>(Volts.of(0), constants.offsetVoltageStep, Volts.of(-12), Volts.of(12));
+        new Offset<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12));
   }
 
   @Trace
