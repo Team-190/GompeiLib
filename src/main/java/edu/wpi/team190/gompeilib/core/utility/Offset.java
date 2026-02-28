@@ -31,7 +31,7 @@ public class Offset<U extends Unit> {
     this.min = min.plus(this.setpoint).minus(setpoint);
     this.max = max.plus(this.setpoint).minus(setpoint);
     this.setpoint = setpoint;
-    offset = clamp(offset);
+    //    offset = clamp(offset);
   }
 
   public Measure<U> getNewSetpoint() {
