@@ -20,7 +20,7 @@ public class GenericRoller {
   @Getter private Offset<VoltageUnit> voltageGoalVolts;
 
   public GenericRoller(
-      GenericRollerIO io, GenericRollerConstants constants, Subsystem subsystem, String name) {
+      GenericRollerIO io, Subsystem subsystem, GenericRollerConstants constants, String name) {
     this.io = io;
     inputs = new GenericRollerIOInputsAutoLogged();
     aKitTopic = subsystem.getName() + "/Roller" + name;
@@ -50,5 +50,17 @@ public class GenericRoller {
 
   public Command setVoltage(double volts) {
     return setVoltage(Volts.of(volts));
+  }
+
+  public Command incrementVoltageOffset() {
+    return Commands.runOnce(voltageGoalVolts::increment);
+  }
+
+  public Command decrementVoltageOffset() {
+    return Commands.runOnce(voltageGoalVolts::decrement);
+  }
+
+  public Command resetVoltageOffset() {
+    return Commands.runOnce(voltageGoalVolts::reset);
   }
 }
