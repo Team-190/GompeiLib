@@ -39,7 +39,7 @@ public class GenericRoller {
     Logger.recordOutput(aKitTopic + "/Voltage Offset", voltageGoalVolts.getOffset());
     Logger.recordOutput(
         aKitTopic + "/Voltage Magnitude",
-        Math.abs(voltageGoalVolts.getSetpoint().baseUnitMagnitude()));
+        String.format("%.2f", Math.abs(voltageGoalVolts.getSetpoint().baseUnitMagnitude())));
 
     io.setVoltage(voltageGoalVolts.getNewSetpoint().baseUnitMagnitude());
   }
