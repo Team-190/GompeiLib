@@ -122,7 +122,7 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
       follower.optimizeBusUtilization();
     }
 
-    voltageRequest = new VoltageOut(0.0);
+    voltageRequest = new VoltageOut(0.0).withEnableFOC(false);
 
     this.constants = constants;
   }
@@ -148,6 +148,6 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
 
   @Override
   public void setVoltage(double volts) {
-    talonFX.setControl(voltageRequest.withOutput(volts).withEnableFOC(true));
+    talonFX.setControl(voltageRequest.withOutput(volts));
   }
 }
