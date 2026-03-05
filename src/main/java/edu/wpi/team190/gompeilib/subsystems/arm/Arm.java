@@ -32,9 +32,9 @@ public class Arm {
     characterizationRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(
-                Volts.of(0.2).per(Second),
-                Volts.of(3.5),
-                Seconds.of(5),
+                Volts.of(1).per(Second),
+                Volts.of(9),
+                Seconds.of(12),
                 (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
@@ -48,6 +48,7 @@ public class Arm {
 
     Logger.recordOutput(aKitTopic + "/State", currentState.name());
     Logger.recordOutput(aKitTopic + "/At Goal", atGoal());
+    Logger.recordOutput(aKitTopic + "/Goal", positionGoal);
 
     switch (currentState) {
       case OPEN_LOOP_VOLTAGE_CONTROL -> io.setVoltage(voltageGoalVolts);
