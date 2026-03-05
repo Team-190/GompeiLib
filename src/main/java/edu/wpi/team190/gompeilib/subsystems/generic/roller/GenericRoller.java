@@ -1,5 +1,6 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.roller;
 
+import static edu.wpi.first.units.Units.Millivolts;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.VoltageUnit;
@@ -50,6 +51,12 @@ public class GenericRoller {
 
   public Command setVoltage(double volts) {
     return setVoltage(Volts.of(volts));
+  }
+
+  public boolean atGoal(Voltage volts) {
+    return volts
+        .plus(voltageGoalVolts.getOffset())
+        .isNear(voltageGoalVolts.getNewSetpoint(), Millivolts.of(500));
   }
 
   public Command incrementVoltageOffset() {
