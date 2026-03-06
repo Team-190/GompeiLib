@@ -81,12 +81,15 @@ public class GenericFlywheel {
 
     Logger.recordOutput(aKitTopic + "/Velocity Goal", velocityGoalRadiansPerSecond.getSetpoint());
     Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts.getSetpoint());
-    Logger.recordOutput(aKitTopic + "/Velocity Offset", (int) Math.round(velocityGoalRadiansPerSecond.getOffset().in(RadiansPerSecond)));
+    Logger.recordOutput(
+        aKitTopic + "/Velocity Offset",
+        (int) Math.round(velocityGoalRadiansPerSecond.getOffset().in(RadiansPerSecond)));
     Logger.recordOutput(aKitTopic + "/Current State", currentState.name());
     Logger.recordOutput(aKitTopic + "/At Goal", io.atGoal());
     Logger.recordOutput(
         aKitTopic + "/Velocity Magnitude",
-        String.format("%.0f", Math.abs(velocityGoalRadiansPerSecond.getSetpoint().in(RadiansPerSecond))));
+        String.format(
+            "%.0f", Math.abs(velocityGoalRadiansPerSecond.getSetpoint().in(RadiansPerSecond))));
 
     switch (currentState) {
       case VELOCITY_VOLTAGE_CONTROL:
