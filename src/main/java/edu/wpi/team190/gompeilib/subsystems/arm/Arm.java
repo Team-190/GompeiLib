@@ -3,6 +3,9 @@ package edu.wpi.team190.gompeilib.subsystems.arm;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -17,29 +20,34 @@ public class Arm {
 
   private final String aKitTopic;
 
-  private final SysIdRoutine characterizationRoutine;
-
   @Getter private ArmState currentState;
 
-  @Getter private double voltageGoalVolts;
+  @Getter private Voltage voltageGoal;
   @Getter private Rotation2d positionGoal;
+
+  private final SysIdRoutine characterizationRoutine;
 
   public Arm(ArmIO io, Subsystem subsystem, int index) {
     this.io = io;
     this.inputs = new ArmIOInputsAutoLogged();
 
     aKitTopic = subsystem.getName() + "/Arms" + index;
-    characterizationRoutine =
-        new SysIdRoutine(
-            new SysIdRoutine.Config(
-                Volts.of(1).per(Second),
-                Volts.of(9),
-                Seconds.of(12),
-                (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
-            new SysIdRoutine.Mechanism(
-                (voltage) -> io.setVoltage(voltage.in(Volts)), null, subsystem));
 
     currentState = ArmState.IDLE;
+
+    voltageGoal = Volts.of(0.0);
+    positionGoal = Rotation2d.fromRadians(0.0);
+
+    characterizationRoutine =
+            new SysIdRoutine(
+                    new SysIdRoutine.Config(
+                            Volts.of(1).per(Second),
+                            Volts.of(9),
+                            Seconds.of(12),
+                            (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
+                    new SysIdRoutine.Mechanism(
+                            io::setVoltageGoal, null, subsystem));
+
   }
 
   public void periodic() {
@@ -47,11 +55,13 @@ public class Arm {
     Logger.processInputs(aKitTopic, inputs);
 
     Logger.recordOutput(aKitTopic + "/State", currentState.name());
-    Logger.recordOutput(aKitTopic + "/At Goal", atGoal());
-    Logger.recordOutput(aKitTopic + "/Goal", positionGoal);
+    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoal);
+    Logger.recordOutput(aKitTopic + "/Position Goal", positionGoal);
+    Logger.recordOutput(aKitTopic + "/At Voltage Goal", atVoltageGoal());
+    Logger.recordOutput(aKitTopic + "/At Position Goal", atPositionGoal());
 
     switch (currentState) {
-      case OPEN_LOOP_VOLTAGE_CONTROL -> io.setVoltage(voltageGoalVolts);
+      case OPEN_LOOP_VOLTAGE_CONTROL -> io.setVoltageGoal(voltageGoal);
       case CLOSED_LOOP_POSITION_CONTROL -> io.setPositionGoal(positionGoal);
     }
   }
@@ -60,46 +70,54 @@ public class Arm {
     return inputs.position;
   }
 
+  public void setVoltageGoal(Voltage voltageGoal) {
+              currentState = ArmState.OPEN_LOOP_VOLTAGE_CONTROL;
+              this.voltageGoal = voltageGoal;
+  }
+
+  public void setPositionGoal(Rotation2d positionGoal) {
+          currentState = ArmState.CLOSED_LOOP_POSITION_CONTROL;
+          this.positionGoal = positionGoal;
+  }
+
+  public boolean atVoltageGoal(Voltage voltageReference) {
+    return io.atVoltageGoal(voltageReference);
+  }
+
+  public boolean atPositionGoal(Rotation2d positionReference) {
+    return io.atPositionGoal(positionReference);
+  }
+
+  public boolean atVoltageGoal() {
+    return atVoltageGoal(voltageGoal);
+  }
+
+  public boolean atPositionGoal() {
+    return atPositionGoal(positionGoal);
+  }
+
+  public void setPosition(Rotation2d position) {
+    io.setPosition(position);
+  }
+
+  public void setGainSlot(GainSlot slot) {
+    io.setGainSlot(slot);
+  }
+
+  public Command waitUntilAtGoal() {
+    return Commands.waitUntil(this::atPositionGoal);
+  }
+
   public void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
+          double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
     io.updateGains(kP, kD, kS, kV, kA, kG, slot);
   }
 
   public void updateConstraints(
-      double maxAcceleration, double cruisingVelocity, double goalTolerance) {
-    io.updateConstraints(maxAcceleration, cruisingVelocity, goalTolerance);
-  }
-
-  public Command setPosition(Rotation2d position) {
-    return Commands.runOnce(() -> io.setPosition(position));
-  }
-
-  public Command setPositionGoal(Rotation2d positionGoal) {
-    return Commands.runOnce(
-        () -> {
-          currentState = ArmState.CLOSED_LOOP_POSITION_CONTROL;
-          this.positionGoal = positionGoal;
-        });
-  }
-
-  public Command setVoltage(double volts) {
-    return Commands.runOnce(
-        () -> {
-          currentState = ArmState.OPEN_LOOP_VOLTAGE_CONTROL;
-          this.voltageGoalVolts = volts;
-        });
-  }
-
-  public void setSlot(GainSlot slot) {
-    io.setSlot(slot);
-  }
-
-  public boolean atGoal() {
-    return io.atGoal();
-  }
-
-  public Command waitUntilAtGoal() {
-    return Commands.waitUntil(this::atGoal);
+          AngularAcceleration maxAcceleration,
+          AngularVelocity maxVelocity,
+          Rotation2d goalTolerance) {
+    io.updateConstraints(maxAcceleration, maxVelocity, goalTolerance);
   }
 
   public Command sysIdRoutine() {

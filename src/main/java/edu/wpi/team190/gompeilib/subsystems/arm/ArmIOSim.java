@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
@@ -16,7 +17,7 @@ import java.util.Arrays;
 public class ArmIOSim implements ArmIO {
   public SingleJointedArmSim armSim;
 
-  private double appliedVolts;
+  private Voltage appliedVolts;
 
   private final ProfiledPIDController feedback;
   private ArmFeedforward feedforward;
@@ -26,8 +27,6 @@ public class ArmIOSim implements ArmIO {
   private final ArmConstants constants;
 
   public ArmIOSim(ArmConstants constants) {
-    this.constants = constants;
-
     armSim =
         new SingleJointedArmSim(
             LinearSystemId.createSingleJointedArmSystem(
@@ -42,7 +41,7 @@ public class ArmIOSim implements ArmIO {
             true,
             constants.armParameters.minAngle().getRadians());
 
-    appliedVolts = 0.0;
+    appliedVolts = Volts.of(0.0);
 
     feedback =
         new ProfiledPIDController(
@@ -65,31 +64,35 @@ public class ArmIOSim implements ArmIO {
             constants.slot0Gains.kV().get(),
             constants.slot0Gains.kA().get(),
             constants.slot0Gains.kG().get());
+
+    isClosedLoop = true;
+
+    this.constants = constants;
   }
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
     if (isClosedLoop)
       appliedVolts =
-          feedback.calculate(armSim.getAngleRads())
+          Volts.of(feedback.calculate(armSim.getAngleRads())
               + feedforward.calculate(
-                  feedback.getSetpoint().position, feedback.getSetpoint().velocity);
+                  feedback.getSetpoint().position, feedback.getSetpoint().velocity));
 
-    appliedVolts = MathUtil.clamp(appliedVolts, -12.0, 12.0);
-    armSim.setInputVoltage(appliedVolts);
+    appliedVolts = Volts.of(MathUtil.clamp(appliedVolts.in(Volts), -12.0, 12.0));
+    armSim.setInputVoltage(appliedVolts.in(Volts));
     armSim.update(GompeiLib.getLoopPeriod());
 
     inputs.position = Rotation2d.fromRadians(armSim.getAngleRads());
-    inputs.velocityRadiansPerSecond = armSim.getVelocityRadPerSec();
+    inputs.velocity = RadiansPerSecond.of(armSim.getVelocityRadPerSec());
 
-    inputs.appliedVolts = new double[constants.armParameters.numMotors()];
-    inputs.supplyCurrentAmps = new double[constants.armParameters.numMotors()];
-    inputs.torqueCurrentAmps = new double[constants.armParameters.numMotors()];
-    inputs.temperatureCelsius = new double[constants.armParameters.numMotors()];
+    inputs.appliedVolts = new Voltage[constants.armParameters.numMotors()];
+    inputs.supplyCurrentAmps = new Current[constants.armParameters.numMotors()];
+    inputs.torqueCurrentAmps = new Current[constants.armParameters.numMotors()];
+    inputs.temperatureCelsius = new Temperature[constants.armParameters.numMotors()];
 
     Arrays.fill(inputs.appliedVolts, appliedVolts);
-    Arrays.fill(inputs.supplyCurrentAmps, armSim.getCurrentDrawAmps());
-    Arrays.fill(inputs.torqueCurrentAmps, armSim.getCurrentDrawAmps());
+    Arrays.fill(inputs.supplyCurrentAmps, Amps.of(armSim.getCurrentDrawAmps()));
+    Arrays.fill(inputs.torqueCurrentAmps, Amps.of(armSim.getCurrentDrawAmps()));
 
     inputs.positionGoal = Rotation2d.fromRadians(feedback.getGoal().position);
     inputs.positionSetpoint = Rotation2d.fromRadians(feedback.getSetpoint().position);
@@ -97,14 +100,35 @@ public class ArmIOSim implements ArmIO {
   }
 
   @Override
-  public void setVoltage(double appliedVolts) {
+  public void setVoltageGoal(Voltage voltageGoal) {
     isClosedLoop = false;
-    this.appliedVolts = appliedVolts;
+    this.appliedVolts = voltageGoal;
   }
 
   @Override
-  public void setSlot(GainSlot slot) {
-    switch (slot) {
+  public void setPositionGoal(Rotation2d rotationGoal) {
+    isClosedLoop = true;
+    feedback.setGoal(rotationGoal.getRadians());
+  }
+
+  @Override
+  public boolean atVoltageGoal(Voltage voltageReference) {
+    return appliedVolts.isNear(voltageReference, Millivolts.of(500));
+  }
+
+  @Override
+  public boolean atPositionGoal(Rotation2d positionReference) {
+    return Math.abs(positionReference.getRadians() - armSim.getAngleRads()) < constants.constraints.goalTolerance().get(Radians);
+  }
+
+  @Override
+  public void setPosition(Rotation2d position) {
+    armSim.setState(position.getRadians(), 0);
+  }
+
+  @Override
+  public void setGainSlot(GainSlot gainSlot) {
+    switch (gainSlot) {
       case ZERO:
         feedback.setPID(constants.slot0Gains.kP().get(), 0.0, constants.slot0Gains.kD().get());
         break;
@@ -118,17 +142,6 @@ public class ArmIOSim implements ArmIO {
   }
 
   @Override
-  public void setPosition(Rotation2d position) {
-    armSim.setState(position.getRadians(), 0);
-  }
-
-  @Override
-  public void setPositionGoal(Rotation2d rotationGoal) {
-    isClosedLoop = true;
-    feedback.setGoal(rotationGoal.getRadians());
-  }
-
-  @Override
   public void updateGains(
       double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
     feedback.setPID(kP, 0, kD);
@@ -137,16 +150,11 @@ public class ArmIOSim implements ArmIO {
 
   @Override
   public void updateConstraints(
-      double cruisingVelocityRadiansPerSecond,
-      double maxAccelerationRadiansPerSecondSquared,
-      double goalToleranceRadians) {
+      AngularAcceleration maxAcceleration,
+      AngularVelocity maxVelocity,
+      Rotation2d goalTolerance) {
     feedback.setConstraints(
-        new Constraints(cruisingVelocityRadiansPerSecond, maxAccelerationRadiansPerSecondSquared));
-    feedback.setTolerance(goalToleranceRadians);
-  }
-
-  @Override
-  public boolean atGoal() {
-    return feedback.atGoal();
+        new Constraints(maxVelocity.in(RadiansPerSecond), maxAcceleration.in(RadiansPerSecondPerSecond)));
+    feedback.setTolerance(goalTolerance.getRadians());
   }
 }

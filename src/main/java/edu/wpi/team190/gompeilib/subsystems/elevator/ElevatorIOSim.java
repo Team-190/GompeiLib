@@ -7,18 +7,20 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import java.util.Arrays;
 
 public class ElevatorIOSim implements ElevatorIO {
   private final ElevatorSim sim;
 
+  private Voltage appliedVolts;
+  private boolean isClosedLoop;
+
   private final ProfiledPIDController feedback;
   private ElevatorFeedforward feedforward;
-
-  private double appliedVolts;
-  private boolean isClosedLoop;
 
   private final ElevatorConstants constants;
 
@@ -36,6 +38,9 @@ public class ElevatorIOSim implements ElevatorIO {
             true,
             constants.elevatorParameters.MIN_HEIGHT_METERS());
 
+    appliedVolts = Volts.of(0.0);
+    isClosedLoop = true;
+
     feedback =
         new ProfiledPIDController(
             constants.slot0Gains.kP().get(),
@@ -52,9 +57,6 @@ public class ElevatorIOSim implements ElevatorIO {
             constants.slot0Gains.kV().get(),
             constants.slot0Gains.kA().get());
 
-    appliedVolts = 0;
-    isClosedLoop = true;
-
     this.constants = constants;
   }
 
@@ -62,49 +64,60 @@ public class ElevatorIOSim implements ElevatorIO {
   public void updateInputs(ElevatorIOInputs inputs) {
     if (isClosedLoop) {
       appliedVolts =
-          feedback.calculate(sim.getPositionMeters())
-              + feedforward.calculate((feedback.getSetpoint().velocity));
+          Volts.of(feedback.calculate(sim.getPositionMeters())
+              + feedforward.calculate((feedback.getSetpoint().velocity)));
     }
 
-    appliedVolts = MathUtil.clamp(appliedVolts, -12, 12);
+    appliedVolts = Volts.of(MathUtil.clamp(appliedVolts.in(Volts), -12, 12));
 
-    sim.setInputVoltage(appliedVolts);
-    sim.update(0.02); // TODO: Replace with a constant
+    sim.setInputVoltage(appliedVolts.in(Volts));
+    sim.update(GompeiLib.getLoopPeriod());
 
-    inputs.positionSetpointMeters = sim.getPositionMeters();
-    inputs.velocityMetersPerSecond = sim.getVelocityMetersPerSecond();
-    inputs.accelerationMetersPerSecondSquared =
-        -1; // TODO: Replace with calculation based on velocity
+    inputs.position = Meters.of(sim.getPositionMeters());
+    inputs.velocity = MetersPerSecond.of(sim.getVelocityMetersPerSecond());
+    inputs.acceleration =
+        MetersPerSecondPerSecond.of(-1.0); // TODO: Replace with calculation based on velocity
 
-    inputs.appliedVolts = new double[constants.elevatorParameters.NUM_MOTORS()];
-    inputs.supplyCurrentAmps = new double[constants.elevatorParameters.NUM_MOTORS()];
-    inputs.torqueCurrentAmps = new double[constants.elevatorParameters.NUM_MOTORS()];
-    inputs.temperatureCelsius = new double[constants.elevatorParameters.NUM_MOTORS()];
+    inputs.appliedVolts = new Voltage[constants.elevatorParameters.NUM_MOTORS()];
+    inputs.supplyCurrentAmps = new Current[constants.elevatorParameters.NUM_MOTORS()];
+    inputs.torqueCurrentAmps = new Current[constants.elevatorParameters.NUM_MOTORS()];
+    inputs.temperatureCelsius = new Temperature[constants.elevatorParameters.NUM_MOTORS()];
 
     Arrays.fill(inputs.appliedVolts, appliedVolts);
-    Arrays.fill(inputs.supplyCurrentAmps, sim.getCurrentDrawAmps());
-    Arrays.fill(inputs.torqueCurrentAmps, sim.getCurrentDrawAmps());
-    Arrays.fill(inputs.temperatureCelsius, 0);
+    Arrays.fill(inputs.supplyCurrentAmps, Amps.of(sim.getCurrentDrawAmps()));
+    Arrays.fill(inputs.torqueCurrentAmps, Amps.of(sim.getCurrentDrawAmps()));
+    Arrays.fill(inputs.temperatureCelsius, Celsius.of(0.0));
 
-    inputs.positionGoalMeters = feedback.getGoal().position;
-    inputs.positionSetpointMeters = feedback.getSetpoint().position;
-    inputs.positionErrorMeters = feedback.getPositionError();
+    inputs.positionGoalMeters = Meters.of(feedback.getGoal().position);
+    inputs.positionSetpointMeters = Meters.of(feedback.getSetpoint().position);
+    inputs.positionErrorMeters = Meters.of(feedback.getPositionError());
   }
 
   @Override
-  public void setPosition(double positionMeters) {
-    sim.setState(positionMeters, sim.getVelocityMetersPerSecond());
+  public void setVoltageGoal(Voltage volts) {
+    isClosedLoop = false;
+    appliedVolts = volts;
   }
 
   @Override
-  public void setPositionGoal(double positionMeters) {
-    feedback.setGoal(positionMeters);
+  public void setPositionGoal(Distance position) {
+    feedback.setGoal(position.in(Meters));
     isClosedLoop = true;
   }
 
   @Override
-  public void setPositionGoal(double positionMeters, GainSlot slot) {
-    setPositionGoal(positionMeters);
+  public boolean atVoltageGoal(Voltage voltageReference) {
+    return appliedVolts.isNear(voltageReference, Millivolt.of(500));
+  }
+
+  @Override
+  public boolean atPositionGoal(Distance positionReference) {
+    return Meters.of(sim.getPositionMeters()).isNear(positionReference, constants.constraints.goalTolerance().get());
+  }
+
+  @Override
+  public void setPosition(Distance position) {
+    sim.setState(position.in(Meters), sim.getVelocityMetersPerSecond());
   }
 
   @Override
@@ -123,18 +136,6 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void setVoltage(double volts) {
-    isClosedLoop = false;
-    appliedVolts = volts;
-  }
-
-  @Override
-  public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG) {
-    feedback.setPID(kP, 0, kD);
-    feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
-  }
-
-  @Override
   public void updateGains(
       double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
     feedback.setPID(kP, 0, kD);
@@ -143,8 +144,8 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void updateConstraints(
-      double maxAcceleration, double cruisingVelocity, double goalTolerance) {
-    feedback.setConstraints(new TrapezoidProfile.Constraints(cruisingVelocity, maxAcceleration));
-    feedback.setTolerance(goalTolerance);
+          LinearAcceleration maxAcceleration, LinearVelocity maxVelocity, Distance goalTolerance) {
+    feedback.setConstraints(new TrapezoidProfile.Constraints(maxVelocity.in(MetersPerSecond), maxAcceleration.in(MetersPerSecondPerSecond)));
+    feedback.setTolerance(goalTolerance.in(Meters));
   }
 }
