@@ -22,6 +22,8 @@ public interface ElevatorIO {
     public Distance positionGoalMeters = Meters.of(0.0);
     public Distance positionSetpointMeters = Meters.of(0.0);
     public Distance positionErrorMeters = Meters.of(0.0);
+
+    public GainSlot gainSlot;
   }
 
   /**
@@ -89,7 +91,7 @@ public interface ElevatorIO {
    */
 
   default void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {}
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {}
 
   /**
    * Sets the constraints for the elevator.

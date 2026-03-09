@@ -214,8 +214,8 @@ public class ArmIOTalonFX implements ArmIO {
 
   @Override
   public void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
-    switch (slot) {
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {
+    switch (gainSlot) {
       case ZERO:
         config.Slot0.withKP(kP).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
         break;

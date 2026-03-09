@@ -15,14 +15,13 @@ import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import java.util.Arrays;
 
 public class ArmIOSim implements ArmIO {
-  public SingleJointedArmSim armSim;
+  private final SingleJointedArmSim armSim;
 
   private Voltage appliedVolts;
+  private boolean isClosedLoop;
 
   private final ProfiledPIDController feedback;
   private ArmFeedforward feedforward;
-
-  private boolean isClosedLoop;
 
   private final ArmConstants constants;
 
@@ -42,6 +41,7 @@ public class ArmIOSim implements ArmIO {
             constants.armParameters.minAngle().getRadians());
 
     appliedVolts = Volts.of(0.0);
+    isClosedLoop = true;
 
     feedback =
         new ProfiledPIDController(
@@ -57,15 +57,12 @@ public class ArmIOSim implements ArmIO {
           constants.armParameters.maxAngle().getRadians());
     }
     feedback.setTolerance(constants.constraints.goalTolerance().get().in(Radians));
-
     feedforward =
         new ArmFeedforward(
             constants.slot0Gains.kS().get(),
             constants.slot0Gains.kV().get(),
             constants.slot0Gains.kA().get(),
             constants.slot0Gains.kG().get());
-
-    isClosedLoop = true;
 
     this.constants = constants;
   }
@@ -143,7 +140,7 @@ public class ArmIOSim implements ArmIO {
 
   @Override
   public void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {
     feedback.setPID(kP, 0, kD);
     feedforward = new ArmFeedforward(kS, kG, kV);
   }

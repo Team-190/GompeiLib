@@ -12,7 +12,6 @@ public interface ArmIO {
   @AutoLog
   public static class ArmIOInputs {
     public Rotation2d position = new Rotation2d();
-
     public AngularVelocity velocity = RadiansPerSecond.of(0.0);
     public AngularAcceleration acceleration = RadiansPerSecondPerSecond.of(0.0);
 
@@ -25,7 +24,7 @@ public interface ArmIO {
     public Rotation2d positionSetpoint = new Rotation2d();
     public Rotation2d positionError = new Rotation2d();
 
-    public GainSlot slot;
+    public GainSlot gainSlot;
   }
 
   /**
@@ -90,7 +89,7 @@ public interface ArmIO {
    * @param kG the gravity gain.
    */
   default void updateGains(
-          double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {}
+          double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {}
 
   /**
    * Sets the constraints for the arm.

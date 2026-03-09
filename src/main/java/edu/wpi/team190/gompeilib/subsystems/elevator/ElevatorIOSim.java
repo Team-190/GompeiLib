@@ -137,7 +137,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {
     feedback.setPID(kP, 0, kD);
     feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
   }

@@ -1,58 +1,51 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.AutoLog;
+
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 public interface GenericFlywheelIO {
 
   @AutoLog
   public static class GenericFlywheelIOInputs {
-    public Rotation2d positionRadians = new Rotation2d();
-    public double velocityRadiansPerSecond = 0.0;
+    public Rotation2d position = new Rotation2d();
+    public AngularVelocity velocity = RadiansPerSecond.of(0.0);
 
-    public double[] appliedVolts = new double[] {};
-    public double[] supplyCurrentAmps = new double[] {};
-    public double[] torqueCurrentAmps = new double[] {};
-    public double[] temperatureCelsius = new double[] {};
+    public Voltage[] appliedVolts = new Voltage[] {};
+    public Current[] supplyCurrentAmps = new Current[] {};
+    public Current[] torqueCurrentAmps = new Current[] {};
+    public Temperature[] temperatureCelsius = new Temperature[] {};
 
-    public double velocityGoalRadiansPerSecond = 0.0;
-    public double velocitySetpointRadiansPerSecond = 0.0;
-    public double velocityErrorRadiansPerSecond = 0.0;
+    public AngularVelocity velocityGoal = RadiansPerSecond.of(0.0);
+    public AngularVelocity velocitySetpoint = RadiansPerSecond.of(0.0);
+    public AngularVelocity velocityError = RadiansPerSecond.of(0.0);
+
+    public GainSlot gainSlot;
   }
 
-  public default void updateInputs(GenericFlywheelIOInputs inputs) {}
-  ;
+  default void updateInputs(GenericFlywheelIOInputs inputs) {}
 
-  public default void setVoltage(double volts) {}
-  ;
+  default void setVoltageGoal(Voltage voltageGoal) {}
 
-  public default void setAmps(double amps) {}
-  ;
+  default void setCurrentGoal(Current currentGoal) {}
 
-  public default void setVelocityVoltage(double velocityRadiansPerSecond) {}
-  ;
+  default void setVelocityGoal(AngularVelocity velocityGoal) {}
 
-  public default void setVelocityTorque(double velocityRadiansPerSecond, double feedForward) {}
-  ;
+  default void setVelocityGoal(AngularVelocity velocityGoal, Current currentFeedforward) {}
 
-  public default void setPID(GainSlot slot, double kP, double kI, double kD) {}
-  ;
+  default boolean atVoltageGoal(Voltage voltageReference) {return false;}
 
-  public default void setFeedforward(GainSlot slot, double kS, double kV, double kA) {}
-  ;
+  default boolean atCurrentGoal(Current currentReference) {return false;}
 
-  public default void setProfile(
-      double maxAccelerationRadiansPerSecondSquared,
-      double cruisingVelocityRadiansPerSecond,
-      double goalToleranceRadiansPerSecond) {}
-  ;
+  default boolean atVelocityGoal(AngularVelocity velocityReference) {return false;}
 
-  public default boolean atGoal() {
-    return false;
-  }
-  ;
+  default void updateGains(double kP, double kI, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {}
 
-  public default void stop() {}
-  ;
+  default void updateConstraints(
+      AngularAcceleration maxAcceleration,
+      AngularVelocity maxVelocity,
+      AngularVelocity goalTolerance) {}
 }

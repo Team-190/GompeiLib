@@ -1,14 +1,17 @@
 package edu.wpi.team190.gompeilib.core.utility.control;
 
-import edu.wpi.first.units.*;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.AngularAccelerationUnit;
+import edu.wpi.first.units.AngularVelocityUnit;
+import edu.wpi.first.units.Measure;
 import edu.wpi.team190.gompeilib.core.utility.tunable.LoggedTunableMeasure;
 import lombok.Builder;
 import lombok.NonNull;
 
 /** Specifically for Angular constraints (Degrees, Radians, Rotations). */
 @Builder(setterPrefix = "with")
-public record AngularConstraints(
-    LoggedTunableMeasure<AngleUnit> goalTolerance,
+public record AngularVelocityConstraints(
+    LoggedTunableMeasure<AngularVelocityUnit> goalTolerance,
     LoggedTunableMeasure<AngularVelocityUnit> maxVelocity,
     LoggedTunableMeasure<AngularAccelerationUnit> maxAcceleration) {
 
@@ -16,9 +19,9 @@ public record AngularConstraints(
       setterPrefix = "with",
       builderClassName = "FromMeasures",
       builderMethodName = "fromMeasures")
-  public AngularConstraints(
+  public AngularVelocityConstraints(
       @NonNull String prefix,
-      Measure<AngleUnit> goalTolerance,
+      Measure<AngularVelocityUnit> goalTolerance,
       Measure<AngularVelocityUnit> maxVelocity,
       Measure<AngularAccelerationUnit> maxAcceleration) {
     this(
