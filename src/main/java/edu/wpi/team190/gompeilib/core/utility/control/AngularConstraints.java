@@ -2,10 +2,9 @@ package edu.wpi.team190.gompeilib.core.utility.control;
 
 import edu.wpi.first.units.*;
 import edu.wpi.team190.gompeilib.core.utility.tunable.LoggedTunableMeasure;
+import java.util.function.Consumer;
 import lombok.Builder;
 import lombok.NonNull;
-
-import java.util.function.Consumer;
 
 /** Specifically for Angular constraints (Degrees, Radians, Rotations). */
 @Builder(setterPrefix = "with")
@@ -42,6 +41,7 @@ public record AngularConstraints(
   }
 
   public void update(int id, Consumer<AngularConstraints> consumer) {
-    LoggedTunableMeasure.ifChanged(id, ()->consumer.accept(this), goalTolerance, maxVelocity, maxAcceleration);
+    LoggedTunableMeasure.ifChanged(
+        id, () -> consumer.accept(this), goalTolerance, maxVelocity, maxAcceleration);
   }
 }

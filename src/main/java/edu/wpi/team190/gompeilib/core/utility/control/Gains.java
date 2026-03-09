@@ -3,7 +3,6 @@ package edu.wpi.team190.gompeilib.core.utility.control;
 import edu.wpi.team190.gompeilib.core.utility.tunable.LoggedTunableNumber;
 import java.util.function.Consumer;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NonNull;
 
 @Builder(setterPrefix = "with")
@@ -42,21 +41,27 @@ public record Gains(
   public double getKP() {
     return kP.get();
   }
+
   public double getKI() {
     return kI.get();
   }
+
   public double getKD() {
     return kD.get();
   }
+
   public double getKS() {
     return kS.get();
   }
+
   public double getKV() {
     return kV.get();
   }
+
   public double getKA() {
     return kA.get();
   }
+
   public double getKG() {
     return kG.get();
   }
