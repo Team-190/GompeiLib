@@ -2,7 +2,6 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -14,9 +13,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import edu.wpi.team190.gompeilib.core.utility.sysid.CustomSysIdRoutine;
 import edu.wpi.team190.gompeilib.core.utility.sysid.CustomUnits;
-
 import java.util.function.Supplier;
-
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
@@ -62,17 +59,18 @@ public class GenericFlywheel {
             Volts.mutable(0));
 
     torqueCharacterizationRoutine =
-            new CustomSysIdRoutine<>(
-                    new CustomSysIdRoutine.Config<CurrentUnit>(
-                            CustomUnits.ampsPerSecond.ofNative(0.5),
-                            Amps.of(3.5),
-                            Seconds.of(10),
-                            (state) ->
-                                    Logger.recordOutput(
-                                            aKitTopic + "/Torque Current SysID State", state.toString()),
-                            Amp),
-                    new CustomSysIdRoutine.Mechanism<>((amps) -> io.setCurrentGoal(Amps.of(amps.in(Amps))), subsystem),
-                    Amp.mutable(0));
+        new CustomSysIdRoutine<>(
+            new CustomSysIdRoutine.Config<CurrentUnit>(
+                CustomUnits.ampsPerSecond.ofNative(0.5),
+                Amps.of(3.5),
+                Seconds.of(10),
+                (state) ->
+                    Logger.recordOutput(
+                        aKitTopic + "/Torque Current SysID State", state.toString()),
+                Amp),
+            new CustomSysIdRoutine.Mechanism<>(
+                (amps) -> io.setCurrentGoal(Amps.of(amps.in(Amps))), subsystem),
+            Amp.mutable(0));
   }
 
   public void periodic() {
@@ -110,8 +108,8 @@ public class GenericFlywheel {
   }
 
   public void setVoltageGoal(Voltage voltageGoal) {
-              currentState = GenericFlywheelState.VOLTAGE_CONTROL;
-              this.voltageGoal = voltageGoal;
+    currentState = GenericFlywheelState.VOLTAGE_CONTROL;
+    this.voltageGoal = voltageGoal;
   }
 
   public void setVelocityGoal(AngularVelocity velocityGoal) {
@@ -120,21 +118,21 @@ public class GenericFlywheel {
   }
 
   public void setVelocityGoal(Supplier<AngularVelocity> velocityGoal) {
-          currentState = GenericFlywheelState.VELOCITY_VOLTAGE_CONTROL;
-          this.velocityGoal = velocityGoal.get();
+    currentState = GenericFlywheelState.VELOCITY_VOLTAGE_CONTROL;
+    this.velocityGoal = velocityGoal.get();
   }
 
   public void setVelocityGoal(AngularVelocity velocityGoal, Current currentGoal) {
-          currentState = GenericFlywheelState.VELOCITY_TORQUE_CONTROL;
-          this.velocityGoal = velocityGoal;
-          this.currentGoal = currentGoal;
+    currentState = GenericFlywheelState.VELOCITY_TORQUE_CONTROL;
+    this.velocityGoal = velocityGoal;
+    this.currentGoal = currentGoal;
   }
 
   public void setVelocityGoal(
-          Supplier<AngularVelocity> velocityGoal, Supplier<Current> currentGoal) {
-          currentState = GenericFlywheelState.VELOCITY_TORQUE_CONTROL;
-          this.velocityGoal = velocityGoal.get();
-          this.currentGoal = currentGoal.get();
+      Supplier<AngularVelocity> velocityGoal, Supplier<Current> currentGoal) {
+    currentState = GenericFlywheelState.VELOCITY_TORQUE_CONTROL;
+    this.velocityGoal = velocityGoal.get();
+    this.currentGoal = currentGoal.get();
   }
 
   public boolean atVoltageGoal(Voltage voltageReference) {
@@ -165,18 +163,23 @@ public class GenericFlywheel {
     return Commands.waitUntil(this::atVelocityGoal);
   }
 
-  public void updateGains(double kP, double kI, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {
-    io.updateGains(kP,kI, kD, kS, kV, kA, kG, gainSlot);
+  public void updateGains(
+      double kP,
+      double kI,
+      double kD,
+      double kS,
+      double kV,
+      double kA,
+      double kG,
+      GainSlot gainSlot) {
+    io.updateGains(kP, kI, kD, kS, kV, kA, kG, gainSlot);
   }
 
   public void updateConstraints(
-          AngularAcceleration maxAcceleration,
-          AngularVelocity maxVelocity,
-          AngularVelocity goalTolerance) {
-    io.updateConstraints(
-        maxAcceleration,
-        maxVelocity,
-        goalTolerance);
+      AngularAcceleration maxAcceleration,
+      AngularVelocity maxVelocity,
+      AngularVelocity goalTolerance) {
+    io.updateConstraints(maxAcceleration, maxVelocity, goalTolerance);
   }
 
   public Command sysIdRoutineVoltage() {

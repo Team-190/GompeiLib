@@ -5,7 +5,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.team190.gompeilib.core.utility.control.AngularPositionConstraints;
 import edu.wpi.team190.gompeilib.core.utility.control.AngularVelocityConstraints;
 import edu.wpi.team190.gompeilib.core.utility.control.CurrentLimits;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;

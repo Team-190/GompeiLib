@@ -1,10 +1,10 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.AutoLog;
-
-import static edu.wpi.first.units.Units.*;
 
 public interface ElevatorIO {
 
@@ -14,10 +14,10 @@ public interface ElevatorIO {
     public LinearVelocity velocity = MetersPerSecond.of(0.0);
     public LinearAcceleration acceleration = MetersPerSecondPerSecond.of(0.0);
 
-    public Voltage[] appliedVolts = new Voltage[] {};
-    public Current[] supplyCurrentAmps = new Current[] {};
-    public Current[] torqueCurrentAmps = new Current[] {};
-    public Temperature[] temperatureCelsius = new Temperature[] {};
+    public double[] appliedVolts = new double[] {};
+    public double[] supplyCurrentAmps = new double[] {};
+    public double[] torqueCurrentAmps = new double[] {};
+    public double[] temperatureCelsius = new double[] {};
 
     public Distance positionGoalMeters = Meters.of(0.0);
     public Distance positionSetpointMeters = Meters.of(0.0);
@@ -89,7 +89,6 @@ public interface ElevatorIO {
    * @param kA the acceleration gain.
    * @param kG the gravity gain.
    */
-
   default void updateGains(
       double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {}
 

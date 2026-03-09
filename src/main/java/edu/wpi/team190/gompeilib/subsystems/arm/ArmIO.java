@@ -1,12 +1,12 @@
 package edu.wpi.team190.gompeilib.subsystems.arm;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.AutoLog;
-
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
 public interface ArmIO {
   @AutoLog
@@ -15,10 +15,10 @@ public interface ArmIO {
     public AngularVelocity velocity = RadiansPerSecond.of(0.0);
     public AngularAcceleration acceleration = RadiansPerSecondPerSecond.of(0.0);
 
-    public Voltage[] appliedVolts = new Voltage[] {};
-    public Current[] supplyCurrentAmps = new Current[] {};
-    public Current[] torqueCurrentAmps = new Current[] {};
-    public Temperature[] temperatureCelsius = new Temperature[] {};
+    public double[] appliedVolts = new double[] {};
+    public double[] supplyCurrentAmps = new double[] {};
+    public double[] torqueCurrentAmps = new double[] {};
+    public double[] temperatureCelsius = new double[] {};
 
     public Rotation2d positionGoal = new Rotation2d();
     public Rotation2d positionSetpoint = new Rotation2d();
@@ -54,7 +54,9 @@ public interface ArmIO {
    * @param voltageReference The voltage to check against
    * @return True if the voltage matches, false otherwise
    */
-  default boolean atVoltageGoal(Voltage voltageReference) { return false; }
+  default boolean atVoltageGoal(Voltage voltageReference) {
+    return false;
+  }
 
   /**
    * Checks if the position of the arm matches the positionGoal argument
@@ -89,7 +91,7 @@ public interface ArmIO {
    * @param kG the gravity gain.
    */
   default void updateGains(
-          double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {}
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {}
 
   /**
    * Sets the constraints for the arm.
@@ -99,5 +101,5 @@ public interface ArmIO {
    * @param goalTolerance the acceptable tolerance for arm control.
    */
   default void updateConstraints(
-          AngularAcceleration maxAcceleration, AngularVelocity maxVelocity, Rotation2d goalTolerance) {}
+      AngularAcceleration maxAcceleration, AngularVelocity maxVelocity, Rotation2d goalTolerance) {}
 }

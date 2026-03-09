@@ -29,8 +29,7 @@ public class Elevator {
 
   public final ElevatorConstants constants;
 
-  public Elevator(
-          ElevatorConstants constants, Subsystem subsystem, int index, ElevatorIO io) {
+  public Elevator(ElevatorConstants constants, Subsystem subsystem, int index, ElevatorIO io) {
     this.io = io;
     this.inputs = new ElevatorIOInputsAutoLogged();
 
@@ -70,16 +69,18 @@ public class Elevator {
     }
   }
 
-  public Distance getElevatorPosition() {return inputs.position;}
+  public Distance getElevatorPosition() {
+    return inputs.position;
+  }
 
   public void setVoltageGoal(Voltage voltageGoal) {
-              currentState = ElevatorState.OPEN_LOOP_VOLTAGE_CONTROL;
-              this.voltageGoal = voltageGoal;
+    currentState = ElevatorState.OPEN_LOOP_VOLTAGE_CONTROL;
+    this.voltageGoal = voltageGoal;
   }
 
   public void setPositionGoal(Distance positionGoal) {
-              currentState = ElevatorState.CLOSED_LOOP_POSITION_CONTROL;
-              this.positionGoal = positionGoal;
+    currentState = ElevatorState.CLOSED_LOOP_POSITION_CONTROL;
+    this.positionGoal = positionGoal;
   }
 
   public boolean atVoltageGoal(Voltage voltageReference) {
@@ -102,31 +103,33 @@ public class Elevator {
     io.setPosition(position);
   }
 
-  public void setGainSlot(GainSlot gainSlot) {io.setGainSlot(gainSlot);}
-  
+  public void setGainSlot(GainSlot gainSlot) {
+    io.setGainSlot(gainSlot);
+  }
+
   public Command waitUntilAtGoal() {
     return Commands.waitUntil(this::atPositionGoal);
   }
 
   public void updateGains(
-          double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
     io.updateGains(kP, kD, kS, kV, kA, kG, slot);
   }
 
   public void updateConstraints(
-          LinearAcceleration maxAcceleration, LinearVelocity maxVelocity, Distance goalTolerance) {
+      LinearAcceleration maxAcceleration, LinearVelocity maxVelocity, Distance goalTolerance) {
     io.updateConstraints(maxAcceleration, maxVelocity, goalTolerance);
   }
 
   public Command runSysIdRoutine() {
     return Commands.sequence(
-            Commands.runOnce(() -> currentState = ElevatorState.IDLE),
-            characterizationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
-            Commands.waitSeconds(1.0),
-            characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
-            Commands.waitSeconds(1.0),
-            characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward),
-            Commands.waitSeconds(1.0),
-            characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+        Commands.runOnce(() -> currentState = ElevatorState.IDLE),
+        characterizationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
   }
 }

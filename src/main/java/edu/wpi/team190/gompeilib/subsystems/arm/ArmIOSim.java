@@ -71,9 +71,10 @@ public class ArmIOSim implements ArmIO {
   public void updateInputs(ArmIOInputs inputs) {
     if (isClosedLoop)
       appliedVolts =
-          Volts.of(feedback.calculate(armSim.getAngleRads())
-              + feedforward.calculate(
-                  feedback.getSetpoint().position, feedback.getSetpoint().velocity));
+          Volts.of(
+              feedback.calculate(armSim.getAngleRads())
+                  + feedforward.calculate(
+                      feedback.getSetpoint().position, feedback.getSetpoint().velocity));
 
     appliedVolts = Volts.of(MathUtil.clamp(appliedVolts.in(Volts), -12.0, 12.0));
     armSim.setInputVoltage(appliedVolts.in(Volts));
@@ -82,14 +83,14 @@ public class ArmIOSim implements ArmIO {
     inputs.position = Rotation2d.fromRadians(armSim.getAngleRads());
     inputs.velocity = RadiansPerSecond.of(armSim.getVelocityRadPerSec());
 
-    inputs.appliedVolts = new Voltage[constants.armParameters.numMotors()];
-    inputs.supplyCurrentAmps = new Current[constants.armParameters.numMotors()];
-    inputs.torqueCurrentAmps = new Current[constants.armParameters.numMotors()];
-    inputs.temperatureCelsius = new Temperature[constants.armParameters.numMotors()];
+    inputs.appliedVolts = new double[constants.armParameters.numMotors()];
+    inputs.supplyCurrentAmps = new double[constants.armParameters.numMotors()];
+    inputs.torqueCurrentAmps = new double[constants.armParameters.numMotors()];
+    inputs.temperatureCelsius = new double[constants.armParameters.numMotors()];
 
-    Arrays.fill(inputs.appliedVolts, appliedVolts);
-    Arrays.fill(inputs.supplyCurrentAmps, Amps.of(armSim.getCurrentDrawAmps()));
-    Arrays.fill(inputs.torqueCurrentAmps, Amps.of(armSim.getCurrentDrawAmps()));
+    Arrays.fill(inputs.appliedVolts, appliedVolts.in(Volts));
+    Arrays.fill(inputs.supplyCurrentAmps, armSim.getCurrentDrawAmps());
+    Arrays.fill(inputs.torqueCurrentAmps, armSim.getCurrentDrawAmps());
 
     inputs.positionGoal = Rotation2d.fromRadians(feedback.getGoal().position);
     inputs.positionSetpoint = Rotation2d.fromRadians(feedback.getSetpoint().position);
@@ -115,7 +116,8 @@ public class ArmIOSim implements ArmIO {
 
   @Override
   public boolean atPositionGoal(Rotation2d positionReference) {
-    return Math.abs(positionReference.getRadians() - armSim.getAngleRads()) < constants.constraints.goalTolerance().get(Radians);
+    return Math.abs(positionReference.getRadians() - armSim.getAngleRads())
+        < constants.constraints.goalTolerance().get(Radians);
   }
 
   @Override
@@ -147,11 +149,10 @@ public class ArmIOSim implements ArmIO {
 
   @Override
   public void updateConstraints(
-      AngularAcceleration maxAcceleration,
-      AngularVelocity maxVelocity,
-      Rotation2d goalTolerance) {
+      AngularAcceleration maxAcceleration, AngularVelocity maxVelocity, Rotation2d goalTolerance) {
     feedback.setConstraints(
-        new Constraints(maxVelocity.in(RadiansPerSecond), maxAcceleration.in(RadiansPerSecondPerSecond)));
+        new Constraints(
+            maxVelocity.in(RadiansPerSecond), maxAcceleration.in(RadiansPerSecondPerSecond)));
     feedback.setTolerance(goalTolerance.getRadians());
   }
 }

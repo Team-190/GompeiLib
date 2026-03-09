@@ -47,10 +47,10 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
         new SimpleMotorFeedforward(
             constants.voltageGains.kS().get(), constants.voltageGains.kV().get());
     profile =
-            new LinearProfile(
-                    constants.constraints.maxAcceleration().get().in(RadiansPerSecondPerSecond),
-                    constants.constraints.maxVelocity().get().in(RadiansPerSecond),
-                    1 / GompeiLib.getLoopPeriod());
+        new LinearProfile(
+            constants.constraints.maxAcceleration().get().in(RadiansPerSecondPerSecond),
+            constants.constraints.maxVelocity().get().in(RadiansPerSecond),
+            1 / GompeiLib.getLoopPeriod());
 
     this.constants = constants;
 
@@ -60,21 +60,26 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
   @Override
   public void updateInputs(GenericFlywheelIOInputs inputs) {
     if (isClosedLoop)
-      appliedVolts = Volts.of(feedback.calculate(motorSim.getAngularVelocityRadPerSec()) + feedforward.calculate(feedback.getSetpoint()));
+      appliedVolts =
+          Volts.of(
+              feedback.calculate(motorSim.getAngularVelocityRadPerSec())
+                  + feedforward.calculate(feedback.getSetpoint()));
 
     appliedVolts = Volts.of(MathUtil.clamp(appliedVolts.in(Volts), -12.0, 12.0));
     motorSim.setInputVoltage(appliedVolts.in(Volts));
     motorSim.update(1.0 / GompeiLib.getLoopPeriod());
 
-    accumulatedPosition = Radians.of(accumulatedPosition.in(Radians) + (motorSim.getAngularVelocityRadPerSec() * (1.0 / GompeiLib.getLoopPeriod())));
+    accumulatedPosition =
+        Radians.of(
+            accumulatedPosition.in(Radians)
+                + (motorSim.getAngularVelocityRadPerSec() * GompeiLib.getLoopPeriod()));
 
-    inputs.position =
-        Rotation2d.fromRadians(accumulatedPosition.in(Radians));
+    inputs.position = Rotation2d.fromRadians(accumulatedPosition.in(Radians));
     inputs.velocity = motorSim.getAngularVelocity();
 
-    Arrays.fill(inputs.appliedVolts, appliedVolts);
-    Arrays.fill(inputs.supplyCurrentAmps, Amps.of(motorSim.getCurrentDrawAmps()));
-    Arrays.fill(inputs.torqueCurrentAmps, Amps.of(motorSim.getCurrentDrawAmps()));
+    Arrays.fill(inputs.appliedVolts, appliedVolts.in(Volts));
+    Arrays.fill(inputs.supplyCurrentAmps, motorSim.getCurrentDrawAmps());
+    Arrays.fill(inputs.torqueCurrentAmps, motorSim.getCurrentDrawAmps());
 
     inputs.velocityGoal = RadiansPerSecond.of(profile.getGoal());
     inputs.velocitySetpoint = RadiansPerSecond.of(feedback.getSetpoint());
@@ -90,8 +95,9 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
   public void setVelocityGoal(AngularVelocity velocityGoal) {
     profile.setGoal(velocityGoal.in(RadiansPerSecond), motorSim.getAngularVelocityRadPerSec());
     appliedVolts =
-        Volts.of(feedback.calculate(motorSim.getAngularVelocityRadPerSec(), profile.calculateSetpoint())
-            + feedforward.calculate(feedback.getSetpoint()));
+        Volts.of(
+            feedback.calculate(motorSim.getAngularVelocityRadPerSec(), profile.calculateSetpoint())
+                + feedforward.calculate(feedback.getSetpoint()));
   }
 
   @Override
@@ -101,11 +107,21 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
 
   @Override
   public boolean atVelocityGoal(AngularVelocity velocityReference) {
-    return motorSim.getAngularVelocity().isNear(velocityReference, constants.constraints.goalTolerance().get(RadiansPerSecond));
+    return motorSim
+        .getAngularVelocity()
+        .isNear(velocityReference, constants.constraints.goalTolerance().get(RadiansPerSecond));
   }
 
   @Override
-  public void updateGains(double kP, double kI, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {
+  public void updateGains(
+      double kP,
+      double kI,
+      double kD,
+      double kS,
+      double kV,
+      double kA,
+      double kG,
+      GainSlot gainSlot) {
     feedback.setPID(kP, kI, kD);
     feedforward.setKs(kS);
     feedforward.setKv(kV);
@@ -114,9 +130,9 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
 
   @Override
   public void updateConstraints(
-          AngularAcceleration maxAcceleration,
-          AngularVelocity maxVelocity,
-          AngularVelocity goalTolerance) {
+      AngularAcceleration maxAcceleration,
+      AngularVelocity maxVelocity,
+      AngularVelocity goalTolerance) {
     profile.setMaxAcceleration(maxAcceleration.in(RadiansPerSecondPerSecond));
     profile.setMaxVelocity(maxVelocity.in(RadiansPerSecond));
     feedback.setTolerance(goalTolerance.in(RadiansPerSecond));

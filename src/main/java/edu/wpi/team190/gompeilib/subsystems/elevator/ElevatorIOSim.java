@@ -64,8 +64,9 @@ public class ElevatorIOSim implements ElevatorIO {
   public void updateInputs(ElevatorIOInputs inputs) {
     if (isClosedLoop) {
       appliedVolts =
-          Volts.of(feedback.calculate(sim.getPositionMeters())
-              + feedforward.calculate((feedback.getSetpoint().velocity)));
+          Volts.of(
+              feedback.calculate(sim.getPositionMeters())
+                  + feedforward.calculate((feedback.getSetpoint().velocity)));
     }
 
     appliedVolts = Volts.of(MathUtil.clamp(appliedVolts.in(Volts), -12, 12));
@@ -78,15 +79,15 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.acceleration =
         MetersPerSecondPerSecond.of(-1.0); // TODO: Replace with calculation based on velocity
 
-    inputs.appliedVolts = new Voltage[constants.elevatorParameters.NUM_MOTORS()];
-    inputs.supplyCurrentAmps = new Current[constants.elevatorParameters.NUM_MOTORS()];
-    inputs.torqueCurrentAmps = new Current[constants.elevatorParameters.NUM_MOTORS()];
-    inputs.temperatureCelsius = new Temperature[constants.elevatorParameters.NUM_MOTORS()];
+    inputs.appliedVolts = new double[constants.elevatorParameters.NUM_MOTORS()];
+    inputs.supplyCurrentAmps = new double[constants.elevatorParameters.NUM_MOTORS()];
+    inputs.torqueCurrentAmps = new double[constants.elevatorParameters.NUM_MOTORS()];
+    inputs.temperatureCelsius = new double[constants.elevatorParameters.NUM_MOTORS()];
 
-    Arrays.fill(inputs.appliedVolts, appliedVolts);
-    Arrays.fill(inputs.supplyCurrentAmps, Amps.of(sim.getCurrentDrawAmps()));
-    Arrays.fill(inputs.torqueCurrentAmps, Amps.of(sim.getCurrentDrawAmps()));
-    Arrays.fill(inputs.temperatureCelsius, Celsius.of(0.0));
+    Arrays.fill(inputs.appliedVolts, appliedVolts.in(Volts));
+    Arrays.fill(inputs.supplyCurrentAmps, sim.getCurrentDrawAmps());
+    Arrays.fill(inputs.torqueCurrentAmps, sim.getCurrentDrawAmps());
+    Arrays.fill(inputs.temperatureCelsius, 0.0);
 
     inputs.positionGoalMeters = Meters.of(feedback.getGoal().position);
     inputs.positionSetpointMeters = Meters.of(feedback.getSetpoint().position);
@@ -112,7 +113,8 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public boolean atPositionGoal(Distance positionReference) {
-    return Meters.of(sim.getPositionMeters()).isNear(positionReference, constants.constraints.goalTolerance().get());
+    return Meters.of(sim.getPositionMeters())
+        .isNear(positionReference, constants.constraints.goalTolerance().get());
   }
 
   @Override
@@ -121,7 +123,7 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void setSlot(GainSlot slot) {
+  public void setGainSlot(GainSlot slot) {
     switch (slot) {
       case ZERO:
         feedback.setPID(constants.slot0Gains.kP().get(), 0.0, constants.slot0Gains.kD().get());
@@ -144,8 +146,10 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void updateConstraints(
-          LinearAcceleration maxAcceleration, LinearVelocity maxVelocity, Distance goalTolerance) {
-    feedback.setConstraints(new TrapezoidProfile.Constraints(maxVelocity.in(MetersPerSecond), maxAcceleration.in(MetersPerSecondPerSecond)));
+      LinearAcceleration maxAcceleration, LinearVelocity maxVelocity, Distance goalTolerance) {
+    feedback.setConstraints(
+        new TrapezoidProfile.Constraints(
+            maxVelocity.in(MetersPerSecond), maxAcceleration.in(MetersPerSecondPerSecond)));
     feedback.setTolerance(goalTolerance.in(Meters));
   }
 }

@@ -39,15 +39,13 @@ public class Arm {
     positionGoal = Rotation2d.fromRadians(0.0);
 
     characterizationRoutine =
-            new SysIdRoutine(
-                    new SysIdRoutine.Config(
-                            Volts.of(1).per(Second),
-                            Volts.of(9),
-                            Seconds.of(12),
-                            (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
-                    new SysIdRoutine.Mechanism(
-                            io::setVoltageGoal, null, subsystem));
-
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                Volts.of(1).per(Second),
+                Volts.of(9),
+                Seconds.of(12),
+                (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
+            new SysIdRoutine.Mechanism(io::setVoltageGoal, null, subsystem));
   }
 
   public void periodic() {
@@ -71,13 +69,13 @@ public class Arm {
   }
 
   public void setVoltageGoal(Voltage voltageGoal) {
-              currentState = ArmState.OPEN_LOOP_VOLTAGE_CONTROL;
-              this.voltageGoal = voltageGoal;
+    currentState = ArmState.OPEN_LOOP_VOLTAGE_CONTROL;
+    this.voltageGoal = voltageGoal;
   }
 
   public void setPositionGoal(Rotation2d positionGoal) {
-          currentState = ArmState.CLOSED_LOOP_POSITION_CONTROL;
-          this.positionGoal = positionGoal;
+    currentState = ArmState.CLOSED_LOOP_POSITION_CONTROL;
+    this.positionGoal = positionGoal;
   }
 
   public boolean atVoltageGoal(Voltage voltageReference) {
@@ -109,14 +107,12 @@ public class Arm {
   }
 
   public void updateGains(
-          double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
+      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
     io.updateGains(kP, kD, kS, kV, kA, kG, slot);
   }
 
   public void updateConstraints(
-          AngularAcceleration maxAcceleration,
-          AngularVelocity maxVelocity,
-          Rotation2d goalTolerance) {
+      AngularAcceleration maxAcceleration, AngularVelocity maxVelocity, Rotation2d goalTolerance) {
     io.updateConstraints(maxAcceleration, maxVelocity, goalTolerance);
   }
 

@@ -181,21 +181,24 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
 
-    // CTRE status signals are natively in rotations, but setting sensor to mechanism ratio including the circumference of the drum allows us to transform into meters directly from status signal object
+    // CTRE status signals are natively in rotations, but setting sensor to mechanism ratio
+    // including the circumference of the drum allows us to transform into meters directly from
+    // status signal object
     inputs.position = Meters.of(positionRotations.getValueAsDouble());
     inputs.velocity = MetersPerSecond.of(velocityRotationsPerSecond.getValueAsDouble());
-    inputs.acceleration = MetersPerSecondPerSecond.of(accelerationRotationsPerSecondPerSecond.getValueAsDouble());
+    inputs.acceleration =
+        MetersPerSecondPerSecond.of(accelerationRotationsPerSecondPerSecond.getValueAsDouble());
 
-    inputs.appliedVolts = new Voltage[appliedVolts.size()];
-    inputs.supplyCurrentAmps = new Current[supplyCurrentAmps.size()];
-    inputs.torqueCurrentAmps = new Current[torqueCurrentAmps.size()];
-    inputs.temperatureCelsius = new Temperature[temperatureCelsius.size()];
+    inputs.appliedVolts = new double[appliedVolts.size()];
+    inputs.supplyCurrentAmps = new double[supplyCurrentAmps.size()];
+    inputs.torqueCurrentAmps = new double[torqueCurrentAmps.size()];
+    inputs.temperatureCelsius = new double[temperatureCelsius.size()];
 
     for (int i = 0; i <= followTalonFX.length; i++) {
-      inputs.appliedVolts[i] = appliedVolts.get(i).getValue();
-      inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValue();
-      inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValue();
-      inputs.temperatureCelsius[i] = temperatureCelsius.get(i).getValue();
+      inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
+      inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
+      inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValueAsDouble();
+      inputs.temperatureCelsius[i] = temperatureCelsius.get(i).getValueAsDouble();
     }
     inputs.positionGoalMeters = positionGoalMeters;
     inputs.positionSetpointMeters = Meters.of(positionSetpointRotations.getValueAsDouble());
@@ -220,7 +223,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   @Override
   public boolean atPositionGoal(Distance positionReference) {
-    return Math.abs(positionRotations.getValueAsDouble() - positionReference.in(Meters)) <= constants.constraints.goalTolerance().get(Meters);
+    return Math.abs(positionRotations.getValueAsDouble() - positionReference.in(Meters))
+        <= constants.constraints.goalTolerance().get(Meters);
   }
 
   @Override
@@ -228,9 +232,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     talonFX.setPosition(position.in(Meters));
   }
 
-
   @Override
-  public void setSlot(GainSlot slot) {
+  public void setGainSlot(GainSlot slot) {
     switch (slot) {
       case ONE:
         talonFX.setControl(positionVoltageRequest.withSlot(1));

@@ -11,7 +11,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
@@ -176,28 +175,28 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     inputs.position = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
     inputs.velocity = velocityRotationsPerSecond.getValue();
 
-    inputs.appliedVolts = new Voltage[appliedVolts.size()];
-    inputs.supplyCurrentAmps = new Current[supplyCurrentAmps.size()];
-    inputs.torqueCurrentAmps = new Current[torqueCurrentAmps.size()];
-    inputs.temperatureCelsius = new Temperature[temperatureCelsius.size()];
+    inputs.appliedVolts = new double[appliedVolts.size()];
+    inputs.supplyCurrentAmps = new double[supplyCurrentAmps.size()];
+    inputs.torqueCurrentAmps = new double[torqueCurrentAmps.size()];
+    inputs.temperatureCelsius = new double[temperatureCelsius.size()];
 
     for (int i = 0; i <= followerTalonFX.length; i++) {
-      inputs.appliedVolts[i] = appliedVolts.get(i).getValue();
-      inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValue();
-      inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValue();
-      inputs.temperatureCelsius[i] = temperatureCelsius.get(i).getValue();
+      inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
+      inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
+      inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValueAsDouble();
+      inputs.temperatureCelsius[i] = temperatureCelsius.get(i).getValueAsDouble();
     }
 
     inputs.velocityGoal = velocityGoal;
     inputs.velocitySetpoint =
         RotationsPerSecond.of(velocitySetpointRotationsPerSecond.getValueAsDouble());
-    inputs.velocityError =
-        RotationsPerSecond.of(velocityRotationsPerSecond.getValueAsDouble());
+    inputs.velocityError = RotationsPerSecond.of(velocityRotationsPerSecond.getValueAsDouble());
   }
 
   @Override
   public void setVoltageGoal(Voltage voltageGoal) {
-    talonFX.setControl(voltageControlRequest.withOutput(voltageGoal).withEnableFOC(constants.enableFOC));
+    talonFX.setControl(
+        voltageControlRequest.withOutput(voltageGoal).withEnableFOC(constants.enableFOC));
   }
 
   @Override
@@ -209,9 +208,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   public void setVelocityGoal(AngularVelocity velocityGoal) {
     this.velocityGoal = velocityGoal;
     talonFX.setControl(
-        velocityControlRequest
-            .withVelocity(this.velocityGoal)
-            .withEnableFOC(constants.enableFOC));
+        velocityControlRequest.withVelocity(this.velocityGoal).withEnableFOC(constants.enableFOC));
   }
 
   @Override
@@ -235,14 +232,42 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public boolean atVelocityGoal(AngularVelocity velocityReference) {
-    return velocityRotationsPerSecond.isNear(velocityReference, RotationsPerSecond.of(constants.constraints.goalTolerance().get(RotationsPerSecond)));
+    return velocityRotationsPerSecond.isNear(
+        velocityReference,
+        RotationsPerSecond.of(constants.constraints.goalTolerance().get(RotationsPerSecond)));
   }
 
   @Override
-  public void updateGains(double kP, double kI, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {
+  public void updateGains(
+      double kP,
+      double kI,
+      double kD,
+      double kS,
+      double kV,
+      double kA,
+      double kG,
+      GainSlot gainSlot) {
     switch (gainSlot) {
-      case ONE -> talonFXConfiguration.Slot1.withKP(kP).withKI(kI).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
-      default -> talonFXConfiguration.Slot0.withKP(kP).withKI(kI).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
+      case ONE ->
+          talonFXConfiguration
+              .Slot1
+              .withKP(kP)
+              .withKI(kI)
+              .withKD(kD)
+              .withKS(kS)
+              .withKV(kV)
+              .withKA(kA)
+              .withKG(kG);
+      default ->
+          talonFXConfiguration
+              .Slot0
+              .withKP(kP)
+              .withKI(kI)
+              .withKD(kD)
+              .withKS(kS)
+              .withKV(kV)
+              .withKA(kA)
+              .withKG(kG);
     }
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
     for (TalonFX follower : followerTalonFX) {
@@ -252,15 +277,13 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public void updateConstraints(
-          AngularAcceleration maxAcceleration,
-          AngularVelocity maxVelocity,
-          AngularVelocity goalTolerance) {
+      AngularAcceleration maxAcceleration,
+      AngularVelocity maxVelocity,
+      AngularVelocity goalTolerance) {
     talonFXConfiguration
         .MotionMagic
-        .withMotionMagicAcceleration(
-        maxAcceleration)
-        .withMotionMagicCruiseVelocity(
-            maxVelocity);
+        .withMotionMagicAcceleration(maxAcceleration)
+        .withMotionMagicCruiseVelocity(maxVelocity);
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
     for (TalonFX follower : followerTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));

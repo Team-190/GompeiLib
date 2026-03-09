@@ -154,16 +154,16 @@ public class ArmIOTalonFX implements ArmIO {
     inputs.position = new Rotation2d(positionRotations.getValue());
     inputs.velocity = velocityRotationsPerSecond.getValue();
 
-    inputs.appliedVolts = new Voltage[constants.armParameters.numMotors()];
-    inputs.supplyCurrentAmps = new Current[constants.armParameters.numMotors()];
-    inputs.torqueCurrentAmps = new Current[constants.armParameters.numMotors()];
-    inputs.temperatureCelsius = new Temperature[constants.armParameters.numMotors()];
+    inputs.appliedVolts = new double[constants.armParameters.numMotors()];
+    inputs.supplyCurrentAmps = new double[constants.armParameters.numMotors()];
+    inputs.torqueCurrentAmps = new double[constants.armParameters.numMotors()];
+    inputs.temperatureCelsius = new double[constants.armParameters.numMotors()];
 
     for (int i = 0; i < constants.armParameters.numMotors(); i++) {
-      inputs.appliedVolts[i] = appliedVolts.get(i).getValue();
-      inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValue();
-      inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValue();
-      inputs.temperatureCelsius[i] = temperatureCelsius.get(i).getValue();
+      inputs.appliedVolts[i] = appliedVolts.get(i).getValueAsDouble();
+      inputs.supplyCurrentAmps[i] = supplyCurrentAmps.get(i).getValueAsDouble();
+      inputs.torqueCurrentAmps[i] = torqueCurrentAmps.get(i).getValueAsDouble();
+      inputs.temperatureCelsius[i] = temperatureCelsius.get(i).getValueAsDouble();
     }
 
     inputs.positionGoal = new Rotation2d(positionVoltageRequest.getPositionMeasure());
@@ -190,7 +190,7 @@ public class ArmIOTalonFX implements ArmIO {
   @Override
   public boolean atPositionGoal(Rotation2d positionReference) {
     return Math.abs(positionRotations.getValueAsDouble() - positionReference.getRotations())
-            < constants.constraints.goalTolerance().get().in(Rotations);
+        < constants.constraints.goalTolerance().get().in(Rotations);
   }
 
   @Override
@@ -237,15 +237,11 @@ public class ArmIOTalonFX implements ArmIO {
 
   @Override
   public void updateConstraints(
-          AngularAcceleration maxAcceleration,
-          AngularVelocity maxVelocity,
-          Rotation2d goalTolerance) {
+      AngularAcceleration maxAcceleration, AngularVelocity maxVelocity, Rotation2d goalTolerance) {
     config.MotionMagic =
         new MotionMagicConfigs()
-            .withMotionMagicAcceleration(
-                maxAcceleration)
-            .withMotionMagicCruiseVelocity(
-                maxVelocity);
+            .withMotionMagicAcceleration(maxAcceleration)
+            .withMotionMagicCruiseVelocity(maxVelocity);
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
     for (int i = 0; i < constants.armParameters.numMotors() - 1; i++) {

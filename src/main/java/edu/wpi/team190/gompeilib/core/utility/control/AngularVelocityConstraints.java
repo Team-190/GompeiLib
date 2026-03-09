@@ -1,6 +1,5 @@
 package edu.wpi.team190.gompeilib.core.utility.control;
 
-import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.Measure;
