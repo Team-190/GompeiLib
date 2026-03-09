@@ -1,5 +1,6 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.roller;
 
+import static edu.wpi.first.units.Units.Millivolts;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.VoltageUnit;
@@ -39,7 +40,7 @@ public class GenericRoller {
     Logger.recordOutput(aKitTopic + "/Voltage Offset", voltageGoalVolts.getOffset());
     Logger.recordOutput(
         aKitTopic + "/Voltage Magnitude",
-        String.format("%.2f", Math.abs(voltageGoalVolts.getSetpoint().baseUnitMagnitude())));
+        String.format("%.1f", Math.abs(voltageGoalVolts.getSetpoint().baseUnitMagnitude())));
 
     io.setVoltage(voltageGoalVolts.getNewSetpoint().baseUnitMagnitude());
   }
@@ -50,6 +51,12 @@ public class GenericRoller {
 
   public Command setVoltage(double volts) {
     return setVoltage(Volts.of(volts));
+  }
+
+  public boolean atGoal(Voltage volts) {
+    return volts
+        .plus(voltageGoalVolts.getOffset())
+        .isNear(voltageGoalVolts.getNewSetpoint(), Millivolts.of(500));
   }
 
   public Command incrementVoltageOffset() {
