@@ -11,7 +11,8 @@ import lombok.NonNull;
 public record AngularConstraints(
     LoggedTunableMeasure<AngleUnit> goalTolerance,
     LoggedTunableMeasure<AngularVelocityUnit> maxVelocity,
-    LoggedTunableMeasure<AngularAccelerationUnit> maxAcceleration) {
+    LoggedTunableMeasure<AngularAccelerationUnit> maxAcceleration)
+    implements Constraints<AngularConstraints> {
 
   @Builder(
       setterPrefix = "with",

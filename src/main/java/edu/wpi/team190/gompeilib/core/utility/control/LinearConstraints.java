@@ -11,7 +11,8 @@ import lombok.NonNull;
 public record LinearConstraints(
     LoggedTunableMeasure<DistanceUnit> goalTolerance,
     LoggedTunableMeasure<LinearVelocityUnit> maxVelocity,
-    LoggedTunableMeasure<LinearAccelerationUnit> maxAcceleration) {
+    LoggedTunableMeasure<LinearAccelerationUnit> maxAcceleration)
+    implements Constraints<LinearConstraints> {
 
   @Builder(
       setterPrefix = "with",
