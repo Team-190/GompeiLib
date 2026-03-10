@@ -22,9 +22,10 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
 
   private Voltage appliedVolts;
   private boolean isClosedLoop;
+  private GainSlot gainSlot;
 
   private final PIDController feedback;
-  private SimpleMotorFeedforward feedforward;
+  private final SimpleMotorFeedforward feedforward;
   private final LinearProfile profile;
 
   GenericFlywheelConstants constants;
@@ -85,15 +86,19 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
     inputs.velocityGoal = RadiansPerSecond.of(profile.getGoal());
     inputs.velocitySetpoint = RadiansPerSecond.of(feedback.getSetpoint());
     inputs.velocityError = RadiansPerSecond.of(feedback.getError());
+
+    inputs.gainSlot = gainSlot;
   }
 
   @Override
   public void setVoltageGoal(Voltage voltageGoal) {
+    isClosedLoop = false;
     appliedVolts = voltageGoal;
   }
 
   @Override
   public void setVelocityGoal(AngularVelocity velocityGoal) {
+    isClosedLoop = true;
     profile.setGoal(velocityGoal.in(RadiansPerSecond), motorSim.getAngularVelocityRadPerSec());
     appliedVolts =
         Volts.of(
@@ -115,6 +120,7 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
 
   @Override
   public void updateGains(Gains gains, GainSlot gainSlot) {
+    this.gainSlot = gainSlot;
     feedback.setPID(gains.kP().get(), gains.kI().get(), gains.kD().get());
     feedforward.setKs(gains.kS().get());
     feedforward.setKv(gains.kV().get());

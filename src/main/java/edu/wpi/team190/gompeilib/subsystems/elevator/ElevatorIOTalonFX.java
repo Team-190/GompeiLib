@@ -205,6 +205,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     inputs.positionGoalMeters = positionGoalMeters;
     inputs.positionSetpointMeters = Meters.of(positionSetpointRotations.getValueAsDouble());
     inputs.positionErrorMeters = Meters.of(positionErrorRotations.getValueAsDouble());
+
+    inputs.gainSlot = GainSlot.integerToGainSlot(talonFX.getClosedLoopSlot().getValue());
   }
 
   @Override

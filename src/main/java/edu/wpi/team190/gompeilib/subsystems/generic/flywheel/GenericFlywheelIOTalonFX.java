@@ -193,6 +193,8 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     inputs.velocitySetpoint =
         RotationsPerSecond.of(velocitySetpointRotationsPerSecond.getValueAsDouble());
     inputs.velocityError = RotationsPerSecond.of(velocityRotationsPerSecond.getValueAsDouble());
+
+    inputs.gainSlot = GainSlot.integerToGainSlot(talonFX.getClosedLoopSlot().getValue());
   }
 
   @Override

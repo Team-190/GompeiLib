@@ -171,6 +171,8 @@ public class ArmIOTalonFX implements ArmIO {
     inputs.positionSetpoint =
         Rotation2d.fromRotations(positionSetpointRotations.getValueAsDouble());
     inputs.positionError = Rotation2d.fromRotations(positionErrorRotations.getValueAsDouble());
+
+    inputs.gainSlot = GainSlot.integerToGainSlot(talonFX.getClosedLoopSlot().getValue());
   }
 
   @Override

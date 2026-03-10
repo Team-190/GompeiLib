@@ -4,5 +4,14 @@ package edu.wpi.team190.gompeilib.core.utility.phoenix;
 public enum GainSlot {
   ZERO,
   ONE,
-  TWO,
+  TWO;
+
+  public static GainSlot integerToGainSlot(Integer integer) {
+      return switch (integer) {
+          case 0 -> ZERO;
+          case 1 -> ONE;
+          case 2 -> TWO;
+          default -> null;
+      };
+  }
 }

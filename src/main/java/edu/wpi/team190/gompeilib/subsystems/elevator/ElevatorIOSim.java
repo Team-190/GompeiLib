@@ -20,6 +20,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
   private Voltage appliedVolts;
   private boolean isClosedLoop;
+  private GainSlot gainSlot;
 
   private final ProfiledPIDController feedback;
   private ElevatorFeedforward feedforward;
@@ -42,6 +43,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
     appliedVolts = Volts.of(0.0);
     isClosedLoop = true;
+    gainSlot = GainSlot.ZERO;
 
     feedback =
         new ProfiledPIDController(
@@ -94,6 +96,8 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.positionGoalMeters = Meters.of(feedback.getGoal().position);
     inputs.positionSetpointMeters = Meters.of(feedback.getSetpoint().position);
     inputs.positionErrorMeters = Meters.of(feedback.getPositionError());
+
+    inputs.gainSlot = gainSlot;
   }
 
   @Override
@@ -104,8 +108,8 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void setPositionGoal(Distance position) {
-    feedback.setGoal(position.in(Meters));
     isClosedLoop = true;
+    feedback.setGoal(position.in(Meters));
   }
 
   @Override
@@ -125,8 +129,9 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void setGainSlot(GainSlot slot) {
-    switch (slot) {
+  public void setGainSlot(GainSlot gainSlot) {
+    this.gainSlot = gainSlot;
+    switch (gainSlot) {
       case ZERO:
         feedback.setPID(constants.slot0Gains.kP().get(), 0.0, constants.slot0Gains.kD().get());
         break;
