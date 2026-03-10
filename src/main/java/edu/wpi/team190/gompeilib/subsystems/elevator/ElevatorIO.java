@@ -1,5 +1,10 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.units.measure.*;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
+import edu.wpi.team190.gompeilib.core.utility.control.LinearConstraints;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -7,18 +12,20 @@ public interface ElevatorIO {
 
   @AutoLog
   public static class ElevatorIOInputs {
-    public double positionMeters = 0.0;
-    public double velocityMetersPerSecond = 0.0;
-    public double accelerationMetersPerSecondSquared = 0.0;
+    public Distance position = Meters.of(0.0);
+    public LinearVelocity velocity = MetersPerSecond.of(0.0);
+    public LinearAcceleration acceleration = MetersPerSecondPerSecond.of(0.0);
 
     public double[] appliedVolts = new double[] {};
     public double[] supplyCurrentAmps = new double[] {};
     public double[] torqueCurrentAmps = new double[] {};
     public double[] temperatureCelsius = new double[] {};
 
-    public double positionGoalMeters = 0.0;
-    public double positionSetpointMeters = 0.0;
-    public double positionErrorMeters = 0.0;
+    public Distance positionGoalMeters = Meters.of(0.0);
+    public Distance positionSetpointMeters = Meters.of(0.0);
+    public Distance positionErrorMeters = Meters.of(0.0);
+
+    public GainSlot gainSlot;
   }
 
   /**
@@ -26,79 +33,65 @@ public interface ElevatorIO {
    *
    * @param inputs The inputs to update.
    */
-  public default void updateInputs(ElevatorIOInputs inputs) {}
-
-  /**
-   * Sets the position of the elevator.
-   *
-   * @param positionMeters The position to set in meters.
-   */
-  public default void setPosition(double positionMeters) {}
-
-  /**
-   * Sets the position goal of the elevator.
-   *
-   * @param positionMeters The position goal of the elevator in meters.
-   */
-  public default void setPositionGoal(double positionMeters) {}
-
-  /**
-   * Sets the position goal of the elevator, while taking in the current slot as an input
-   *
-   * @param positionMeters The position goal of the elevator in meters.
-   * @param slot The slot that the current position goal is being set for.
-   */
-  public default void setPositionGoal(double positionMeters, GainSlot slot) {}
-
-  /**
-   * @param slot The slot to set the elevator to.
-   */
-  public default void setSlot(GainSlot slot) {}
+  default void updateInputs(ElevatorIOInputs inputs) {}
 
   /**
    * Sets the voltage for the elevator.
    *
-   * @param volts The voltage of the elevator in volts.
+   * @param voltageGoal The voltage of the elevator in volts.
    */
-  public default void setVoltage(double volts) {}
+  default void setVoltageGoal(Voltage voltageGoal) {}
+
+  /**
+   * Sets the position goal of the elevator.
+   *
+   * @param positionGoal The position goal of the elevator in meters.
+   */
+  default void setPositionGoal(Distance positionGoal) {}
+
+  /**
+   * Checks if the voltage of the elevator matches the volts argument
+   *
+   * @param voltageReference The voltage to check against
+   * @return True if the voltage matches, false otherwise
+   */
+  default boolean atVoltageGoal(Voltage voltageReference) {
+    return false;
+  }
+
+  /**
+   * Checks if the position of the subsystem matches the positionGoal argument
+   *
+   * @param positionReference the position to check against
+   * @return True if the position matches, false otherwise
+   */
+  default boolean atPositionGoal(Distance positionReference) {
+    return false;
+  }
+
+  /**
+   * Sets the position of the elevator.
+   *
+   * @param position The position to set.
+   */
+  default void setPosition(Distance position) {}
+
+  /**
+   * @param gainSlot The CTRE gain slot to set the elevator to.
+   */
+  default void setGainSlot(GainSlot gainSlot) {}
 
   /**
    * Sets the gains for the elevator.
    *
-   * @param kP the proportional gain.
-   * @param kD the derivative gain.
-   * @param kS the static gain.
-   * @param kV the velocity gain.
-   * @param kA the acceleration gain.
-   * @param kG the gravity gain.
+   * @param gains the gains to update
    */
-  public default void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG) {}
-
-  /**
-   * Sets the gains for the elevator.
-   *
-   * @param kP the proportional gain.
-   * @param kD the derivative gain.
-   * @param kS the static gain.
-   * @param kV the velocity gain.
-   * @param kA the acceleration gain.
-   * @param kG the gravity gain.
-   * @param slot the PID slot to change the gains for
-   */
-  public default void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {}
+  default void updateGains(Gains gains, GainSlot gainSlot) {}
 
   /**
    * Sets the constraints for the elevator.
    *
-   * @param maxAcceleration the max acceleration of the elevator.
-   * @param cruisingVelocity the cruising velocity
+   * @param constraints the constraints to update
    */
-  public default void updateConstraints(
-      double maxAcceleration, double cruisingVelocity, double goalTolerance) {}
-
-  public default boolean atGoal() {
-    return false;
-  }
+  default void updateConstraints(LinearConstraints constraints) {}
 }
