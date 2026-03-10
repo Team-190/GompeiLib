@@ -1,5 +1,7 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.roller;
 
+import static edu.wpi.first.units.Units.Millivolts;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -8,7 +10,6 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil;
@@ -122,17 +123,15 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
       follower.optimizeBusUtilization();
     }
 
-    voltageRequest = new VoltageOut(0.0);
+    voltageRequest = new VoltageOut(0.0).withEnableFOC(false);
 
     this.constants = constants;
   }
 
   @Override
   public void updateInputs(GenericRollerIOInputs inputs) {
-
-    inputs.positionRadians = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
-    inputs.velocityRadiansPerSecond =
-        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());
+    inputs.position = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
+    inputs.velocity = velocityRotationsPerSecond.getValue();
 
     inputs.appliedVolts = new double[appliedVolts.size()];
     inputs.supplyCurrentAmps = new double[supplyCurrentAmps.size()];
@@ -148,7 +147,12 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
   }
 
   @Override
-  public void setVoltage(double volts) {
-    talonFX.setControl(voltageRequest.withOutput(volts).withEnableFOC(true));
+  public void setVoltageGoal(Voltage voltageGoal) {
+    talonFX.setControl(voltageRequest.withOutput(voltageGoal));
+  }
+
+  @Override
+  public boolean atVoltageGoal(Voltage referenceVoltage) {
+    return appliedVolts.get(0).isNear(referenceVoltage, Millivolts.of(500));
   }
 }

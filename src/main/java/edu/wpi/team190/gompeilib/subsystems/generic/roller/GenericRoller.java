@@ -1,31 +1,29 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.roller;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import static edu.wpi.first.units.Units.Volts;
+
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
-import java.util.function.DoubleSupplier;
 import lombok.Getter;
+import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class GenericRoller {
   private final GenericRollerIO io;
   private final GenericRollerIOInputsAutoLogged inputs;
+
   private final String aKitTopic;
 
-  @Getter private double voltageGoalVolts;
-
-  private final DoubleSupplier voltageGoalOffset;
+  @Setter @Getter private Voltage voltageGoal;
 
   public GenericRoller(
-      GenericRollerIO io, Subsystem subsystem, DoubleSupplier voltageGoalOffset, String name) {
+      GenericRollerIO io, Subsystem subsystem, GenericRollerConstants constants, String name) {
     this.io = io;
     inputs = new GenericRollerIOInputsAutoLogged();
     aKitTopic = subsystem.getName() + "/Roller" + name;
 
-    voltageGoalVolts = 0;
-    this.voltageGoalOffset = voltageGoalOffset;
+    voltageGoal = Volts.of(0.0);
   }
 
   @Trace
@@ -33,22 +31,17 @@ public class GenericRoller {
     io.updateInputs(inputs);
     Logger.processInputs(aKitTopic, inputs);
 
-    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts);
-    Logger.recordOutput(aKitTopic + "/Voltage Offset", voltageGoalOffset.getAsDouble());
-    Logger.recordOutput(aKitTopic + "/Voltage Magnitude", Math.abs(voltageGoalVolts));
+    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoal);
+    Logger.recordOutput(aKitTopic + "/At Voltage Goal", atVoltageGoal());
 
-    io.setVoltage(
-        MathUtil.clamp(
-            Math.max(
-                    0,
-                    (voltageGoalVolts + voltageGoalOffset.getAsDouble())
-                        * Math.signum(voltageGoalVolts))
-                * Math.signum(voltageGoalVolts),
-            -12.0,
-            12.0));
+    io.setVoltageGoal(voltageGoal);
   }
 
-  public Command setVoltage(double volts) {
-    return Commands.runOnce(() -> voltageGoalVolts = volts);
+  public boolean atVoltageGoal(Voltage voltageReference) {
+    return io.atVoltageGoal(voltageReference);
+  }
+
+  public boolean atVoltageGoal() {
+    return atVoltageGoal(voltageGoal);
   }
 }

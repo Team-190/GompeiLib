@@ -2,34 +2,44 @@ package edu.wpi.team190.gompeilib.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
+import edu.wpi.team190.gompeilib.core.utility.control.LinearConstraints;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator {
   public final ElevatorIO io;
-  public final ElevatorConstants elevatorConstants;
   public final ElevatorIOInputsAutoLogged inputs;
 
-  private ElevatorState currentState;
-  private double positionGoal;
-  private double voltageGoal;
-
   private final String aKitTopic;
+
+  private ElevatorState currentState;
+
+  private Voltage voltageGoal;
+  private Distance positionGoal;
+
   private final SysIdRoutine characterizationRoutine;
 
-  public Elevator(
-      ElevatorConstants elevatorConstants, Subsystem subsystem, int index, ElevatorIO io) {
+  public final ElevatorConstants constants;
+
+  public Elevator(ElevatorConstants constants, Subsystem subsystem, int index, ElevatorIO io) {
     this.io = io;
-    this.elevatorConstants = elevatorConstants;
     this.inputs = new ElevatorIOInputsAutoLogged();
 
-    currentState = ElevatorState.IDLE;
     aKitTopic = subsystem.getName() + "/Elevators" + index;
+
+    currentState = ElevatorState.IDLE;
+
+    voltageGoal = Volts.of(0.0);
+    positionGoal = Meters.of(0.0);
+
     characterizationRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(
@@ -37,10 +47,9 @@ public class Elevator {
                 Volts.of(3),
                 Seconds.of(3),
                 (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
-            new SysIdRoutine.Mechanism((volts) -> io.setVoltage(volts.in(Volts)), null, subsystem));
+            new SysIdRoutine.Mechanism(io::setVoltageGoal, null, subsystem));
 
-    positionGoal = 0;
-    voltageGoal = 0;
+    this.constants = constants;
   }
 
   @Trace
@@ -49,58 +58,65 @@ public class Elevator {
     Logger.processInputs(aKitTopic, inputs);
 
     Logger.recordOutput(aKitTopic + "/State", currentState.name());
-    Logger.recordOutput(aKitTopic + "/At Goal", atGoal());
+    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoal);
+    Logger.recordOutput(aKitTopic + "/Position Goal", positionGoal);
+    Logger.recordOutput(aKitTopic + "/At Voltage Goal", atVoltageGoal());
+    Logger.recordOutput(aKitTopic + "/At Position Goal", atPositionGoal());
 
     switch (currentState) {
-      case OPEN_LOOP_VOLTAGE_CONTROL -> io.setVoltage(voltageGoal);
-      case CLOSED_LOOP_POSITION_CONTROL -> io.setPosition(positionGoal);
+      case OPEN_LOOP_VOLTAGE_CONTROL -> io.setVoltageGoal(voltageGoal);
+      case CLOSED_LOOP_POSITION_CONTROL -> io.setPositionGoal(positionGoal);
     }
   }
 
-  public void updateGains(double kP, double kD, double kS, double kV, double kA, double kG) {
-    io.updateGains(kP, kD, kS, kV, kA, kG);
+  public Distance getElevatorPosition() {
+    return inputs.position;
   }
 
-  public void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
-    io.updateGains(kP, kD, kS, kV, kA, kG, slot);
+  public void setVoltageGoal(Voltage voltageGoal) {
+    currentState = ElevatorState.OPEN_LOOP_VOLTAGE_CONTROL;
+    this.voltageGoal = voltageGoal;
   }
 
-  public void updateConstraints(
-      double maxAcceleration, double cruisingVelocity, double goalTolerance) {
-    io.updateConstraints(maxAcceleration, cruisingVelocity, goalTolerance);
+  public void setPositionGoal(Distance positionGoal) {
+    currentState = ElevatorState.CLOSED_LOOP_POSITION_CONTROL;
+    this.positionGoal = positionGoal;
   }
 
-  public void setPosition(double positionMeters) {
-    io.setPosition(positionMeters);
+  public boolean atVoltageGoal(Voltage voltageReference) {
+    return voltageGoal.isNear(voltageReference, Millivolts.of(500));
   }
 
-  public Command setPositionGoal(double positionMeters) {
-    return Commands.runOnce(
-        () -> {
-          currentState = ElevatorState.CLOSED_LOOP_POSITION_CONTROL;
-          positionGoal = positionMeters;
-        });
+  public boolean atPositionGoal(Distance positionReference) {
+    return positionGoal.isNear(positionReference, constants.constraints.goalTolerance().get());
   }
 
-  public Command setVoltage(double volts) {
-    return Commands.runOnce(
-        () -> {
-          currentState = ElevatorState.OPEN_LOOP_VOLTAGE_CONTROL;
-          voltageGoal = volts;
-        });
+  public boolean atVoltageGoal() {
+    return atVoltageGoal(voltageGoal);
   }
 
-  public boolean atGoal() {
-    return io.atGoal();
+  public boolean atPositionGoal() {
+    return atPositionGoal(positionGoal);
+  }
+
+  public void setPosition(Distance position) {
+    io.setPosition(position);
+  }
+
+  public void setGainSlot(GainSlot gainSlot) {
+    io.setGainSlot(gainSlot);
   }
 
   public Command waitUntilAtGoal() {
-    return Commands.waitUntil(this::atGoal);
+    return Commands.waitUntil(this::atPositionGoal);
   }
 
-  public double getPositionMeters() {
-    return inputs.positionMeters;
+  public void updateGains(Gains gains, GainSlot slot) {
+    io.updateGains(gains, slot);
+  }
+
+  public void updateConstraints(LinearConstraints constraints) {
+    io.updateConstraints(constraints);
   }
 
   public Command runSysIdRoutine() {
