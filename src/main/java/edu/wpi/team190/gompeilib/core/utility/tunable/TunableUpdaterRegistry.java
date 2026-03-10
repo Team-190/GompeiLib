@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  * when a value changes. The {@link #periodic()} method should be called regularly to detect changes
  * and invoke the corresponding update callbacks.
  */
-public class TunableUpdaterRegistery {
+public class TunableUpdaterRegistry {
   /** Registered gain sets and their update callbacks. */
   private static final HashMap<Gains, Consumer<Gains>> GAINS_UPDATER = new HashMap<>();
 

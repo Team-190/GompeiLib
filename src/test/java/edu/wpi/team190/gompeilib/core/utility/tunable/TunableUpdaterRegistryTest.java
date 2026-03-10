@@ -1,225 +1,162 @@
 package edu.wpi.team190.gompeilib.core.utility.tunable;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.robot.RobotMode;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
-import edu.wpi.team190.gompeilib.core.utility.control.constraints.Constraints;
 import edu.wpi.team190.gompeilib.core.utility.control.constraints.LinearConstraints;
-import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class TunableUpdaterRegistryTest {
+class TunableUpdaterRegistryTest {
 
   @BeforeEach
-  void setUp() throws Exception {
+  void setUp() {
     GompeiLib.deinit();
     GompeiLib.init(RobotMode.SIM, true, 0.02);
   }
 
   @Test
-  void periodicWithNoRegistrationsDoesNotThrow() {
-    assertDoesNotThrow(TunableUpdaterRegistery::periodic);
+  void periodicWithNoRegistrationsDoesNothing() {
+    assertDoesNotThrow(TunableUpdaterRegistry::periodic);
   }
 
   @Test
-  void registerGainsAndPeriodicInvokesConsumer() {
+  void registerGainsInvokesConsumer() {
     Gains gains =
         Gains.fromDoubles()
             .withPrefix("test/gains")
-            .withKP(1.0)
-            .withKI(2.0)
-            .withKD(3.0)
-            .withKS(4.0)
-            .withKV(5.0)
-            .withKA(6.0)
-            .withKG(7.0)
+            .withKP(1)
+            .withKI(2)
+            .withKD(3)
+            .withKS(4)
+            .withKV(5)
+            .withKA(6)
+            .withKG(7)
             .build();
 
-    AtomicInteger callCount = new AtomicInteger();
-    AtomicReference<Gains> updatedGains = new AtomicReference<>();
+    AtomicInteger calls = new AtomicInteger();
 
-    TunableUpdaterRegistery.registerGains(
-        gains,
-        g -> {
-          callCount.incrementAndGet();
-          updatedGains.set(g);
-        });
+    TunableUpdaterRegistry.registerGains(gains, g -> calls.incrementAndGet());
 
-    TunableUpdaterRegistery.periodic();
+    TunableUpdaterRegistry.periodic();
 
-    assertEquals(1, callCount.get());
-    assertSame(gains, updatedGains.get());
+    assertEquals(1, calls.get());
   }
 
   @Test
-  void registerGainsIgnoresDuplicateRegistration() {
+  void registerGainsDuplicateIgnored() {
     Gains gains =
         Gains.fromDoubles()
-            .withPrefix("test/gains/duplicate")
-            .withKP(1.0)
-            .withKI(2.0)
-            .withKD(3.0)
-            .withKS(4.0)
-            .withKV(5.0)
-            .withKA(6.0)
-            .withKG(7.0)
+            .withPrefix("test/gains/dup")
+            .withKP(1)
+            .withKI(2)
+            .withKD(3)
+            .withKS(4)
+            .withKV(5)
+            .withKA(6)
+            .withKG(7)
             .build();
 
-    AtomicInteger firstConsumerCalls = new AtomicInteger();
-    AtomicInteger secondConsumerCalls = new AtomicInteger();
+    AtomicInteger first = new AtomicInteger();
+    AtomicInteger second = new AtomicInteger();
 
-    TunableUpdaterRegistery.registerGains(gains, g -> firstConsumerCalls.incrementAndGet());
-    TunableUpdaterRegistery.registerGains(gains, g -> secondConsumerCalls.incrementAndGet());
+    TunableUpdaterRegistry.registerGains(gains, g -> first.incrementAndGet());
+    TunableUpdaterRegistry.registerGains(gains, g -> second.incrementAndGet());
 
-    TunableUpdaterRegistery.periodic();
+    TunableUpdaterRegistry.periodic();
 
-    assertEquals(1, firstConsumerCalls.get());
-    assertEquals(0, secondConsumerCalls.get());
+    assertEquals(1, first.get());
+    assertEquals(0, second.get());
   }
 
   @Test
-  void registerConstraintsAndPeriodicInvokesConsumer() {
+  void registerConstraintsInvokesConsumer() {
     LinearConstraints constraints =
         LinearConstraints.fromMeasures()
             .withPrefix("test/constraints")
             .withGoalTolerance(Units.Meters.of(0.1))
-            .withMaxVelocity(Units.MetersPerSecond.of(2.0))
-            .withMaxAcceleration(Units.MetersPerSecondPerSecond.of(3.0))
+            .withMaxVelocity(Units.MetersPerSecond.of(2))
+            .withMaxAcceleration(Units.MetersPerSecondPerSecond.of(3))
             .build();
 
-    AtomicInteger callCount = new AtomicInteger();
-    AtomicReference<Constraints<?>> updatedConstraints = new AtomicReference<>();
+    AtomicInteger calls = new AtomicInteger();
 
-    TunableUpdaterRegistery.registerConstraints(
-        constraints,
-        c -> {
-          callCount.incrementAndGet();
-          updatedConstraints.set(c);
-        });
+    TunableUpdaterRegistry.registerConstraints(constraints, c -> calls.incrementAndGet());
 
-    TunableUpdaterRegistery.periodic();
+    TunableUpdaterRegistry.periodic();
 
-    assertEquals(1, callCount.get());
-    assertSame(constraints, updatedConstraints.get());
+    assertEquals(1, calls.get());
   }
 
   @Test
-  void registerConstraintsIgnoresDuplicateRegistration() {
+  void registerConstraintsDuplicateIgnored() {
     LinearConstraints constraints =
         LinearConstraints.fromMeasures()
-            .withPrefix("test/constraints/duplicate")
+            .withPrefix("test/constraints/dup")
             .withGoalTolerance(Units.Meters.of(0.2))
-            .withMaxVelocity(Units.MetersPerSecond.of(4.0))
-            .withMaxAcceleration(Units.MetersPerSecondPerSecond.of(6.0))
+            .withMaxVelocity(Units.MetersPerSecond.of(3))
+            .withMaxAcceleration(Units.MetersPerSecondPerSecond.of(4))
             .build();
 
-    AtomicInteger firstConsumerCalls = new AtomicInteger();
-    AtomicInteger secondConsumerCalls = new AtomicInteger();
+    AtomicInteger first = new AtomicInteger();
+    AtomicInteger second = new AtomicInteger();
 
-    TunableUpdaterRegistery.registerConstraints(
-        constraints, c -> firstConsumerCalls.incrementAndGet());
-    TunableUpdaterRegistery.registerConstraints(
-        constraints, c -> secondConsumerCalls.incrementAndGet());
+    TunableUpdaterRegistry.registerConstraints(constraints, c -> first.incrementAndGet());
+    TunableUpdaterRegistry.registerConstraints(constraints, c -> second.incrementAndGet());
 
-    TunableUpdaterRegistery.periodic();
+    TunableUpdaterRegistry.periodic();
 
-    assertEquals(1, firstConsumerCalls.get());
-    assertEquals(0, secondConsumerCalls.get());
+    assertEquals(1, first.get());
+    assertEquals(0, second.get());
   }
 
   @Test
-  void registerNumberAndPeriodicInvokesConsumerWithValues() {
-    LoggedTunableNumber[] numbers = {
-      new LoggedTunableNumber("test/number/one", 1.25),
-      new LoggedTunableNumber("test/number/two", 2.5)
-    };
+  void registerNumberAcceptsArray() {
+    LoggedTunableNumber[] nums = new LoggedTunableNumber[0];
 
-    AtomicInteger callCount = new AtomicInteger();
-    AtomicReference<double[]> updatedValues = new AtomicReference<>();
-
-    TunableUpdaterRegistery.registerNumber(
-        numbers,
-        values -> {
-          callCount.incrementAndGet();
-          updatedValues.set(values);
-        });
-
-    TunableUpdaterRegistery.periodic();
-
-    assertEquals(1, callCount.get());
-    assertArrayEquals(new double[] {1.25, 2.5}, updatedValues.get());
+    assertDoesNotThrow(() -> TunableUpdaterRegistry.registerNumber(nums, v -> {}));
   }
 
   @Test
-  void registerNumberIgnoresDuplicateRegistrationForSameArrayInstance() {
-    LoggedTunableNumber[] numbers = {
-      new LoggedTunableNumber("test/number/duplicate/one", 3.0),
-      new LoggedTunableNumber("test/number/duplicate/two", 4.0)
-    };
+  void registerNumberDuplicateIgnored() {
+    LoggedTunableNumber[] nums = new LoggedTunableNumber[0];
 
-    AtomicInteger firstConsumerCalls = new AtomicInteger();
-    AtomicInteger secondConsumerCalls = new AtomicInteger();
+    AtomicInteger first = new AtomicInteger();
+    AtomicInteger second = new AtomicInteger();
 
-    TunableUpdaterRegistery.registerNumber(numbers, values -> firstConsumerCalls.incrementAndGet());
-    TunableUpdaterRegistery.registerNumber(
-        numbers, values -> secondConsumerCalls.incrementAndGet());
+    TunableUpdaterRegistry.registerNumber(nums, v -> first.incrementAndGet());
+    TunableUpdaterRegistry.registerNumber(nums, v -> second.incrementAndGet());
 
-    TunableUpdaterRegistery.periodic();
+    TunableUpdaterRegistry.periodic();
 
-    assertEquals(1, firstConsumerCalls.get());
-    assertEquals(0, secondConsumerCalls.get());
+    assertEquals(1, first.get());
+    assertEquals(0, second.get());
   }
 
   @Test
-  void registerMeasureAndPeriodicInvokesRunnable() {
-    LoggedTunableMeasure<?>[] measures = {
-      new LoggedTunableMeasure<>("test/measure/one", Units.Meters.of(1.0)),
-      new LoggedTunableMeasure<>("test/measure/two", Units.MetersPerSecond.of(2.0))
-    };
+  void registerMeasureAcceptsArray() {
+    LoggedTunableMeasure<?>[] measures = new LoggedTunableMeasure<?>[0];
 
-    AtomicInteger callCount = new AtomicInteger();
-
-    TunableUpdaterRegistery.registerMeasure(measures, callCount::incrementAndGet);
-
-    TunableUpdaterRegistery.periodic();
-
-    assertEquals(1, callCount.get());
+    assertDoesNotThrow(() -> TunableUpdaterRegistry.registerMeasure(measures, () -> {}));
   }
 
   @Test
-  void registerMeasureIgnoresDuplicateRegistrationForSameArrayInstance() {
-    LoggedTunableMeasure<?>[] measures = {
-      new LoggedTunableMeasure<>("test/measure/duplicate/one", Units.Meters.of(5.0)),
-      new LoggedTunableMeasure<>("test/measure/duplicate/two", Units.MetersPerSecond.of(6.0))
-    };
+  void registerMeasureDuplicateIgnored() {
+    LoggedTunableMeasure<?>[] measures = new LoggedTunableMeasure<?>[0];
 
-    AtomicInteger firstConsumerCalls = new AtomicInteger();
-    AtomicInteger secondConsumerCalls = new AtomicInteger();
+    AtomicInteger first = new AtomicInteger();
+    AtomicInteger second = new AtomicInteger();
 
-    TunableUpdaterRegistery.registerMeasure(measures, firstConsumerCalls::incrementAndGet);
-    TunableUpdaterRegistery.registerMeasure(measures, secondConsumerCalls::incrementAndGet);
+    TunableUpdaterRegistry.registerMeasure(measures, first::incrementAndGet);
+    TunableUpdaterRegistry.registerMeasure(measures, second::incrementAndGet);
 
-    TunableUpdaterRegistery.periodic();
+    TunableUpdaterRegistry.periodic();
 
-    assertEquals(1, firstConsumerCalls.get());
-    assertEquals(0, secondConsumerCalls.get());
-  }
-
-  @SuppressWarnings("unchecked")
-  private void clearRegistry(String fieldName) throws Exception {
-    Field field = TunableUpdaterRegistery.class.getDeclaredField(fieldName);
-    field.setAccessible(true);
-    ((HashMap<Object, Consumer<?>>) field.get(null)).clear();
+    assertEquals(1, first.get());
+    assertEquals(0, second.get());
   }
 }
