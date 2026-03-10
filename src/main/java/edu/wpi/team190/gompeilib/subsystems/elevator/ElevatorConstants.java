@@ -3,7 +3,7 @@ package edu.wpi.team190.gompeilib.subsystems.elevator;
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
-import edu.wpi.team190.gompeilib.core.utility.control.LinearConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.constraints.LinearConstraints;
 import java.util.Set;
 import lombok.Builder;
 import lombok.NonNull;
