@@ -32,6 +32,7 @@ public class GenericRoller {
     Logger.processInputs(aKitTopic, inputs);
 
     Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoal);
+    Logger.recordOutput(aKitTopic + "/At Voltage Goal", atVoltageGoal());
 
     io.setVoltageGoal(voltageGoal);
   }

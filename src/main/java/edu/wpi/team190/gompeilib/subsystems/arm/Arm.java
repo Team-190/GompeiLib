@@ -3,13 +3,13 @@ package edu.wpi.team190.gompeilib.subsystems.arm;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.team190.gompeilib.core.utility.control.AngularPositionConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
@@ -106,14 +106,12 @@ public class Arm {
     return Commands.waitUntil(this::atPositionGoal);
   }
 
-  public void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
-    io.updateGains(kP, kD, kS, kV, kA, kG, slot);
+  public void updateGains(Gains gains, GainSlot slot) {
+    io.updateGains(gains, slot);
   }
 
-  public void updateConstraints(
-      AngularAcceleration maxAcceleration, AngularVelocity maxVelocity, Rotation2d goalTolerance) {
-    io.updateConstraints(maxAcceleration, maxVelocity, goalTolerance);
+  public void updateConstraints(AngularPositionConstraints constraints) {
+    io.updateConstraints(constraints);
   }
 
   public Command sysIdRoutine() {

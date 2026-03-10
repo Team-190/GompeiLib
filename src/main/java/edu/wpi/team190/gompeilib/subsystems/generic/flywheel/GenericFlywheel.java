@@ -3,13 +3,14 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.*;
-import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.team190.gompeilib.core.utility.control.AngularVelocityConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import edu.wpi.team190.gompeilib.core.utility.sysid.CustomSysIdRoutine;
 import edu.wpi.team190.gompeilib.core.utility.sysid.CustomUnits;
@@ -163,23 +164,12 @@ public class GenericFlywheel {
     return Commands.waitUntil(this::atVelocityGoal);
   }
 
-  public void updateGains(
-      double kP,
-      double kI,
-      double kD,
-      double kS,
-      double kV,
-      double kA,
-      double kG,
-      GainSlot gainSlot) {
-    io.updateGains(kP, kI, kD, kS, kV, kA, kG, gainSlot);
+  public void updateGains(Gains gains, GainSlot gainSlot) {
+    io.updateGains(gains, gainSlot);
   }
 
-  public void updateConstraints(
-      AngularAcceleration maxAcceleration,
-      AngularVelocity maxVelocity,
-      AngularVelocity goalTolerance) {
-    io.updateConstraints(maxAcceleration, maxVelocity, goalTolerance);
+  public void updateConstraints(AngularVelocityConstraints constraints) {
+    io.updateConstraints(constraints);
   }
 
   public Command sysIdRoutineVoltage() {

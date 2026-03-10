@@ -14,12 +14,13 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
+import edu.wpi.team190.gompeilib.core.utility.control.AngularPositionConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil;
 import java.util.ArrayList;
@@ -213,18 +214,32 @@ public class ArmIOTalonFX implements ArmIO {
   }
 
   @Override
-  public void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {
+  public void updateGains(Gains gains, GainSlot gainSlot) {
     switch (gainSlot) {
       case ZERO:
-        config.Slot0.withKP(kP).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
+        config.Slot0.withKP(gains.kP().get())
+            .withKD(gains.kD().get())
+            .withKS(gains.kS().get())
+            .withKV(gains.kV().get())
+            .withKA(gains.kA().get())
+            .withKG(gains.kG().get());
         break;
       case ONE:
-        config.Slot1.withKP(kP).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
+        config.Slot1.withKP(gains.kP().get())
+            .withKD(gains.kD().get())
+            .withKS(gains.kS().get())
+            .withKV(gains.kV().get())
+            .withKA(gains.kA().get())
+            .withKG(gains.kG().get());
         break;
       case TWO:
       default:
-        config.Slot2.withKP(kP).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
+        config.Slot2.withKP(gains.kP().get())
+            .withKD(gains.kD().get())
+            .withKS(gains.kS().get())
+            .withKV(gains.kV().get())
+            .withKA(gains.kA().get())
+            .withKG(gains.kG().get());
         break;
     }
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config));
@@ -236,12 +251,12 @@ public class ArmIOTalonFX implements ArmIO {
   }
 
   @Override
-  public void updateConstraints(
-      AngularAcceleration maxAcceleration, AngularVelocity maxVelocity, Rotation2d goalTolerance) {
+  public void updateConstraints(AngularPositionConstraints constraints) {
     config.MotionMagic =
         new MotionMagicConfigs()
-            .withMotionMagicAcceleration(maxAcceleration)
-            .withMotionMagicCruiseVelocity(maxVelocity);
+            .withMotionMagicAcceleration(
+                constraints.maxAcceleration().get(RotationsPerSecondPerSecond))
+            .withMotionMagicCruiseVelocity(constraints.maxVelocity().get(RotationsPerSecond));
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
 
     for (int i = 0; i < constants.armParameters.numMotors() - 1; i++) {

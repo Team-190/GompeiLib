@@ -3,14 +3,14 @@ package edu.wpi.team190.gompeilib.subsystems.elevator;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
+import edu.wpi.team190.gompeilib.core.utility.control.LinearConstraints;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.Logger;
 
@@ -111,14 +111,12 @@ public class Elevator {
     return Commands.waitUntil(this::atPositionGoal);
   }
 
-  public void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot slot) {
-    io.updateGains(kP, kD, kS, kV, kA, kG, slot);
+  public void updateGains(Gains gains, GainSlot slot) {
+    io.updateGains(gains, slot);
   }
 
-  public void updateConstraints(
-      LinearAcceleration maxAcceleration, LinearVelocity maxVelocity, Distance goalTolerance) {
-    io.updateConstraints(maxAcceleration, maxVelocity, goalTolerance);
+  public void updateConstraints(LinearConstraints constraints) {
+    io.updateConstraints(constraints);
   }
 
   public Command runSysIdRoutine() {

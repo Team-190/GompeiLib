@@ -11,6 +11,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
+import edu.wpi.team190.gompeilib.core.utility.control.AngularPositionConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import java.util.Arrays;
 
@@ -19,6 +21,7 @@ public class ArmIOSim implements ArmIO {
 
   private Voltage appliedVolts;
   private boolean isClosedLoop;
+  private GainSlot gainSlot;
 
   private final ProfiledPIDController feedback;
   private ArmFeedforward feedforward;
@@ -95,6 +98,8 @@ public class ArmIOSim implements ArmIO {
     inputs.positionGoal = Rotation2d.fromRadians(feedback.getGoal().position);
     inputs.positionSetpoint = Rotation2d.fromRadians(feedback.getSetpoint().position);
     inputs.positionError = Rotation2d.fromRadians(feedback.getPositionError());
+
+    inputs.gainSlot = gainSlot;
   }
 
   @Override
@@ -127,6 +132,7 @@ public class ArmIOSim implements ArmIO {
 
   @Override
   public void setGainSlot(GainSlot gainSlot) {
+    this.gainSlot = gainSlot;
     switch (gainSlot) {
       case ZERO:
         feedback.setPID(constants.slot0Gains.kP().get(), 0.0, constants.slot0Gains.kD().get());
@@ -141,18 +147,17 @@ public class ArmIOSim implements ArmIO {
   }
 
   @Override
-  public void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {
-    feedback.setPID(kP, 0, kD);
-    feedforward = new ArmFeedforward(kS, kG, kV);
+  public void updateGains(Gains gains, GainSlot gainSlot) {
+    feedback.setPID(gains.kP().get(), gains.kI().get(), gains.kD().get());
+    feedforward = new ArmFeedforward(gains.kS().get(), gains.kG().get(), gains.kV().get());
   }
 
   @Override
-  public void updateConstraints(
-      AngularAcceleration maxAcceleration, AngularVelocity maxVelocity, Rotation2d goalTolerance) {
+  public void updateConstraints(AngularPositionConstraints constraints) {
     feedback.setConstraints(
         new Constraints(
-            maxVelocity.in(RadiansPerSecond), maxAcceleration.in(RadiansPerSecondPerSecond)));
-    feedback.setTolerance(goalTolerance.getRadians());
+            constraints.maxVelocity().get().in(RadiansPerSecond),
+            constraints.maxAcceleration().get().in(RadiansPerSecondPerSecond)));
+    feedback.setTolerance(constraints.goalTolerance().get().in(Radians));
   }
 }

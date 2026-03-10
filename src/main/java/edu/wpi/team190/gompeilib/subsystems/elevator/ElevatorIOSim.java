@@ -10,6 +10,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
+import edu.wpi.team190.gompeilib.core.utility.control.LinearConstraints;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import java.util.Arrays;
 
@@ -138,18 +140,19 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {
-    feedback.setPID(kP, 0, kD);
-    feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
+  public void updateGains(Gains gains, GainSlot gainSlot) {
+    feedback.setPID(gains.kP().get(), gains.kI().get(), gains.kD().get());
+    feedforward =
+        new ElevatorFeedforward(
+            gains.kS().get(), gains.kG().get(), gains.kV().get(), gains.kA().get());
   }
 
   @Override
-  public void updateConstraints(
-      LinearAcceleration maxAcceleration, LinearVelocity maxVelocity, Distance goalTolerance) {
+  public void updateConstraints(LinearConstraints constraints) {
     feedback.setConstraints(
         new TrapezoidProfile.Constraints(
-            maxVelocity.in(MetersPerSecond), maxAcceleration.in(MetersPerSecondPerSecond)));
-    feedback.setTolerance(goalTolerance.in(Meters));
+            constraints.maxVelocity().get().in(MetersPerSecond),
+            constraints.maxAcceleration().get().in(MetersPerSecondPerSecond)));
+    feedback.setTolerance(constraints.goalTolerance().get().in(Meters));
   }
 }

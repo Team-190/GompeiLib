@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.*;
+import edu.wpi.team190.gompeilib.core.utility.control.AngularPositionConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -24,7 +26,7 @@ public interface ArmIO {
     public Rotation2d positionSetpoint = new Rotation2d();
     public Rotation2d positionError = new Rotation2d();
 
-    public GainSlot gainSlot;
+    public GainSlot gainSlot = GainSlot.ZERO;
   }
 
   /**
@@ -83,23 +85,14 @@ public interface ArmIO {
   /**
    * Sets the gains for the arm.
    *
-   * @param kP the proportional gain.
-   * @param kD the derivative gain.
-   * @param kS the static gain.
-   * @param kV the velocity gain.
-   * @param kA the acceleration gain.
-   * @param kG the gravity gain.
+   * @param gains the gains to update
    */
-  default void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {}
+  default void updateGains(Gains gains, GainSlot gainSlot) {}
 
   /**
    * Sets the constraints for the arm.
    *
-   * @param maxAcceleration the max acceleration of the arm.
-   * @param maxVelocity the max velocity of the arm
-   * @param goalTolerance the acceptable tolerance for arm control.
+   * @param constraints the constraints to update
    */
-  default void updateConstraints(
-      AngularAcceleration maxAcceleration, AngularVelocity maxVelocity, Rotation2d goalTolerance) {}
+  default void updateConstraints(AngularPositionConstraints constraints) {}
 }

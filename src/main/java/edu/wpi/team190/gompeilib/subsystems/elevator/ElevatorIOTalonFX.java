@@ -13,6 +13,8 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
+import edu.wpi.team190.gompeilib.core.utility.control.LinearConstraints;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil;
 import java.util.ArrayList;
@@ -248,18 +250,32 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   }
 
   @Override
-  public void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {
+  public void updateGains(Gains gains, GainSlot gainSlot) {
     switch (gainSlot) {
       case ZERO:
-        config.Slot0.withKP(kP).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
+        config.Slot0.withKP(gains.kP().get())
+            .withKD(gains.kD().get())
+            .withKS(gains.kS().get())
+            .withKV(gains.kV().get())
+            .withKA(gains.kA().get())
+            .withKG(gains.kG().get());
         break;
       case ONE:
-        config.Slot1.withKP(kP).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
+        config.Slot1.withKP(gains.kP().get())
+            .withKD(gains.kD().get())
+            .withKS(gains.kS().get())
+            .withKV(gains.kV().get())
+            .withKA(gains.kA().get())
+            .withKG(gains.kG().get());
         break;
       case TWO:
       default:
-        config.Slot2.withKP(kP).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG);
+        config.Slot2.withKP(gains.kP().get())
+            .withKD(gains.kD().get())
+            .withKS(gains.kS().get())
+            .withKV(gains.kV().get())
+            .withKA(gains.kA().get())
+            .withKG(gains.kG().get());
         break;
     }
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
@@ -269,10 +285,10 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   }
 
   @Override
-  public void updateConstraints(
-      LinearAcceleration maxAcceleration, LinearVelocity maxVelocity, Distance goalTolerance) {
-    config.MotionMagic.withMotionMagicAcceleration(maxAcceleration.in(MetersPerSecondPerSecond))
-        .withMotionMagicCruiseVelocity(maxVelocity.in(MetersPerSecond));
+  public void updateConstraints(LinearConstraints constraints) {
+    config.MotionMagic.withMotionMagicAcceleration(
+            constraints.maxAcceleration().get().in(MetersPerSecondPerSecond))
+        .withMotionMagicCruiseVelocity(constraints.maxVelocity().get().in(MetersPerSecond));
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(config, 0.25));
     for (TalonFX follower : followTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config, 0.25));

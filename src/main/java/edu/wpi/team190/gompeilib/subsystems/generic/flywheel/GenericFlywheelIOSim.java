@@ -10,6 +10,8 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
+import edu.wpi.team190.gompeilib.core.utility.control.AngularVelocityConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.control.LinearProfile;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import java.util.Arrays;
@@ -70,9 +72,8 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
     motorSim.update(1.0 / GompeiLib.getLoopPeriod());
 
     accumulatedPosition =
-        Radians.of(
-            accumulatedPosition.in(Radians)
-                + (motorSim.getAngularVelocityRadPerSec() * GompeiLib.getLoopPeriod()));
+        accumulatedPosition.plus(
+            motorSim.getAngularVelocity().times(Seconds.of(GompeiLib.getLoopPeriod())));
 
     inputs.position = Rotation2d.fromRadians(accumulatedPosition.in(Radians));
     inputs.velocity = motorSim.getAngularVelocity();
@@ -113,28 +114,17 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
   }
 
   @Override
-  public void updateGains(
-      double kP,
-      double kI,
-      double kD,
-      double kS,
-      double kV,
-      double kA,
-      double kG,
-      GainSlot gainSlot) {
-    feedback.setPID(kP, kI, kD);
-    feedforward.setKs(kS);
-    feedforward.setKv(kV);
-    feedforward.setKa(kA);
+  public void updateGains(Gains gains, GainSlot gainSlot) {
+    feedback.setPID(gains.kP().get(), gains.kI().get(), gains.kD().get());
+    feedforward.setKs(gains.kS().get());
+    feedforward.setKv(gains.kV().get());
+    feedforward.setKa(gains.kA().get());
   }
 
   @Override
-  public void updateConstraints(
-      AngularAcceleration maxAcceleration,
-      AngularVelocity maxVelocity,
-      AngularVelocity goalTolerance) {
-    profile.setMaxAcceleration(maxAcceleration.in(RadiansPerSecondPerSecond));
-    profile.setMaxVelocity(maxVelocity.in(RadiansPerSecond));
-    feedback.setTolerance(goalTolerance.in(RadiansPerSecond));
+  public void updateConstraints(AngularVelocityConstraints constraints) {
+    profile.setMaxAcceleration(constraints.maxAcceleration().get().in(RadiansPerSecondPerSecond));
+    profile.setMaxVelocity(constraints.maxVelocity().get().in(RadiansPerSecond));
+    feedback.setTolerance(constraints.goalTolerance().get().in(RadiansPerSecond));
   }
 }

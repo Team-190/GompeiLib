@@ -3,6 +3,8 @@ package edu.wpi.team190.gompeilib.subsystems.elevator;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.*;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
+import edu.wpi.team190.gompeilib.core.utility.control.LinearConstraints;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -82,23 +84,14 @@ public interface ElevatorIO {
   /**
    * Sets the gains for the elevator.
    *
-   * @param kP the proportional gain.
-   * @param kD the derivative gain.
-   * @param kS the static gain.
-   * @param kV the velocity gain.
-   * @param kA the acceleration gain.
-   * @param kG the gravity gain.
+   * @param gains the gains to update
    */
-  default void updateGains(
-      double kP, double kD, double kS, double kV, double kA, double kG, GainSlot gainSlot) {}
+  default void updateGains(Gains gains, GainSlot gainSlot) {}
 
   /**
    * Sets the constraints for the elevator.
    *
-   * @param maxAcceleration the max acceleration of the elevator.
-   * @param maxVelocity the max velocity of the arm.
-   * @param goalTolerance the acceptable tolerance for elevator control.
+   * @param constraints the constraints to update
    */
-  default void updateConstraints(
-      LinearAcceleration maxAcceleration, LinearVelocity maxVelocity, Distance goalTolerance) {}
+  default void updateConstraints(LinearConstraints constraints) {}
 }

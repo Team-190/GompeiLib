@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.*;
+import edu.wpi.team190.gompeilib.core.utility.control.AngularVelocityConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -48,18 +50,7 @@ public interface GenericFlywheelIO {
     return false;
   }
 
-  default void updateGains(
-      double kP,
-      double kI,
-      double kD,
-      double kS,
-      double kV,
-      double kA,
-      double kG,
-      GainSlot gainSlot) {}
+  default void updateGains(Gains gains, GainSlot gainSlot) {}
 
-  default void updateConstraints(
-      AngularAcceleration maxAcceleration,
-      AngularVelocity maxVelocity,
-      AngularVelocity goalTolerance) {}
+  default void updateConstraints(AngularVelocityConstraints constraints) {}
 }
