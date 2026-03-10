@@ -45,6 +45,7 @@ public class ArmIOSim implements ArmIO {
 
     appliedVolts = Volts.of(0.0);
     isClosedLoop = true;
+    gainSlot = GainSlot.ZERO;
 
     feedback =
         new ProfiledPIDController(
