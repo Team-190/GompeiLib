@@ -10,9 +10,9 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
-import edu.wpi.team190.gompeilib.core.utility.control.AngularVelocityConstraints;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.control.LinearProfile;
+import edu.wpi.team190.gompeilib.core.utility.control.constraints.AngularVelocityConstraints;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import java.util.Arrays;
 

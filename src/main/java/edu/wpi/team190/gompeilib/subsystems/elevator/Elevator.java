@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
-import edu.wpi.team190.gompeilib.core.utility.control.LinearConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.constraints.LinearConstraints;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.Logger;
 

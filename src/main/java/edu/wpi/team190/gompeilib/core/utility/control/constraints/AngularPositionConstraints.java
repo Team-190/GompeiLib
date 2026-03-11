@@ -1,7 +1,8 @@
-package edu.wpi.team190.gompeilib.core.utility.control;
+package edu.wpi.team190.gompeilib.core.utility.control.constraints;
 
 import edu.wpi.first.units.*;
 import edu.wpi.team190.gompeilib.core.utility.tunable.LoggedTunableMeasure;
+import java.util.function.Consumer;
 import lombok.Builder;
 import lombok.NonNull;
 
@@ -10,7 +11,8 @@ import lombok.NonNull;
 public record AngularPositionConstraints(
     LoggedTunableMeasure<AngleUnit> goalTolerance,
     LoggedTunableMeasure<AngularVelocityUnit> maxVelocity,
-    LoggedTunableMeasure<AngularAccelerationUnit> maxAcceleration) {
+    LoggedTunableMeasure<AngularAccelerationUnit> maxAcceleration)
+    implements Constraints<AngularPositionConstraints> {
 
   @Builder(
       setterPrefix = "with",
@@ -25,5 +27,22 @@ public record AngularPositionConstraints(
         new LoggedTunableMeasure<>(String.format("%s/Goal Tolerance", prefix), goalTolerance),
         new LoggedTunableMeasure<>(String.format("%s/Max Velocity", prefix), maxVelocity),
         new LoggedTunableMeasure<>(String.format("%s/Max Acceleration", prefix), maxAcceleration));
+  }
+
+  public double getGoalTolerance(AngleUnit unit) {
+    return goalTolerance.get(unit);
+  }
+
+  public double getMaxVelocity(AngularVelocityUnit unit) {
+    return maxVelocity.get(unit);
+  }
+
+  public double getMaxAcceleration(AngularAccelerationUnit unit) {
+    return maxAcceleration.get(unit);
+  }
+
+  public void update(int id, Consumer<AngularPositionConstraints> consumer) {
+    LoggedTunableMeasure.ifChanged(
+        id, () -> consumer.accept(this), goalTolerance, maxVelocity, maxAcceleration);
   }
 }

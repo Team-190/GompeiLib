@@ -11,8 +11,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
-import edu.wpi.team190.gompeilib.core.utility.control.AngularPositionConstraints;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
+import edu.wpi.team190.gompeilib.core.utility.control.constraints.AngularPositionConstraints;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import java.util.Arrays;
 

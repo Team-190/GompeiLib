@@ -1,6 +1,7 @@
 package edu.wpi.team190.gompeilib.core.utility.control;
 
 import edu.wpi.team190.gompeilib.core.utility.tunable.LoggedTunableNumber;
+import java.util.function.Consumer;
 import lombok.Builder;
 import lombok.NonNull;
 
@@ -35,5 +36,37 @@ public record Gains(
         new LoggedTunableNumber(prefix + "/Kv", kV),
         new LoggedTunableNumber(prefix + "/Ka", kA),
         new LoggedTunableNumber(prefix + "/Kg", kG));
+  }
+
+  public double getKP() {
+    return kP.get();
+  }
+
+  public double getKI() {
+    return kI.get();
+  }
+
+  public double getKD() {
+    return kD.get();
+  }
+
+  public double getKS() {
+    return kS.get();
+  }
+
+  public double getKV() {
+    return kV.get();
+  }
+
+  public double getKA() {
+    return kA.get();
+  }
+
+  public double getKG() {
+    return kG.get();
+  }
+
+  public void update(int id, Consumer<Gains> consumer) {
+    LoggedTunableNumber.ifChanged(id, g -> consumer.accept(this), kP, kI, kD, kS, kV, kA, kG);
   }
 }

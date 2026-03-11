@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
-import edu.wpi.team190.gompeilib.core.utility.control.LinearConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.constraints.LinearConstraints;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.littletonrobotics.junction.AutoLog;
 
