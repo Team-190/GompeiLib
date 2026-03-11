@@ -1,10 +1,11 @@
 package edu.wpi.team190.gompeilib.core.utility.tunable;
 
+import static edu.wpi.first.units.Units.Radian;
 import static org.junit.jupiter.api.Assertions.*;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Units;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
-import edu.wpi.team190.gompeilib.core.robot.RobotMode;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.control.constraints.LinearConstraints;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,7 +17,7 @@ class TunableUpdaterRegistryTest {
   @BeforeEach
   void setUp() {
     GompeiLib.deinit();
-    GompeiLib.init(RobotMode.SIM, true, 0.02);
+    GompeiLib.init(null, true, 0.02);
   }
 
   @Test
@@ -130,13 +131,19 @@ class TunableUpdaterRegistryTest {
   @Test
   @Order(7)
   void registerNumberDuplicateIgnored() {
-    LoggedTunableNumber[] nums = new LoggedTunableNumber[0];
+    LoggedTunableNumber[] nums = new LoggedTunableNumber[1];
+    nums[0] = new LoggedTunableNumber("test/testnumber1");
 
     AtomicInteger first = new AtomicInteger();
     AtomicInteger second = new AtomicInteger();
 
     TunableUpdaterRegistry.registerNumber(nums, v -> first.incrementAndGet());
     TunableUpdaterRegistry.registerNumber(nums, v -> second.incrementAndGet());
+
+    NetworkTableInstance.getDefault()
+        .getDoubleTopic("TunableNumbers/test/testnumber1")
+        .publish()
+        .set(100);
 
     TunableUpdaterRegistry.periodic();
 
@@ -155,13 +162,20 @@ class TunableUpdaterRegistryTest {
   @Test
   @Order(9)
   void registerMeasureDuplicateIgnored() {
-    LoggedTunableMeasure<?>[] measures = new LoggedTunableMeasure<?>[0];
+    LoggedTunableMeasure<?>[] measures = new LoggedTunableMeasure<?>[1];
+
+    measures[0] = new LoggedTunableMeasure<>("test/testmeasure1", Radian.zero());
 
     AtomicInteger first = new AtomicInteger();
     AtomicInteger second = new AtomicInteger();
 
     TunableUpdaterRegistry.registerMeasure(measures, first::incrementAndGet);
     TunableUpdaterRegistry.registerMeasure(measures, second::incrementAndGet);
+
+    NetworkTableInstance.getDefault()
+        .getDoubleTopic("TunableNumbers/test/testmeasure1 (Radian)")
+        .publish()
+        .set(100);
 
     TunableUpdaterRegistry.periodic();
 
