@@ -1,8 +1,7 @@
-package edu.wpi.team190.gompeilib;
+package edu.wpi.team190.gompeilib.core;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.robot.RobotMode;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
