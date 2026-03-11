@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
     id 'java-library'
     id 'maven-publish'
@@ -16,6 +18,14 @@ java {
 group = 'edu.wpi.team190'
 version = project.hasProperty("releaseVersion") ? project.property("releaseVersion") : "0.0.0-SNAPSHOT"
 
+// Detect OS
+def osClassifier = {
+    def osName = System.getProperty("os.name").toLowerCase()
+    if (osName.contains("win")) return "windowsx86-64"
+    if (osName.contains("mac")) return "osxuniversal"
+    return "linuxx86-64"
+}()
+
 repositories {
     mavenCentral()
     maven { url = uri("https://frcmaven.wpi.edu/artifactory/release") }
@@ -23,6 +33,8 @@ repositories {
     maven { url = uri("https://maven.ctr-electronics.com/release/") }
     maven { url = uri("https://frcmaven.wpi.edu/artifactory/sleipnirgroup-mvn-release/") }
 }
+
+apply from: "gradle/native-utils.gradle"
 
 dependencies {
     // WPILib bundle

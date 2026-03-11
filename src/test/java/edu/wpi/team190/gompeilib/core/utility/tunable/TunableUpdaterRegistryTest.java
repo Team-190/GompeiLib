@@ -8,9 +8,9 @@ import edu.wpi.team190.gompeilib.core.robot.RobotMode;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.control.constraints.LinearConstraints;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class TunableUpdaterRegistryTest {
 
   @BeforeEach
@@ -20,11 +20,13 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
+  @Order(1)
   void periodicWithNoRegistrationsDoesNothing() {
     assertDoesNotThrow(TunableUpdaterRegistry::periodic);
   }
 
   @Test
+  @Order(2)
   void registerGainsInvokesConsumer() {
     Gains gains =
         Gains.fromDoubles()
@@ -48,6 +50,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
+  @Order(3)
   void registerGainsDuplicateIgnored() {
     Gains gains =
         Gains.fromDoubles()
@@ -74,6 +77,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
+  @Order(4)
   void registerConstraintsInvokesConsumer() {
     LinearConstraints constraints =
         LinearConstraints.fromMeasures()
@@ -93,6 +97,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
+  @Order(5)
   void registerConstraintsDuplicateIgnored() {
     LinearConstraints constraints =
         LinearConstraints.fromMeasures()
@@ -115,6 +120,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
+  @Order(6)
   void registerNumberAcceptsArray() {
     LoggedTunableNumber[] nums = new LoggedTunableNumber[0];
 
@@ -122,6 +128,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
+  @Order(7)
   void registerNumberDuplicateIgnored() {
     LoggedTunableNumber[] nums = new LoggedTunableNumber[0];
 
@@ -138,6 +145,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
+  @Order(8)
   void registerMeasureAcceptsArray() {
     LoggedTunableMeasure<?>[] measures = new LoggedTunableMeasure<?>[0];
 
@@ -145,6 +153,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
+  @Order(9)
   void registerMeasureDuplicateIgnored() {
     LoggedTunableMeasure<?>[] measures = new LoggedTunableMeasure<?>[0];
 

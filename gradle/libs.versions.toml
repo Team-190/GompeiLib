@@ -1,5 +1,7 @@
+
 [versions]
 wpilib = "2026.2.1"
+wpilib-jni = "2025.3.2"
 phoenix6 = "26.1.1"
 choreo = "2026.0.1"
 aspectj = "1.9.21"
@@ -20,6 +22,11 @@ wpilib-wpiunits = { group = "edu.wpi.first.wpiunits", name = "wpiunits-java", ve
 wpilib-commands = { group = "edu.wpi.first.wpilibNewCommands", name = "wpilibNewCommands-java", version.ref = "wpilib" }
 wpilib-hal = { group = "edu.wpi.first.hal", name = "hal-java", version.ref = "wpilib" }
 wpilib-apriltag = {group = "edu.wpi.first.apriltag", name="apriltag-java", version.ref = "wpilib"}
+
+# WPILib JNI
+wpilib-ntcore-jni = { group = "edu.wpi.first.ntcore", name = "ntcore-jni", version.ref = "wpilib-jni" }
+wpilib-wpiutil-jni = { group = "edu.wpi.first.wpiutil", name = "wpiutil-jni", version.ref = "wpilib-jni" }
+wpilib-hal-jni = { group = "edu.wpi.first.hal", name = "hal-jni", version.ref = "wpilib-jni" }
 
 # CTRE Phoenix 6/Pro
 phoenix6 = { group = "com.ctre.phoenix6", name = "wpiapi-java", version.ref = "phoenix6" }
@@ -54,6 +61,12 @@ wpilib = [
     "wpilib-commands",
     "wpilib-hal",
     "wpilib-apriltag"
+]
+
+wpilib-runtime = [
+    "wpilib-ntcore-jni",
+    "wpilib-wpiutil-jni",
+    "wpilib-hal-jni"
 ]
 
 aspectj =  [
