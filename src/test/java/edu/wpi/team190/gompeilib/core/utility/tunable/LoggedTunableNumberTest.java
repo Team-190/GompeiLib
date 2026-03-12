@@ -1,7 +1,10 @@
 package edu.wpi.team190.gompeilib.core.utility.tunable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import org.junit.jupiter.api.*;
 
@@ -30,6 +33,7 @@ public class LoggedTunableNumberTest {
     assertEquals(42.0, number.getAsDouble());
   }
 
+  @Test
   @Order(3)
   public void defaultValueTuningMode() {
     GompeiLib.init(null, true, 0.02);
@@ -52,7 +56,8 @@ public class LoggedTunableNumberTest {
   public void hasChangedLastValueNullCurrentValueEqualsLastValue() {
     GompeiLib.init(null, true, 0.02);
     LoggedTunableNumber number = new LoggedTunableNumber("number");
-
+    number.initDefault(42.0);
+    assertTrue(number.hasChanged(0));
   }
 
   @Test
@@ -60,7 +65,8 @@ public class LoggedTunableNumberTest {
   public void hasChangedLastValueNullCurrentValueNotEqualsLastValue() {
     GompeiLib.init(null, true, 0.02);
     LoggedTunableNumber number = new LoggedTunableNumber("number");
-
+    number.initDefault(42);
+    assertTrue(number.hasChanged(0));
   }
 
   @Test
@@ -68,14 +74,22 @@ public class LoggedTunableNumberTest {
   public void hasChangedLastValueNotNullCurrentValueEqualsLastValue() {
     GompeiLib.init(null, true, 0.02);
     LoggedTunableNumber number = new LoggedTunableNumber("number");
-
+    number.initDefault(42.0);
+    number.hasChanged(0);
+    assertFalse(number.hasChanged(0));
   }
 
   @Test
   @Order(8)
   public void hasChangedLastValueNotNullCurrentValueNotEqualsLastValue() {
     GompeiLib.init(null, true, 0.02);
-    LoggedTunableNumber number = new LoggedTunableNumber("number");
 
+    LoggedTunableNumber number = new LoggedTunableNumber("number");
+    number.initDefault(42.0);
+    number.hasChanged(0);
+    NetworkTableInstance.getDefault().getDoubleTopic("TunableNumbers/number").publish().set(190);
+    NetworkTableInstance.getDefault().flush();
+    System.out.println(number.getAsDouble());
+    assertTrue(number.hasChanged(0));
   }
 }
