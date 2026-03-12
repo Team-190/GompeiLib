@@ -31,7 +31,7 @@ public class Arm {
 
   private final SysIdRoutine characterizationRoutine;
 
-  public Arm(ArmIO io, Subsystem subsystem, int index, ArmConstants constants) {
+  public Arm(ArmIO io, Subsystem subsystem, int index, ArmConstants constants, Setpoint<AngleUnit> positionGoal, Setpoint<VoltageUnit> voltageGoal) {
     this.io = io;
     this.inputs = new ArmIOInputsAutoLogged();
 
@@ -39,15 +39,8 @@ public class Arm {
 
     currentState = ArmState.IDLE;
 
-    voltageGoal =
-        new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12));
-    ;
-    positionGoal =
-        new Setpoint<>(
-            Rotation2d.kZero.getMeasure(),
-            constants.positionOffsetStep.getMeasure(),
-            constants.armParameters.maxAngle().getMeasure(),
-            constants.armParameters.minAngle().getMeasure());
+    this.positionGoal = positionGoal;
+    this.voltageGoal = voltageGoal;
 
     characterizationRoutine =
         new SysIdRoutine(
@@ -57,6 +50,20 @@ public class Arm {
                 Seconds.of(12),
                 (state) -> Logger.recordOutput(aKitTopic + "/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(io::setVoltageGoal, null, subsystem));
+  }
+
+  public Arm(ArmIO io, Subsystem subsystem, int index, ArmConstants constants) {
+    this(io, subsystem, index, constants,
+            new Setpoint<>(
+                    Rotation2d.kZero.getMeasure(),
+                    constants.positionOffsetStep.getMeasure(),
+                    constants.armParameters.maxAngle().getMeasure(),
+                    constants.armParameters.minAngle().getMeasure()),
+            new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12)));
+  }
+
+  public Arm(ArmIO io, Subsystem subsystem, int index, ArmConstants constants, Setpoint<AngleUnit> positionGoal) {
+    this(io, subsystem, index, constants, positionGoal, new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12)));
   }
 
   public void periodic() {

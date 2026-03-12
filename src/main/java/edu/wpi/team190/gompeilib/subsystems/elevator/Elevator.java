@@ -32,7 +32,7 @@ public class Elevator {
 
   public final ElevatorConstants constants;
 
-  public Elevator(ElevatorConstants constants, Subsystem subsystem, int index, ElevatorIO io) {
+  public Elevator(ElevatorConstants constants, Subsystem subsystem, int index, ElevatorIO io, Setpoint<DistanceUnit> positionGoal, Setpoint<VoltageUnit> voltageGoal) {
     this.io = io;
     this.inputs = new ElevatorIOInputsAutoLogged();
 
@@ -40,15 +40,8 @@ public class Elevator {
 
     currentState = ElevatorState.IDLE;
 
-    voltageGoal =
-        new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12));
-    ;
-    positionGoal =
-        new Setpoint<>(
-            Meters.of(0),
-            constants.heightOffsetStep,
-            constants.elevatorParameters.MIN_HEIGHT(),
-            constants.elevatorParameters.MAX_HEIGHT());
+    this.positionGoal = positionGoal;
+    this.voltageGoal = voltageGoal;
 
     characterizationRoutine =
         new SysIdRoutine(
@@ -61,6 +54,16 @@ public class Elevator {
 
     this.constants = constants;
   }
+
+  public Elevator(ElevatorConstants constants, Subsystem subsystem, int index, ElevatorIO io) {
+    this(constants, subsystem, index, io, new Setpoint<>(Meters.of(0), constants.heightOffsetStep, constants.elevatorParameters.MIN_HEIGHT(), constants.elevatorParameters.MAX_HEIGHT()), new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12)));
+  }
+
+  public Elevator(ElevatorConstants constants, Subsystem subsystem, int index, ElevatorIO io, Setpoint<DistanceUnit> positionGoal) {
+    this(constants, subsystem, index, io, positionGoal, new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12)));
+  }
+
+
 
   @Trace
   public void periodic() {

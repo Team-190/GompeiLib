@@ -19,13 +19,16 @@ public class GenericRoller {
   @Getter private Setpoint<VoltageUnit> voltageGoal;
 
   public GenericRoller(
-      GenericRollerIO io, Subsystem subsystem, GenericRollerConstants constants, String name) {
+      GenericRollerIO io, Subsystem subsystem, GenericRollerConstants constants, String name, Setpoint<VoltageUnit> voltageGoal) {
     this.io = io;
     inputs = new GenericRollerIOInputsAutoLogged();
     aKitTopic = subsystem.getName() + "/Roller" + name;
+    this.voltageGoal = voltageGoal;
+  }
 
-    voltageGoal =
-        new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12));
+  public GenericRoller(
+      GenericRollerIO io, Subsystem subsystem, GenericRollerConstants constants, String name) {
+    this(io, subsystem, constants, name, new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12)));
   }
 
   @Trace

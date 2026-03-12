@@ -15,6 +15,8 @@ import edu.wpi.team190.gompeilib.core.utility.control.constraints.AngularVelocit
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import edu.wpi.team190.gompeilib.core.utility.sysid.CustomSysIdRoutine;
 import edu.wpi.team190.gompeilib.core.utility.sysid.CustomUnits;
+
+import java.util.Set;
 import java.util.function.Supplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
@@ -35,7 +37,7 @@ public class GenericFlywheel {
   private final CustomSysIdRoutine<CurrentUnit> torqueCharacterizationRoutine;
 
   public GenericFlywheel(
-      GenericFlywheelIO io, Subsystem subsystem, GenericFlywheelConstants constants, String name) {
+          GenericFlywheelIO io, Subsystem subsystem, GenericFlywheelConstants constants, String name, Setpoint<AngularVelocityUnit> velocityGoal, Setpoint<VoltageUnit> voltageGoal) {
     this.io = io;
     inputs = new GenericFlywheelIOInputsAutoLogged();
 
@@ -43,15 +45,8 @@ public class GenericFlywheel {
 
     currentState = GenericFlywheelState.IDLE;
 
-    velocityGoal =
-        new Setpoint<>(
-            RadiansPerSecond.of(0),
-            constants.velocityOffsetStep,
-            RadiansPerSecond.of(-constants.gearRatio * constants.motorConfig.freeSpeedRadPerSec),
-            RadiansPerSecond.of(constants.gearRatio * constants.motorConfig.freeSpeedRadPerSec));
-    ;
-    voltageGoal =
-        new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12));
+    this.velocityGoal = velocityGoal;
+    this.voltageGoal = voltageGoal;
     currentGoal = Amps.of(0.0);
 
     voltageCharacterizationRoutine =
@@ -81,6 +76,22 @@ public class GenericFlywheel {
                 (amps) -> io.setCurrentGoal(Amps.of(amps.in(Amps))), subsystem),
             Amp.mutable(0));
   }
+
+  public GenericFlywheel(GenericFlywheelIO io, Subsystem subsystem, GenericFlywheelConstants constants, String name) {
+    this(io, subsystem, constants, name,
+
+            new Setpoint<>(
+                    RadiansPerSecond.of(0),
+                    constants.velocityOffsetStep,
+                    RadiansPerSecond.of(-constants.gearRatio * constants.motorConfig.freeSpeedRadPerSec),
+                    RadiansPerSecond.of(constants.gearRatio * constants.motorConfig.freeSpeedRadPerSec)),
+            new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12)));
+  }
+
+  public GenericFlywheel(GenericFlywheelIO io, Subsystem subsystem, GenericFlywheelConstants constants, String name, Setpoint<AngularVelocityUnit> velocityGoal) {
+    this(io, subsystem, constants, name, velocityGoal, new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12)));
+  }
+
 
   public void periodic() {
     io.updateInputs(inputs);
