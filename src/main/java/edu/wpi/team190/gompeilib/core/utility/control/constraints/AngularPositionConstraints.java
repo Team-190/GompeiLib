@@ -12,7 +12,7 @@ public record AngularPositionConstraints(
     LoggedTunableMeasure<AngleUnit> goalTolerance,
     LoggedTunableMeasure<AngularVelocityUnit> maxVelocity,
     LoggedTunableMeasure<AngularAccelerationUnit> maxAcceleration)
-    implements Constraints<AngularPositionConstraints> {
+    implements Constraints<AngularPositionConstraints>, Constraints.PositionConstraints<AngularPositionConstraints> {
 
   @Builder(
       setterPrefix = "with",
