@@ -209,6 +209,11 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   }
 
   @Override
+  public void setNeutralControl() {
+    talonFX.setControl(neutralControlRequest);
+  }
+
+  @Override
   public void setVelocityGoal(AngularVelocity velocityGoal) {
     this.velocityGoal = velocityGoal;
     talonFX.setControl(

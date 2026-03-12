@@ -3,11 +3,15 @@ package edu.wpi.team190.gompeilib.subsystems.arm;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.team190.gompeilib.core.utility.Setpoint;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.control.constraints.AngularPositionConstraints;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
@@ -22,12 +26,12 @@ public class Arm {
 
   @Getter private ArmState currentState;
 
-  @Getter private Voltage voltageGoal;
-  @Getter private Rotation2d positionGoal;
+  @Getter private Setpoint<VoltageUnit> voltageGoal;
+  @Getter private Setpoint<AngleUnit> positionGoal;
 
   private final SysIdRoutine characterizationRoutine;
 
-  public Arm(ArmIO io, Subsystem subsystem, int index) {
+  public Arm(ArmIO io, Subsystem subsystem, int index, ArmConstants constants) {
     this.io = io;
     this.inputs = new ArmIOInputsAutoLogged();
 
@@ -35,8 +39,15 @@ public class Arm {
 
     currentState = ArmState.IDLE;
 
-    voltageGoal = Volts.of(0.0);
-    positionGoal = Rotation2d.fromRadians(0.0);
+    voltageGoal =
+        new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12));
+    ;
+    positionGoal =
+        new Setpoint<>(
+            Rotation2d.kZero.getMeasure(),
+            constants.positionOffsetStep.getMeasure(),
+            constants.armParameters.maxAngle().getMeasure(),
+            constants.armParameters.minAngle().getMeasure());
 
     characterizationRoutine =
         new SysIdRoutine(
@@ -53,14 +64,18 @@ public class Arm {
     Logger.processInputs(aKitTopic, inputs);
 
     Logger.recordOutput(aKitTopic + "/State", currentState.name());
-    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoal);
-    Logger.recordOutput(aKitTopic + "/Position Goal", positionGoal);
+    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoal.getSetpoint());
+    Logger.recordOutput(
+        aKitTopic + "/Position Goal", new Rotation2d((Angle) positionGoal.getSetpoint()));
+    Logger.recordOutput(aKitTopic + "/Voltage Offset", voltageGoal.getOffset());
+    Logger.recordOutput(aKitTopic + "/Position Offset", positionGoal.getOffset());
     Logger.recordOutput(aKitTopic + "/At Voltage Goal", atVoltageGoal());
     Logger.recordOutput(aKitTopic + "/At Position Goal", atPositionGoal());
 
     switch (currentState) {
-      case OPEN_LOOP_VOLTAGE_CONTROL -> io.setVoltageGoal(voltageGoal);
-      case CLOSED_LOOP_POSITION_CONTROL -> io.setPositionGoal(positionGoal);
+      case OPEN_LOOP_VOLTAGE_CONTROL -> io.setVoltageGoal((Voltage) voltageGoal.getNewSetpoint());
+      case CLOSED_LOOP_POSITION_CONTROL ->
+          io.setPositionGoal(new Rotation2d((Angle) positionGoal.getNewSetpoint()));
     }
   }
 
@@ -70,10 +85,20 @@ public class Arm {
 
   public void setVoltageGoal(Voltage voltageGoal) {
     currentState = ArmState.OPEN_LOOP_VOLTAGE_CONTROL;
+    this.voltageGoal.setSetpoint(voltageGoal);
+  }
+
+  public void setVoltageGoal(Setpoint<VoltageUnit> voltageGoal) {
+    currentState = ArmState.OPEN_LOOP_VOLTAGE_CONTROL;
     this.voltageGoal = voltageGoal;
   }
 
   public void setPositionGoal(Rotation2d positionGoal) {
+    currentState = ArmState.CLOSED_LOOP_POSITION_CONTROL;
+    this.positionGoal.setSetpoint(positionGoal.getMeasure());
+  }
+
+  public void setPositionGoal(Setpoint<AngleUnit> positionGoal) {
     currentState = ArmState.CLOSED_LOOP_POSITION_CONTROL;
     this.positionGoal = positionGoal;
   }
@@ -87,11 +112,11 @@ public class Arm {
   }
 
   public boolean atVoltageGoal() {
-    return atVoltageGoal(voltageGoal);
+    return atVoltageGoal((Voltage) voltageGoal.getNewSetpoint());
   }
 
   public boolean atPositionGoal() {
-    return atPositionGoal(positionGoal);
+    return atPositionGoal(new Rotation2d((Angle) positionGoal.getNewSetpoint()));
   }
 
   public void setPosition(Rotation2d position) {

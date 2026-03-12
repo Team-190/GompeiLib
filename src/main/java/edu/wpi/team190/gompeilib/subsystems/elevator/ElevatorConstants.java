@@ -2,6 +2,8 @@ package edu.wpi.team190.gompeilib.subsystems.elevator;
 
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.control.constraints.LinearConstraints;
 import java.util.Set;
@@ -33,11 +35,14 @@ public class ElevatorConstants {
   @NonNull
   public final Set<Integer> opposedFollowerCANIDs;
 
+  @NonNull public final Voltage voltageOffsetStep;
+  @NonNull public final Distance heightOffsetStep;
+
   @Builder(setterPrefix = "with")
   public record ElevatorParameters(
       @NonNull DCMotor ELEVATOR_MOTOR_CONFIG,
       @NonNull Double CARRIAGE_MASS_KG,
-      @NonNull Double MIN_HEIGHT_METERS,
-      @NonNull Double MAX_HEIGHT_METERS,
+      @NonNull Distance MIN_HEIGHT,
+      @NonNull Distance MAX_HEIGHT,
       @NonNull Integer NUM_MOTORS) {}
 }
