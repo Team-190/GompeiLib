@@ -32,7 +32,13 @@ public class Elevator {
 
   public final ElevatorConstants constants;
 
-  public Elevator(ElevatorConstants constants, Subsystem subsystem, int index, ElevatorIO io, Setpoint<DistanceUnit> positionGoal, Setpoint<VoltageUnit> voltageGoal) {
+  public Elevator(
+      ElevatorConstants constants,
+      Subsystem subsystem,
+      int index,
+      ElevatorIO io,
+      Setpoint<DistanceUnit> positionGoal,
+      Setpoint<VoltageUnit> voltageGoal) {
     this.io = io;
     this.inputs = new ElevatorIOInputsAutoLogged();
 
@@ -56,14 +62,33 @@ public class Elevator {
   }
 
   public Elevator(ElevatorConstants constants, Subsystem subsystem, int index, ElevatorIO io) {
-    this(constants, subsystem, index, io, new Setpoint<>(Meters.of(0), constants.heightOffsetStep, constants.elevatorParameters.MIN_HEIGHT(), constants.elevatorParameters.MAX_HEIGHT()), new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12)));
+    this(
+        constants,
+        subsystem,
+        index,
+        io,
+        new Setpoint<>(
+            Meters.of(0),
+            constants.heightOffsetStep,
+            constants.elevatorParameters.MIN_HEIGHT(),
+            constants.elevatorParameters.MAX_HEIGHT()),
+        new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12)));
   }
 
-  public Elevator(ElevatorConstants constants, Subsystem subsystem, int index, ElevatorIO io, Setpoint<DistanceUnit> positionGoal) {
-    this(constants, subsystem, index, io, positionGoal, new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12)));
+  public Elevator(
+      ElevatorConstants constants,
+      Subsystem subsystem,
+      int index,
+      ElevatorIO io,
+      Setpoint<DistanceUnit> positionGoal) {
+    this(
+        constants,
+        subsystem,
+        index,
+        io,
+        positionGoal,
+        new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12)));
   }
-
-
 
   @Trace
   public void periodic() {
