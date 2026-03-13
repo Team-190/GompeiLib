@@ -107,6 +107,12 @@ public class GenericFlywheelIOSim implements GenericFlywheelIO {
   }
 
   @Override
+  public void setNeutralControl() {
+    appliedVolts = Volts.of(0.0);
+    profile.reset();
+  }
+
+  @Override
   public boolean atVoltageGoal(Voltage voltageReference) {
     return appliedVolts.isNear(voltageReference, Millivolts.of(500));
   }
