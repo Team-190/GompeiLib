@@ -6,6 +6,5 @@ public interface Constraints<T extends Constraints<T>> {
   public void update(int id, Consumer<T> consumer);
 
   public sealed interface PositionConstraints<T extends PositionConstraints<T>>
-          extends Constraints<T>
-          permits AngularPositionConstraints, LinearConstraints {}
+      extends Constraints<T> permits AngularPositionConstraints, LinearConstraints {}
 }
