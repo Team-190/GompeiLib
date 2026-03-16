@@ -10,7 +10,6 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
@@ -84,7 +83,7 @@ public class ArmIOTalonFX implements ArmIO {
         .withKG(constants.slot2Gains.kG().get())
         .withGravityType(GravityTypeValue.Arm_Cosine);
 
-    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    config.MotorOutput.Inverted = constants.invertedValue;
     config.ClosedLoopGeneral.ContinuousWrap = constants.armParameters.continuousOutput();
     config.MotionMagic =
         new MotionMagicConfigs()
