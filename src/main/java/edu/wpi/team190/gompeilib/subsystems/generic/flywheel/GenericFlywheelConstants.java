@@ -43,4 +43,8 @@ public class GenericFlywheelConstants {
   @NonNull public final AngularVelocity velocityOffsetStep;
 
   @NonNull public final Voltage voltageOffsetStep;
+
+  @NonNull public final double flywheelMass;
+
+  @NonNull public final double flywheelRadius;
 }
