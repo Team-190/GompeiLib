@@ -12,7 +12,7 @@ public record LinearConstraints(
     LoggedTunableMeasure<DistanceUnit> goalTolerance,
     LoggedTunableMeasure<LinearVelocityUnit> maxVelocity,
     LoggedTunableMeasure<LinearAccelerationUnit> maxAcceleration)
-    implements Constraints<LinearConstraints> {
+    implements Constraints<LinearConstraints>, Constraints.PositionConstraints<LinearConstraints> {
 
   @Builder(
       setterPrefix = "with",

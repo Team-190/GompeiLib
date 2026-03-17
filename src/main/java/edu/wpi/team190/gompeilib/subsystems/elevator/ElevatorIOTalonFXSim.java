@@ -1,7 +1,7 @@
 package edu.wpi.team190.gompeilib.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Meters;
 
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -27,10 +27,10 @@ public class ElevatorIOTalonFXSim extends ElevatorIOTalonFX {
                 constants.drumRadius,
                 constants.elevatorGearRatio),
             constants.elevatorParameters.ELEVATOR_MOTOR_CONFIG(),
-            constants.elevatorParameters.MIN_HEIGHT_METERS(),
-            constants.elevatorParameters.MAX_HEIGHT_METERS(),
+            constants.elevatorParameters.MIN_HEIGHT().in(Meters),
+            constants.elevatorParameters.MAX_HEIGHT().in(Meters),
             true,
-            constants.elevatorParameters.MIN_HEIGHT_METERS());
+            constants.elevatorParameters.MIN_HEIGHT().in(Meters));
 
     elevatorController = super.talonFX.getSimState();
   }
