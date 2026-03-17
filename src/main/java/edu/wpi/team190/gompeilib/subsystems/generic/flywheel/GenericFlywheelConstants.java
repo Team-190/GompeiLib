@@ -5,9 +5,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.team190.gompeilib.core.utility.control.AngularConstraints;
 import edu.wpi.team190.gompeilib.core.utility.control.CurrentLimits;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
+import edu.wpi.team190.gompeilib.core.utility.control.constraints.AngularVelocityConstraints;
 import java.util.Set;
 import lombok.Builder;
 import lombok.NonNull;
@@ -30,7 +30,7 @@ public class GenericFlywheelConstants {
 
   @NonNull public final Gains voltageGains;
   @NonNull public final Gains torqueGains;
-  @NonNull public final AngularConstraints constraints;
+  @NonNull public final AngularVelocityConstraints constraints;
 
   @Singular(value = "alignedFollowerCANID")
   @NonNull

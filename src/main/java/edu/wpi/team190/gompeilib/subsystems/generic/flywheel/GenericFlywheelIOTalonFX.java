@@ -11,9 +11,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
+import edu.wpi.team190.gompeilib.core.utility.control.constraints.AngularVelocityConstraints;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   private final ArrayList<StatusSignal<Current>> supplyCurrentAmps;
   private final ArrayList<StatusSignal<Current>> torqueCurrentAmps;
   private final ArrayList<StatusSignal<Temperature>> temperatureCelsius;
-  private double velocityGoalRadiansPerSecond;
+  private AngularVelocity velocityGoal;
   private final StatusSignal<Double> velocitySetpointRotationsPerSecond;
   private final StatusSignal<Double> velocityErrorRotationsPerSecond;
 
@@ -132,7 +133,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
       temperatureCelsius.add(follower.getDeviceTemp());
     }
 
-    velocityGoalRadiansPerSecond = 0.0;
+    velocityGoal = RotationsPerSecond.of(0.0);
 
     velocitySetpointRotationsPerSecond = talonFX.getClosedLoopReference();
     velocityErrorRotationsPerSecond = talonFX.getClosedLoopError();
@@ -173,9 +174,8 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
 
   @Override
   public void updateInputs(GenericFlywheelIOInputs inputs) {
-    inputs.positionRadians = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
-    inputs.velocityRadiansPerSecond =
-        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());
+    inputs.position = Rotation2d.fromRotations(positionRotations.getValueAsDouble());
+    inputs.velocity = velocityRotationsPerSecond.getValue();
 
     inputs.appliedVolts = new double[appliedVolts.size()];
     inputs.supplyCurrentAmps = new double[supplyCurrentAmps.size()];
@@ -189,46 +189,86 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
       inputs.temperatureCelsius[i] = temperatureCelsius.get(i).getValueAsDouble();
     }
 
-    inputs.velocityGoalRadiansPerSecond = velocityGoalRadiansPerSecond;
-    inputs.velocitySetpointRadiansPerSecond =
-        Units.rotationsToRadians(velocitySetpointRotationsPerSecond.getValueAsDouble());
-    inputs.velocityErrorRadiansPerSecond =
-        Units.rotationsToRadians(velocityRotationsPerSecond.getValueAsDouble());
+    inputs.velocityGoal = velocityGoal;
+    inputs.velocitySetpoint =
+        RotationsPerSecond.of(velocitySetpointRotationsPerSecond.getValueAsDouble());
+    inputs.velocityError = RotationsPerSecond.of(velocityRotationsPerSecond.getValueAsDouble());
+
+    inputs.gainSlot = GainSlot.integerToGainSlot(talonFX.getClosedLoopSlot().getValue());
   }
 
   @Override
-  public void setVoltage(double volts) {
-    talonFX.setControl(voltageControlRequest.withOutput(volts).withEnableFOC(constants.enableFOC));
-  }
-
-  @Override
-  public void setAmps(double amps) {
-    talonFX.setControl(torqueCurrentFOCRequest.withOutput(amps));
-  }
-
-  @Override
-  public void setVelocityVoltage(double velocityRadiansPerSecond) {
-    velocityGoalRadiansPerSecond = velocityRadiansPerSecond;
+  public void setVoltageGoal(Voltage voltageGoal) {
     talonFX.setControl(
-        velocityControlRequest
-            .withVelocity(Units.radiansToRotations(velocityGoalRadiansPerSecond))
-            .withEnableFOC(constants.enableFOC));
+        voltageControlRequest.withOutput(voltageGoal).withEnableFOC(constants.enableFOC));
   }
 
   @Override
-  public void setVelocityTorque(double velocityRadiansPerSecond, double feedforward) {
-    velocityGoalRadiansPerSecond = velocityRadiansPerSecond;
+  public void setCurrentGoal(Current currentGoal) {
+    talonFX.setControl(torqueCurrentFOCRequest.withOutput(currentGoal));
+  }
+
+  @Override
+  public void setNeutralControl() {
+    talonFX.setControl(neutralControlRequest);
+  }
+
+  @Override
+  public void setVelocityGoal(AngularVelocity velocityGoal) {
+    this.velocityGoal = velocityGoal;
+    talonFX.setControl(
+        velocityControlRequest.withVelocity(this.velocityGoal).withEnableFOC(constants.enableFOC));
+  }
+
+  @Override
+  public void setVelocityGoal(AngularVelocity velocityGoal, Current currentFeedforward) {
+    this.velocityGoal = velocityGoal;
     talonFX.setControl(
         velocityTorqueCurrentRequest
-            .withVelocity(Units.radiansToRotations(velocityGoalRadiansPerSecond))
-            .withFeedForward(feedforward));
+            .withVelocity(this.velocityGoal)
+            .withFeedForward(currentFeedforward));
   }
 
   @Override
-  public void setPID(GainSlot slot, double kP, double kI, double kD) {
-    switch (slot) {
-      case ONE -> talonFXConfiguration.Slot1.withKP(kP).withKI(kI).withKD(kD);
-      default -> talonFXConfiguration.Slot0.withKP(kP).withKI(kI).withKD(kD);
+  public boolean atVoltageGoal(Voltage voltageReference) {
+    return appliedVolts.get(0).isNear(voltageReference, Millivolts.of(500));
+  }
+
+  @Override
+  public boolean atCurrentGoal(Current currentReference) {
+    return torqueCurrentAmps.get(0).isNear(currentReference, Milliamps.of(500));
+  }
+
+  @Override
+  public boolean atVelocityGoal(AngularVelocity velocityReference) {
+    return velocityRotationsPerSecond.isNear(
+        velocityReference,
+        RotationsPerSecond.of(constants.constraints.goalTolerance().get(RotationsPerSecond)));
+  }
+
+  @Override
+  public void updateGains(Gains gains, GainSlot gainSlot) {
+    switch (gainSlot) {
+      case ONE ->
+          talonFXConfiguration
+              .Slot1
+              .withKP(gains.kP().get())
+              .withKI(gains.kI().get())
+              .withKD(gains.kD().get())
+              .withKS(gains.kS().get())
+              .withKV(gains.kV().get())
+              .withKA(gains.kA().get())
+              .withKG(gains.kG().get());
+      default ->
+          talonFXConfiguration
+              .Slot0
+              .withKP(gains.kP().get())
+              .withKI(gains.kI().get())
+              .withKD(gains.kD().get())
+              .withKS(gains.kS().get())
+              .withKV(gains.kV().get())
+              .withKA(gains.kA().get())
+              .withKG(gains.kG().get());
     }
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
     for (TalonFX follower : followerTalonFX) {
@@ -237,44 +277,14 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   }
 
   @Override
-  public void setFeedforward(GainSlot slot, double kS, double kV, double kA) {
-    switch (slot) {
-      case ONE -> talonFXConfiguration.Slot1.withKS(kS).withKV(kV).withKA(kA);
-      default -> talonFXConfiguration.Slot0.withKS(kS).withKV(kV).withKA(kA);
-    }
-    PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
-    for (TalonFX follower : followerTalonFX) {
-      PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
-    }
-  }
-
-  @Override
-  public void setProfile(
-      double maxAccelerationRadiansPerSecondSquared,
-      double cruisingVelocityRadiansPerSecond,
-      double goalToleranceRadiansPerSecond) {
+  public void updateConstraints(AngularVelocityConstraints constraints) {
     talonFXConfiguration
         .MotionMagic
-        .withMotionMagicAcceleration(
-            Units.radiansToRotations(maxAccelerationRadiansPerSecondSquared))
-        .withMotionMagicCruiseVelocity(
-            AngularVelocity.ofRelativeUnits(cruisingVelocityRadiansPerSecond, RadiansPerSecond));
+        .withMotionMagicAcceleration(constraints.maxAcceleration().get(RotationsPerSecondPerSecond))
+        .withMotionMagicCruiseVelocity(constraints.maxVelocity().get(RotationsPerSecond));
     PhoenixUtil.tryUntilOk(5, () -> talonFX.getConfigurator().apply(talonFXConfiguration));
     for (TalonFX follower : followerTalonFX) {
       PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(talonFXConfiguration));
     }
-  }
-
-  @Override
-  public boolean atGoal() {
-    return Math.abs(
-            velocityGoalRadiansPerSecond
-                - velocityRotationsPerSecond.getValue().in(RadiansPerSecond))
-        <= constants.constraints.goalTolerance().get().in(Radian);
-  }
-
-  @Override
-  public void stop() {
-    talonFX.setControl(neutralControlRequest);
   }
 }

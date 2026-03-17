@@ -1,33 +1,43 @@
 package edu.wpi.team190.gompeilib.subsystems.generic.roller;
 
-import static edu.wpi.first.units.Units.Millivolts;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
-import edu.wpi.team190.gompeilib.core.utility.Offset;
+import edu.wpi.team190.gompeilib.core.utility.Setpoint;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public class GenericRoller {
   private final GenericRollerIO io;
   private final GenericRollerIOInputsAutoLogged inputs;
+
   private final String aKitTopic;
 
-  @Getter private Offset<VoltageUnit> voltageGoalVolts;
+  @Getter private Setpoint<VoltageUnit> voltageGoal;
 
   public GenericRoller(
-      GenericRollerIO io, Subsystem subsystem, GenericRollerConstants constants, String name) {
+      GenericRollerIO io,
+      Subsystem subsystem,
+      GenericRollerConstants constants,
+      String name,
+      Setpoint<VoltageUnit> voltageGoal) {
     this.io = io;
     inputs = new GenericRollerIOInputsAutoLogged();
     aKitTopic = subsystem.getName() + "/Roller" + name;
+    this.voltageGoal = voltageGoal;
+  }
 
-    voltageGoalVolts =
-        new Offset<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12));
+  public GenericRoller(
+      GenericRollerIO io, Subsystem subsystem, GenericRollerConstants constants, String name) {
+    this(
+        io,
+        subsystem,
+        constants,
+        name,
+        new Setpoint<>(Volts.of(0), constants.voltageOffsetStep, Volts.of(-12), Volts.of(12)));
   }
 
   @Trace
@@ -35,39 +45,26 @@ public class GenericRoller {
     io.updateInputs(inputs);
     Logger.processInputs(aKitTopic, inputs);
 
-    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoalVolts.getNewSetpoint());
+    Logger.recordOutput(aKitTopic + "/Voltage Goal", voltageGoal.getSetpoint());
+    Logger.recordOutput(aKitTopic + "/Voltage Offset", voltageGoal.getOffset());
+    Logger.recordOutput(aKitTopic + "/At Voltage Goal", atVoltageGoal());
 
-    Logger.recordOutput(aKitTopic + "/Voltage Offset", voltageGoalVolts.getOffset());
-    Logger.recordOutput(
-        aKitTopic + "/Voltage Magnitude",
-        String.format("%.1f", Math.abs(voltageGoalVolts.getSetpoint().baseUnitMagnitude())));
-
-    io.setVoltage(voltageGoalVolts.getNewSetpoint().baseUnitMagnitude());
+    io.setVoltageGoal((Voltage) voltageGoal.getNewSetpoint());
   }
 
-  public Command setVoltage(Voltage volts) {
-    return Commands.runOnce(() -> voltageGoalVolts.setSetpoint(volts));
+  public boolean atVoltageGoal(Voltage voltageReference) {
+    return io.atVoltageGoal(voltageReference);
   }
 
-  public Command setVoltage(double volts) {
-    return setVoltage(Volts.of(volts));
+  public boolean atVoltageGoal() {
+    return atVoltageGoal((Voltage) voltageGoal.getNewSetpoint());
   }
 
-  public boolean atGoal(Voltage volts) {
-    return volts
-        .plus(voltageGoalVolts.getOffset())
-        .isNear(voltageGoalVolts.getNewSetpoint(), Millivolts.of(500));
+  public void setVoltageGoal(Voltage voltage) {
+    voltageGoal.setSetpoint(voltage);
   }
 
-  public Command incrementVoltageOffset() {
-    return Commands.runOnce(voltageGoalVolts::increment);
-  }
-
-  public Command decrementVoltageOffset() {
-    return Commands.runOnce(voltageGoalVolts::decrement);
-  }
-
-  public Command resetVoltageOffset() {
-    return Commands.runOnce(voltageGoalVolts::reset);
+  public void setVoltageGoal(Setpoint<VoltageUnit> voltage) {
+    voltageGoal = voltage;
   }
 }

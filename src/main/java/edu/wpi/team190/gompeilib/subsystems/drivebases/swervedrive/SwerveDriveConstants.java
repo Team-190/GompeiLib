@@ -9,9 +9,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.DistanceUnit;
-import edu.wpi.team190.gompeilib.core.utility.control.AngularConstraints;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
-import edu.wpi.team190.gompeilib.core.utility.control.LinearConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.constraints.AngularPositionConstraints;
+import edu.wpi.team190.gompeilib.core.utility.control.constraints.LinearConstraints;
 import edu.wpi.team190.gompeilib.core.utility.tunable.LoggedTunableMeasure;
 import java.util.concurrent.locks.ReentrantLock;
 import lombok.Builder;
@@ -90,7 +90,7 @@ public class SwerveDriveConstants {
       @NonNull Gains yGains,
       @NonNull LinearConstraints yConstraints,
       @NonNull Gains rotationGains,
-      @NonNull AngularConstraints rotationConstraints,
+      @NonNull AngularPositionConstraints rotationConstraints,
       @NonNull LoggedTunableMeasure<DistanceUnit> linearThreshold,
       @NonNull LoggedTunableMeasure<AngleUnit> angularThreshold) {}
 }

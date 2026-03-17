@@ -2,39 +2,46 @@ package edu.wpi.team190.gompeilib.core.utility;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
+import edu.wpi.team190.gompeilib.core.logging.Trace;
 import lombok.Getter;
 
-public class Offset<U extends Unit> {
+public class Setpoint<U extends Unit> {
   @Getter private Measure<U> setpoint;
+  @Getter private Measure<U> newSetpoint;
   @Getter private Measure<U> offset;
-  private Measure<U> step;
+  private final Measure<U> step;
   public Measure<U> min;
   public Measure<U> max;
 
-  public Offset(Measure<U> setpoint, Measure<U> step, Measure<U> min, Measure<U> max) {
+  public Setpoint(Measure<U> setpoint, Measure<U> step, Measure<U> min, Measure<U> max) {
     this.setpoint = setpoint;
     this.offset = setpoint.times(0);
     this.step = step;
     this.min = min.minus(setpoint);
     this.max = max.minus(setpoint);
+    this.newSetpoint = setpoint;
   }
 
-  public Offset(Measure<U> setpoint, Measure<U> step) {
+  public Setpoint(Measure<U> setpoint, Measure<U> step) {
     this.setpoint = setpoint;
     this.offset = setpoint.times(0);
     this.step = step;
     this.min = step.times(Double.NEGATIVE_INFINITY);
     this.max = step.times(Double.POSITIVE_INFINITY);
+    this.newSetpoint = setpoint;
   }
 
   public void setSetpoint(Measure<U> setpoint) {
     this.min = min.plus(this.setpoint).minus(setpoint);
     this.max = max.plus(this.setpoint).minus(setpoint);
     this.setpoint = setpoint;
+
     //    offset = clamp(offset);
+    newSetpoint = calculateSetpoint();
   }
 
-  public Measure<U> getNewSetpoint() {
+  @Trace
+  private Measure<U> calculateSetpoint() {
     double sign = Math.signum(setpoint.magnitude());
 
     // Apply offset in the direction of the setpoint's sign
@@ -50,21 +57,11 @@ public class Offset<U extends Unit> {
   }
 
   public void increment() {
-    Measure<U> next = offset.plus(step);
-    if (next.gt(max)) {
-      offset = max;
-    } else {
-      offset = next;
-    }
+    increment(step);
   }
 
   public void decrement() {
-    Measure<U> next = offset.minus(step);
-    if (next.lt(min)) {
-      offset = min;
-    } else {
-      offset = next;
-    }
+    decrement(step);
   }
 
   public void increment(Measure<U> step) {
@@ -74,6 +71,7 @@ public class Offset<U extends Unit> {
     } else {
       offset = next;
     }
+    newSetpoint = calculateSetpoint();
   }
 
   public void decrement(Measure<U> step) {
@@ -83,19 +81,11 @@ public class Offset<U extends Unit> {
     } else {
       offset = next;
     }
+    newSetpoint = calculateSetpoint();
   }
 
   public void reset() {
     offset = offset.times(0);
-  }
-
-  public Measure<U> clamp(Measure<U> value) {
-    if (value.gt(max)) {
-      return max;
-    } else if (value.lt(min)) {
-      return min;
-    } else {
-      return value;
-    }
+    newSetpoint = setpoint;
   }
 }
