@@ -2,6 +2,7 @@ package edu.wpi.team190.gompeilib.core.utility;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
+import edu.wpi.team190.gompeilib.core.logging.Trace;
 import lombok.Getter;
 
 public class Setpoint<U extends Unit> {
@@ -39,6 +40,7 @@ public class Setpoint<U extends Unit> {
     newSetpoint = calculateSetpoint();
   }
 
+  @Trace
   private Measure<U> calculateSetpoint() {
     double sign = Math.signum(setpoint.magnitude());
 
