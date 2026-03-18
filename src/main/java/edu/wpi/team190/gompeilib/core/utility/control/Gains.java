@@ -38,6 +38,30 @@ public record Gains(
         new LoggedTunableNumber(prefix + "/Kg", kG));
   }
 
+  public Gains {
+    if (kP == null) {
+      kP = new LoggedTunableNumber("");
+    }
+    if (kI == null) {
+      kI = new LoggedTunableNumber("");
+    }
+    if (kD == null) {
+      kD = new LoggedTunableNumber("");
+    }
+    if (kS == null) {
+      kS = new LoggedTunableNumber("");
+    }
+    if (kV == null) {
+      kV = new LoggedTunableNumber("");
+    }
+    if (kA == null) {
+      kA = new LoggedTunableNumber("");
+    }
+    if (kG == null) {
+      kG = new LoggedTunableNumber("");
+    }
+  }
+
   public double getKP() {
     return kP.get();
   }
