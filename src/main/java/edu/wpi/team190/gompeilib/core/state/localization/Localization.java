@@ -9,6 +9,8 @@ import edu.wpi.team190.gompeilib.core.utility.GeometryUtil;
 import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionMultiTxTyObservation;
 import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionPoseObservation;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Localization {
   private final List<EstimationRegion> estimationRegions;
@@ -69,12 +71,14 @@ public class Localization {
   }
 
   public Pose2d getEstimatedPose(FieldZone fieldZone) {
-    for (EstimationRegion region : estimationRegions) {
-      if (fieldZone.aprilTags().equals(region.getAprilTags())) {
-        return region.getEstimatedPose();
-      }
-    }
-    return globalPoseEstimator.getEstimatedPosition();
+    Set<Integer> zoneTagIDs =
+        fieldZone.aprilTags().stream().map(t -> t.ID).collect(Collectors.toSet());
+
+    return estimationRegions.stream()
+        .filter(region -> zoneTagIDs.equals(region.getAprilTags().keySet()))
+        .findFirst()
+        .map(EstimationRegion::getEstimatedPose)
+        .orElseGet(globalPoseEstimator::getEstimatedPosition);
   }
 
   public Rotation2d getHeading() {
