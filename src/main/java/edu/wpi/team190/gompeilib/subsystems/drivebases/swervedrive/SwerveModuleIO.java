@@ -59,8 +59,9 @@ public interface SwerveModuleIO {
 
   /**
    * Updates current limits.
+   *
    * @param driveCurrentLimit The drive current limit.
    * @param turnCurrentLimit The turn current limit.
    */
-  public default void updateCurrentLimits(double driveCurrentLimit, double turnCurrentLimit){}
+  public default void updateCurrentLimits(double driveCurrentLimit, double turnCurrentLimit) {}
 }

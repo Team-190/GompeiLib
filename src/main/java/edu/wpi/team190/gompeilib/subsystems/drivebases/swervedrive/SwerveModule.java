@@ -158,11 +158,12 @@ public class SwerveModule {
 
   /**
    * Updates current limits.
+   *
    * @param driveCurrentLimit The drive current limit.
    * @param turnCurrentLimit The turn current limit.
    */
   @Trace
-  public void updateCurrentLimits(double driveCurrentLimit, double turnCurrentLimit){
+  public void updateCurrentLimits(double driveCurrentLimit, double turnCurrentLimit) {
     io.updateCurrentLimits(driveCurrentLimit, turnCurrentLimit);
   }
 }
