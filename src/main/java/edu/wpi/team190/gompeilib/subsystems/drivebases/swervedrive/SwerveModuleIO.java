@@ -56,4 +56,11 @@ public interface SwerveModuleIO {
 
   /** Sets the module FF gains */
   public default void setFeedforward(double drive_Ks, double drive_Kv) {}
+
+  /**
+   * Updates current limits.
+   * @param driveCurrentLimit The drive current limit.
+   * @param turnCurrentLimit The turn current limit.
+   */
+  public default void updateCurrentLimits(double driveCurrentLimit, double turnCurrentLimit){}
 }

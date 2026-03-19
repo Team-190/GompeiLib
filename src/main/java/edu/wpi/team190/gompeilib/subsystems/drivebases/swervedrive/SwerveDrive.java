@@ -416,4 +416,16 @@ public class SwerveDrive extends SubsystemBase {
     runVelocity(velocity);
     Logger.recordOutput("Auto/Setpoint", sample.getPose());
   }
+
+  /**
+   * Updates current limits.
+   * @param driveCurrentLimit The drive current limit.
+   * @param turnCurrentLimit The turn current limit.
+   */
+  @Trace
+  public void updateCurrentLimits(double driveCurrentLimit, double turnCurrentLimit) {
+    for (SwerveModule s: modules){
+      s.updateCurrentLimits(driveCurrentLimit, turnCurrentLimit);
+    }
+  }
 }
