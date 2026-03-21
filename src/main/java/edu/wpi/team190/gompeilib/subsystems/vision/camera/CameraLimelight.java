@@ -99,15 +99,17 @@ public class CameraLimelight extends Camera {
         LimelightHelpers.triggerRewindCapture(name, 165);
         enabledTimestamp = Timer.getTimestamp();
       }
+
+      LimelightHelpers.SetIMUMode(name, 4);
     }
 
     if (DriverStation.isDisabled()) {
       if (wasEnabled) {
         LimelightHelpers.triggerRewindCapture(name, Timer.getTimestamp() - enabledTimestamp);
       }
-    }
 
-    LimelightHelpers.SetIMUMode(name, 4);
+      LimelightHelpers.SetIMUMode(name, 1);
+    }
 
     LimelightHelpers.SetRobotOrientation(
         name, this.headingSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
