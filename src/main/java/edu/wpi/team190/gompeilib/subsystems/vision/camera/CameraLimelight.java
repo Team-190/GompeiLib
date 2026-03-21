@@ -7,6 +7,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.team190.gompeilib.core.utility.LimelightHelpers;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants.LimelightConfig;
@@ -35,6 +37,9 @@ public class CameraLimelight extends Camera {
   private final DoubleArrayPublisher headingPublisher;
 
   @Getter private final List<Pose3d> allTagPoses;
+
+  private boolean wasEnabled;
+  private double enabledTimestamp;
 
   public CameraLimelight(
       CameraIOLimelight io,
@@ -74,6 +79,9 @@ public class CameraLimelight extends Camera {
         currentCameraPose.getRotation().getMeasureX().in(Degrees),
         currentCameraPose.getRotation().getMeasureY().in(Degrees),
         currentCameraPose.getRotation().getMeasureZ().in(Degrees));
+
+    LimelightHelpers.SetIMUMode(name, 1);
+    LimelightHelpers.setRewindEnabled(name, true);
   }
 
   @Override
@@ -82,9 +90,27 @@ public class CameraLimelight extends Camera {
     multiTxTyObservationList.clear();
     singleTxTyObservationList.clear();
 
-    this.headingPublisher.set(
-        new double[] {this.headingSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0},
-        timestampSupplier.getAsLong());
+    if (DriverStation.isEnabled()) {
+      if (!wasEnabled) {
+        enabledTimestamp = Timer.getTimestamp();
+      }
+
+      if (Timer.getTimestamp() - enabledTimestamp >= 165) {
+        LimelightHelpers.triggerRewindCapture(name, 165);
+        enabledTimestamp = Timer.getTimestamp();
+      }
+    }
+
+    if (DriverStation.isDisabled()) {
+      if (wasEnabled) {
+        LimelightHelpers.triggerRewindCapture(name, Timer.getTimestamp() - enabledTimestamp);
+      }
+    }
+
+    LimelightHelpers.SetIMUMode(name, 4);
+
+    LimelightHelpers.SetRobotOrientation(
+        name, this.headingSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
 
     io.updateInputs(inputs);
     Logger.processInputs("Vision/Cameras/" + this.name, inputs);
