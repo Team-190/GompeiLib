@@ -23,7 +23,8 @@ public class VisionConstants {
       double megatagXYStdev,
       double metatagThetaStdev,
       double megatag2XYStdev,
-      Transform3d robotToCameraTransform) {}
+      Transform3d robotToCameraTransform,
+      Boolean enableRewind) {}
 
   @Builder
   public record GompeiVisionConfig(
