@@ -318,4 +318,13 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
     tryUntilOk(5, () -> driveTalonFX.getConfigurator().apply(driveConfig, 0.25));
     tryUntilOk(5, () -> turnTalonFX.getConfigurator().apply(turnConfig, 0.25));
   }
+
+  @Override
+  @Trace
+  public void updateCurrentLimits(double driveCurrentLimit, double turnCurrentLimit) {
+    driveConfig.CurrentLimits.StatorCurrentLimit = driveCurrentLimit;
+    turnConfig.CurrentLimits.StatorCurrentLimit = turnCurrentLimit;
+    tryUntilOk(5, () -> driveTalonFX.getConfigurator().apply(driveConfig, 0.25));
+    tryUntilOk(5, () -> turnTalonFX.getConfigurator().apply(turnConfig, 0.25));
+  }
 }
