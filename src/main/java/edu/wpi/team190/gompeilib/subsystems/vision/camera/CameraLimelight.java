@@ -104,7 +104,6 @@ public class CameraLimelight extends Camera {
         LimelightHelpers.triggerRewindCapture(name, 165);
         enabledTimestamp = Timer.getTimestamp();
       }
-
     }
 
     if (DriverStation.isDisabled()) {
