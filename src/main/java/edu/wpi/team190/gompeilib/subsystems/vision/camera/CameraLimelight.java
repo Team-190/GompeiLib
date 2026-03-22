@@ -80,11 +80,12 @@ public class CameraLimelight extends Camera {
         currentCameraPose.getRotation().getMeasureY().in(Degrees),
         currentCameraPose.getRotation().getMeasureZ().in(Degrees));
 
-    LimelightHelpers.SetIMUMode(name, 1);
+    LimelightHelpers.SetIMUMode(name, 0);
     LimelightHelpers.setRewindEnabled(name, config.enableRewind());
 
     wasEnabled = false;
     enabledTimestamp = Timer.getTimestamp();
+    // LimelightHelpers.SetIMUAssistAlpha(name, 0.05);
   }
 
   @Override
@@ -112,7 +113,7 @@ public class CameraLimelight extends Camera {
           LimelightHelpers.triggerRewindCapture(name, Timer.getTimestamp() - enabledTimestamp);
         }
         wasEnabled = false;
-        LimelightHelpers.SetIMUMode(name, 1);
+        LimelightHelpers.SetIMUMode(name, 0);
       }
     }
 
