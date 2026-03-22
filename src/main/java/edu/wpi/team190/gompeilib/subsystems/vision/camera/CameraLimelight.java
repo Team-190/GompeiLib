@@ -97,23 +97,24 @@ public class CameraLimelight extends Camera {
       if (!wasEnabled) {
         enabledTimestamp = Timer.getTimestamp();
         wasEnabled = true;
+        LimelightHelpers.SetIMUMode(name, 4);
       }
 
-      if (Timer.getTimestamp() - enabledTimestamp >= 165) {
+      if (Timer.getTimestamp() - enabledTimestamp >= 165 && config.enableRewind()) {
         LimelightHelpers.triggerRewindCapture(name, 165);
         enabledTimestamp = Timer.getTimestamp();
       }
 
-      LimelightHelpers.SetIMUMode(name, 4);
     }
 
     if (DriverStation.isDisabled()) {
       if (wasEnabled) {
-        LimelightHelpers.triggerRewindCapture(name, Timer.getTimestamp() - enabledTimestamp);
+        if (config.enableRewind()) {
+          LimelightHelpers.triggerRewindCapture(name, Timer.getTimestamp() - enabledTimestamp);
+        }
         wasEnabled = false;
+        LimelightHelpers.SetIMUMode(name, 1);
       }
-
-      LimelightHelpers.SetIMUMode(name, 1);
     }
 
     LimelightHelpers.SetRobotOrientation(
