@@ -31,8 +31,7 @@ public class V0_FunkyRobotState {
 
   private static final FieldZone globalZone;
 
-  @Getter @Setter
-  private static long gyroTimestamp;
+  @Getter @Setter private static long gyroTimestamp;
 
   static {
     fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
@@ -65,5 +64,4 @@ public class V0_FunkyRobotState {
   public static Pose2d getGlobalPose() {
     return localization.getEstimatedPose(globalZone);
   }
-
 }
