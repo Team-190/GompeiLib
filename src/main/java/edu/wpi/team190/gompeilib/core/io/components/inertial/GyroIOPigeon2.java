@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
@@ -13,6 +14,8 @@ import edu.wpi.team190.gompeilib.core.logging.Trace;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil;
 import edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive.SwerveDriveConstants;
 import java.util.Queue;
+import java.util.function.Consumer;
+
 import lombok.Getter;
 
 /** IO implementation for Pigeon 2. */
@@ -26,7 +29,9 @@ public class GyroIOPigeon2 implements GyroIO {
   @Getter private final StatusSignal<Angle> roll;
   private final StatusSignal<AngularVelocity> rollVelocity;
 
-  public GyroIOPigeon2(SwerveDriveConstants driveConstants) {
+  private final Consumer<Long> networktablesTimestampConsumer;
+
+  public GyroIOPigeon2(SwerveDriveConstants driveConstants, Consumer<Long> networkTablesTimestampConsumer) {
     Pigeon2 pigeon =
         new Pigeon2(driveConstants.driveConfig.pigeon2Id(), driveConstants.driveConfig.canBus());
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
@@ -42,6 +47,8 @@ public class GyroIOPigeon2 implements GyroIO {
 
     roll = pigeon.getRoll();
     rollVelocity = pigeon.getAngularVelocityYWorld();
+
+    this.networktablesTimestampConsumer = networkTablesTimestampConsumer;
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         2 / GompeiLib.getLoopPeriod(), yawVelocity, pitch, pitchVelocity, roll, rollVelocity);
@@ -65,6 +72,7 @@ public class GyroIOPigeon2 implements GyroIO {
     inputs.connected =
         BaseStatusSignal.isAllGood(yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity);
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
+    networktablesTimestampConsumer.accept(NetworkTablesJNI.now());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
 
     inputs.pitchPosition = new Rotation2d(pitch.getValue());
