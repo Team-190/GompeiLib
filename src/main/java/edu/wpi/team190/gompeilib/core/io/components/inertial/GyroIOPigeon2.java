@@ -15,7 +15,6 @@ import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixUtil;
 import edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive.SwerveDriveConstants;
 import java.util.Queue;
 import java.util.function.Consumer;
-
 import lombok.Getter;
 
 /** IO implementation for Pigeon 2. */
@@ -31,7 +30,8 @@ public class GyroIOPigeon2 implements GyroIO {
 
   private final Consumer<Long> networktablesTimestampConsumer;
 
-  public GyroIOPigeon2(SwerveDriveConstants driveConstants, Consumer<Long> networkTablesTimestampConsumer) {
+  public GyroIOPigeon2(
+      SwerveDriveConstants driveConstants, Consumer<Long> networkTablesTimestampConsumer) {
     Pigeon2 pigeon =
         new Pigeon2(driveConstants.driveConfig.pigeon2Id(), driveConstants.driveConfig.canBus());
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
