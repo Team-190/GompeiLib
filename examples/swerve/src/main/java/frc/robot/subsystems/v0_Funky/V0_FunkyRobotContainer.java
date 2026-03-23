@@ -42,7 +42,7 @@ public class V0_FunkyRobotContainer implements RobotContainer {
           drive =
               new SwerveDrive(
                   V0_FunkyConstants.DRIVE_CONSTANTS,
-                  new GyroIOPigeon2(V0_FunkyConstants.DRIVE_CONSTANTS),
+                  new GyroIOPigeon2(V0_FunkyConstants.DRIVE_CONSTANTS, V0_FunkyRobotState::setGyroTimestamp),
                   new SwerveModuleIOTalonFX(
                       V0_FunkyConstants.DRIVE_CONSTANTS,
                       V0_FunkyConstants.DRIVE_CONSTANTS.driveConfig.frontLeft()),
@@ -103,7 +103,7 @@ public class V0_FunkyRobotContainer implements RobotContainer {
       drive =
           new SwerveDrive(
               V0_FunkyConstants.DRIVE_CONSTANTS,
-              new GyroIOPigeon2(V0_FunkyConstants.DRIVE_CONSTANTS),
+              new GyroIOPigeon2(V0_FunkyConstants.DRIVE_CONSTANTS, V0_FunkyRobotState::setGyroTimestamp),
               new SwerveModuleIO() {},
               new SwerveModuleIO() {},
               new SwerveModuleIO() {},
