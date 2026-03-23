@@ -139,16 +139,18 @@ public class CameraLimelight extends Camera {
               / Math.pow(
                   inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
       thetaStdev =
-                inputs.mt1PoseEstimate.tagCount() > 1 && chassisSpeedsSupplier.get().vxMetersPerSecond <= 0.25 && chassisSpeedsSupplier.get().vyMetersPerSecond <= 0.25
-                        && chassisSpeedsSupplier.get().omegaRadiansPerSecond <= 0.10
-                    ? config.metatagThetaStdev()
-                        * Math.pow(
-                            inputs.mt1PoseEstimate.avgTagDist(),
-                            VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
-                        / Math.pow(
-                            inputs.mt1PoseEstimate.tagCount(),
-                            VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT)
-                    : Double.POSITIVE_INFINITY;
+          inputs.mt1PoseEstimate.tagCount() > 1
+                  && chassisSpeedsSupplier.get().vxMetersPerSecond <= 0.25
+                  && chassisSpeedsSupplier.get().vyMetersPerSecond <= 0.25
+                  && chassisSpeedsSupplier.get().omegaRadiansPerSecond <= 0.10
+              ? config.metatagThetaStdev()
+                  * Math.pow(
+                      inputs.mt1PoseEstimate.avgTagDist(),
+                      VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
+                  / Math.pow(
+                      inputs.mt1PoseEstimate.tagCount(),
+                      VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT)
+              : Double.POSITIVE_INFINITY;
 
       poseObservationList.add(
           new VisionPoseObservation(
