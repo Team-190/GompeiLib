@@ -120,8 +120,7 @@ public class CameraLimelight extends Camera {
       }
     }
 
-    LimelightHelpers.SetRobotOrientation(
-        name, this.headingSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
+    sendHeading();
 
     io.updateInputs(inputs);
     Logger.processInputs("Vision/Cameras/" + this.name, inputs);
@@ -196,5 +195,13 @@ public class CameraLimelight extends Camera {
     }
 
     super.sendObservers();
+  }
+
+  private void sendHeading() {
+    headingPublisher.set(
+        new double[] {
+          headingSupplier.get().getDegrees(),0.0, 0.0, 0.0, 0.0, 0.0
+        },
+            timestampSupplier.getAsLong());
   }
 }

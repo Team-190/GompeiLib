@@ -13,6 +13,7 @@ import frc.robot.util.NTPrefixes;
 import java.util.HashSet;
 import java.util.List;
 import lombok.Getter;
+import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -30,6 +31,7 @@ public class V0_FunkyRobotState {
 
   private static final FieldZone globalZone;
 
+  @Getter @Setter
   private static long gyroTimestamp;
 
   static {
@@ -64,7 +66,4 @@ public class V0_FunkyRobotState {
     return localization.getEstimatedPose(globalZone);
   }
 
-  public static void setGyroTimestamp(long gyroTimestamp) {
-    V0_FunkyRobotState.gyroTimestamp = gyroTimestamp;
-  }
 }

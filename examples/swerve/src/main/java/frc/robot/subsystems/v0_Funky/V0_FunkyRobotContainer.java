@@ -66,7 +66,7 @@ public class V0_FunkyRobotContainer implements RobotContainer {
                       V0_FunkyConstants.LIMELIGHT_CONFIG,
                       V0_FunkyRobotState::getHeading,
                       drive::getMeasuredChassisSpeeds,
-                      NetworkTablesJNI::now,
+                      V0_FunkyRobotState::getGyroTimestamp,
                       List.of(),
                       List.of()));
           break;
