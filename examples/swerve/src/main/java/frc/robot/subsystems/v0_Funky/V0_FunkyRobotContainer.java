@@ -64,6 +64,7 @@ public class V0_FunkyRobotContainer implements RobotContainer {
                       new CameraIOLimelight(V0_FunkyConstants.LIMELIGHT_CONFIG),
                       V0_FunkyConstants.LIMELIGHT_CONFIG,
                       V0_FunkyRobotState::getHeading,
+                      drive::getMeasuredChassisSpeeds,
                       NetworkTablesJNI::now,
                       List.of(),
                       List.of()));
