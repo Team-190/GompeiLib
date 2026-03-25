@@ -102,6 +102,7 @@ public class CameraLimelight extends Camera {
         enabledTimestamp = Timer.getFPGATimestamp();
         wasEnabled = true;
         LimelightHelpers.SetIMUMode(name, 4);
+        LimelightHelpers.SetThrottle(name, 0);
       }
 
       if (Timer.getFPGATimestamp() - enabledTimestamp >= 165 && config.enableRewind()) {
@@ -117,6 +118,7 @@ public class CameraLimelight extends Camera {
         }
         wasEnabled = false;
         LimelightHelpers.SetIMUMode(name, 1);
+        LimelightHelpers.SetThrottle(name, 190);
       }
     }
 
