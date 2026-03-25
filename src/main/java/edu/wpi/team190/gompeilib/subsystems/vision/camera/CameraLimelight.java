@@ -143,9 +143,11 @@ public class CameraLimelight extends Camera {
                   inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
       thetaStdev =
           inputs.mt1PoseEstimate.tagCount() > 1
-                  && chassisSpeedsSupplier.get().vxMetersPerSecond <= 0.25
-                  && chassisSpeedsSupplier.get().vyMetersPerSecond <= 0.25
-                  && chassisSpeedsSupplier.get().omegaRadiansPerSecond <= 0.10
+                  && Math.abs(chassisSpeedsSupplier.get().vxMetersPerSecond) <= 0.15
+                  && Math.abs(chassisSpeedsSupplier.get().vyMetersPerSecond) <= 0.15
+                  && Math.abs(chassisSpeedsSupplier.get().omegaRadiansPerSecond) <= 0.05
+                  && Arrays.stream(inputs.mt1PoseEstimate.rawFiducials())
+                      .allMatch(f -> f.ambiguity() < VisionConstants.AMBIGUITY_THRESHOLD)
               ? config.metatagThetaStdev()
                   * Math.pow(
                       inputs.mt1PoseEstimate.avgTagDist(),
