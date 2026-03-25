@@ -87,6 +87,9 @@ public class CameraLimelight extends Camera {
     LimelightHelpers.SetIMUAssistAlpha(name, 0.0067);
     LimelightHelpers.setRewindEnabled(name, config.enableRewind());
 
+    LimelightHelpers.SetIMUMode(name, 1);
+    LimelightHelpers.SetThrottle(name, 190);
+
     wasEnabled = false;
     enabledTimestamp = Timer.getFPGATimestamp();
   }
@@ -147,7 +150,10 @@ public class CameraLimelight extends Camera {
                   && Math.abs(chassisSpeedsSupplier.get().vyMetersPerSecond) <= 0.15
                   && Math.abs(chassisSpeedsSupplier.get().omegaRadiansPerSecond) <= 0.05
                   && Arrays.stream(inputs.mt1PoseEstimate.rawFiducials())
-                      .allMatch(f -> f.ambiguity() < VisionConstants.AMBIGUITY_THRESHOLD)
+                          .mapToDouble(CameraIO.RawFiducial::ambiguity)
+                          .average()
+                          .orElse(Double.MAX_VALUE)
+                      < VisionConstants.AMBIGUITY_THRESHOLD
               ? config.metatagThetaStdev()
                   * Math.pow(
                       inputs.mt1PoseEstimate.avgTagDist(),

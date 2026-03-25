@@ -104,7 +104,7 @@ public enum CameraType {
     private static final double HORIZONTAL_FOV = Units.degreesToRadians(82.0);
     private static final double VERTICAL_FOV = Units.degreesToRadians(46.2);
     private static final double MEGATAG_XY_STANDARD_DEVIATION_COEFFICIENT = 0.05;
-    private static final double MEGATAG_THETA_STANDARD_DEVIATION_COEFFICIENT = 0.1;
+    private static final double MEGATAG_THETA_STANDARD_DEVIATION_COEFFICIENT = 10;
     private static final double MEGATAG_2_XY_STANDARD_DEVIATION_COEFFICIENT = 0.00015;
   }
 
