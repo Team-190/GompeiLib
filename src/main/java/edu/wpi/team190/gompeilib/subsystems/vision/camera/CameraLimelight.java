@@ -104,7 +104,7 @@ public class CameraLimelight extends Camera {
       if (!wasEnabled) {
         enabledTimestamp = Timer.getFPGATimestamp();
         wasEnabled = true;
-        LimelightHelpers.SetIMUMode(name, 4);
+        LimelightHelpers.SetIMUMode(name, 1);
         LimelightHelpers.SetThrottle(name, 0);
       }
 
