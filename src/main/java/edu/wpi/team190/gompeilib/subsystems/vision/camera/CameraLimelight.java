@@ -5,8 +5,11 @@ import static edu.wpi.first.units.Units.Degrees;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.team190.gompeilib.core.utility.LimelightHelpers;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants.LimelightConfig;
@@ -31,15 +34,20 @@ public class CameraLimelight extends Camera {
   @Getter private final String name;
 
   private final Supplier<Rotation2d> headingSupplier;
+  private final Supplier<ChassisSpeeds> chassisSpeedsSupplier;
   private final LongSupplier timestampSupplier;
   private final DoubleArrayPublisher headingPublisher;
 
   @Getter private final List<Pose3d> allTagPoses;
 
+  private boolean wasEnabled;
+  private double enabledTimestamp;
+
   public CameraLimelight(
       CameraIOLimelight io,
       LimelightConfig config,
       Supplier<Rotation2d> headingSupplier,
+      Supplier<ChassisSpeeds> chassisSpeedsSupplier,
       LongSupplier timestampSupplier,
       List<Consumer<List<VisionPoseObservation>>> poseObservers,
       List<Consumer<List<VisionSingleTxTyObservation>>> singleTxTyObservers) {
@@ -52,6 +60,7 @@ public class CameraLimelight extends Camera {
     this.name = "limelight-" + this.config.key();
 
     this.headingSupplier = headingSupplier;
+    this.chassisSpeedsSupplier = chassisSpeedsSupplier;
     this.timestampSupplier = timestampSupplier;
     this.headingPublisher =
         NetworkTableInstance.getDefault()
@@ -74,6 +83,15 @@ public class CameraLimelight extends Camera {
         currentCameraPose.getRotation().getMeasureX().in(Degrees),
         currentCameraPose.getRotation().getMeasureY().in(Degrees),
         currentCameraPose.getRotation().getMeasureZ().in(Degrees));
+
+    LimelightHelpers.SetIMUAssistAlpha(name, 0.0067);
+    LimelightHelpers.setRewindEnabled(name, config.enableRewind());
+
+    LimelightHelpers.SetIMUMode(name, 1);
+    LimelightHelpers.SetThrottle(name, 190);
+
+    wasEnabled = false;
+    enabledTimestamp = Timer.getFPGATimestamp();
   }
 
   @Override
@@ -82,8 +100,33 @@ public class CameraLimelight extends Camera {
     multiTxTyObservationList.clear();
     singleTxTyObservationList.clear();
 
-    this.headingPublisher.set(
-        new double[] {this.headingSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0},
+    if (DriverStation.isEnabled()) {
+      if (!wasEnabled) {
+        enabledTimestamp = Timer.getFPGATimestamp();
+        wasEnabled = true;
+        LimelightHelpers.SetIMUMode(name, 4);
+        LimelightHelpers.SetThrottle(name, 0);
+      }
+
+      if (Timer.getFPGATimestamp() - enabledTimestamp >= 165 && config.enableRewind()) {
+        LimelightHelpers.triggerRewindCapture(name, 165);
+        enabledTimestamp = Timer.getFPGATimestamp();
+      }
+    }
+
+    if (DriverStation.isDisabled()) {
+      if (wasEnabled) {
+        if (config.enableRewind()) {
+          LimelightHelpers.triggerRewindCapture(name, Timer.getFPGATimestamp() - enabledTimestamp);
+        }
+        wasEnabled = false;
+        LimelightHelpers.SetIMUMode(name, 1);
+        LimelightHelpers.SetThrottle(name, 190);
+      }
+    }
+
+    headingPublisher.set(
+        new double[] {headingSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0},
         timestampSupplier.getAsLong());
 
     io.updateInputs(inputs);
@@ -101,20 +144,25 @@ public class CameraLimelight extends Camera {
                   inputs.mt1PoseEstimate.avgTagDist(), VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
               / Math.pow(
                   inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
-      //      thetaStdev =
-      //          inputs.mt1PoseEstimate.tagCount() > 1
-      //              ? config.metatagThetaStdev()
-      //                  * Math.pow(
-      //                      inputs.mt1PoseEstimate.avgTagDist(),
-      //                      VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
-      //                  / Math.pow(
-      //                      inputs.mt1PoseEstimate.tagCount(),
-      //                      VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT)
-      //              : Double.POSITIVE_INFINITY;
-      thetaStdev = Double.POSITIVE_INFINITY;
-    }
+      thetaStdev =
+          inputs.mt1PoseEstimate.tagCount() > 1
+                  && Math.abs(chassisSpeedsSupplier.get().vxMetersPerSecond) <= 0.15
+                  && Math.abs(chassisSpeedsSupplier.get().vyMetersPerSecond) <= 0.15
+                  && Math.abs(chassisSpeedsSupplier.get().omegaRadiansPerSecond) <= 0.05
+                  && Arrays.stream(inputs.mt1PoseEstimate.rawFiducials())
+                          .mapToDouble(CameraIO.RawFiducial::ambiguity)
+                          .average()
+                          .orElse(Double.MAX_VALUE)
+                      < VisionConstants.AMBIGUITY_THRESHOLD
+              ? config.metatagThetaStdev()
+                  * Math.pow(
+                      inputs.mt1PoseEstimate.avgTagDist(),
+                      VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
+                  / Math.pow(
+                      inputs.mt1PoseEstimate.tagCount(),
+                      VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT)
+              : Double.POSITIVE_INFINITY;
 
-    if (inputs.mt1PoseEstimate.tagCount() != 0) {
       poseObservationList.add(
           new VisionPoseObservation(
               inputs.mt1PoseEstimate.pose(),
@@ -125,17 +173,15 @@ public class CameraLimelight extends Camera {
               VecBuilder.fill(xyStdDev, xyStdDev, thetaStdev)));
     }
 
-    if (inputs.mt1PoseEstimate.tagCount() != 0) {
+    if (inputs.mt2PoseEstimate.tagCount() != 0) {
       xyStdDev =
           config.megatag2XYStdev()
               * Math.pow(
-                  inputs.mt1PoseEstimate.avgTagDist(), VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
+                  inputs.mt2PoseEstimate.avgTagDist(), VisionConstants.XY_STDEV_DISTANCE_EXPONENT)
               / Math.pow(
-                  inputs.mt1PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
+                  inputs.mt2PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
       thetaStdev = Double.POSITIVE_INFINITY;
-    }
 
-    if (inputs.mt2PoseEstimate.tagCount() != 0) {
       poseObservationList.add(
           new VisionPoseObservation(
               inputs.mt2PoseEstimate.pose(),

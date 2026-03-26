@@ -2,10 +2,10 @@
 [versions]
 wpilib = "2026.2.1"
 wpilib-jni = "2025.3.2"
-phoenix6 = "26.1.1"
-choreo = "2026.0.1"
+phoenix6 = "26.1.3"
+choreo = "2026.0.2"
 aspectj = "1.9.21"
-advantagekit = "26.0.0"
+advantagekit = "26.0.2"
 quickbuf = "1.4"
 jackson = "2.17.2"
 

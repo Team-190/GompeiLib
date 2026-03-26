@@ -155,4 +155,15 @@ public class SwerveModule {
   public void setFF(double kS, double kV) {
     io.setFeedforward(kS, kV);
   }
+
+  /**
+   * Updates current limits.
+   *
+   * @param driveCurrentLimit The drive current limit.
+   * @param turnCurrentLimit The turn current limit.
+   */
+  @Trace
+  public void updateCurrentLimits(double driveCurrentLimit, double turnCurrentLimit) {
+    io.updateCurrentLimits(driveCurrentLimit, turnCurrentLimit);
+  }
 }

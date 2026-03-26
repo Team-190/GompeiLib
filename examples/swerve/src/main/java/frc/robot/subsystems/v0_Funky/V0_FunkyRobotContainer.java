@@ -4,7 +4,6 @@ import choreo.auto.AutoChooser;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIO;
@@ -42,7 +41,8 @@ public class V0_FunkyRobotContainer implements RobotContainer {
           drive =
               new SwerveDrive(
                   V0_FunkyConstants.DRIVE_CONSTANTS,
-                  new GyroIOPigeon2(V0_FunkyConstants.DRIVE_CONSTANTS),
+                  new GyroIOPigeon2(
+                      V0_FunkyConstants.DRIVE_CONSTANTS, V0_FunkyRobotState::setGyroTimestamp),
                   new SwerveModuleIOTalonFX(
                       V0_FunkyConstants.DRIVE_CONSTANTS,
                       V0_FunkyConstants.DRIVE_CONSTANTS.driveConfig.frontLeft()),
@@ -64,7 +64,8 @@ public class V0_FunkyRobotContainer implements RobotContainer {
                       new CameraIOLimelight(V0_FunkyConstants.LIMELIGHT_CONFIG),
                       V0_FunkyConstants.LIMELIGHT_CONFIG,
                       V0_FunkyRobotState::getHeading,
-                      NetworkTablesJNI::now,
+                      drive::getMeasuredChassisSpeeds,
+                      V0_FunkyRobotState::getGyroTimestamp,
                       List.of(),
                       List.of()));
           break;
@@ -102,7 +103,8 @@ public class V0_FunkyRobotContainer implements RobotContainer {
       drive =
           new SwerveDrive(
               V0_FunkyConstants.DRIVE_CONSTANTS,
-              new GyroIOPigeon2(V0_FunkyConstants.DRIVE_CONSTANTS),
+              new GyroIOPigeon2(
+                  V0_FunkyConstants.DRIVE_CONSTANTS, V0_FunkyRobotState::setGyroTimestamp),
               new SwerveModuleIO() {},
               new SwerveModuleIO() {},
               new SwerveModuleIO() {},

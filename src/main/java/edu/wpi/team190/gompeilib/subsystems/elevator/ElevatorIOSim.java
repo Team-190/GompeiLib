@@ -36,10 +36,10 @@ public class ElevatorIOSim implements ElevatorIO {
                 constants.drumRadius,
                 constants.elevatorGearRatio),
             constants.elevatorParameters.ELEVATOR_MOTOR_CONFIG(),
-            constants.elevatorParameters.MIN_HEIGHT_METERS(),
-            constants.elevatorParameters.MAX_HEIGHT_METERS(),
+            constants.elevatorParameters.MIN_HEIGHT().in(Meters),
+            constants.elevatorParameters.MAX_HEIGHT().in(Meters),
             true,
-            constants.elevatorParameters.MIN_HEIGHT_METERS());
+            constants.elevatorParameters.MIN_HEIGHT().in(Meters));
 
     appliedVolts = Volts.of(0.0);
     isClosedLoop = true;

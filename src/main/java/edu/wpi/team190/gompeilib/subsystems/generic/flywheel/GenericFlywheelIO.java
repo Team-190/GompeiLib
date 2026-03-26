@@ -38,6 +38,8 @@ public interface GenericFlywheelIO {
 
   default void setVelocityGoal(AngularVelocity velocityGoal, Current currentFeedforward) {}
 
+  default void setNeutralControl() {}
+
   default boolean atVoltageGoal(Voltage voltageReference) {
     return false;
   }

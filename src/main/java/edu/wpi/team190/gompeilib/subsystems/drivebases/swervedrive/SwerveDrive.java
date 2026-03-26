@@ -24,6 +24,7 @@ import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIO;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOInputsAutoLogged;
 import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOPigeon2;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
+import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixOdometryThread;
 import java.util.List;
 import java.util.Optional;
@@ -415,5 +416,24 @@ public class SwerveDrive extends SubsystemBase {
 
     runVelocity(velocity);
     Logger.recordOutput("Auto/Setpoint", sample.getPose());
+  }
+
+  public void setAutoControllers(Gains translationGains, Gains rotationGains) {
+    autoXController.setPID(translationGains.kP().get(), 0.0, translationGains.kD().get());
+    autoYController.setPID(translationGains.kP().get(), 0.0, translationGains.kD().get());
+    autoHeadingController.setPID(rotationGains.kP().get(), 0.0, rotationGains.kD().get());
+  }
+
+  /**
+   * Updates current limits.
+   *
+   * @param driveCurrentLimit The drive current limit.
+   * @param turnCurrentLimit The turn current limit.
+   */
+  @Trace
+  public void updateCurrentLimits(double driveCurrentLimit, double turnCurrentLimit) {
+    for (SwerveModule s : modules) {
+      s.updateCurrentLimits(driveCurrentLimit, turnCurrentLimit);
+    }
   }
 }
