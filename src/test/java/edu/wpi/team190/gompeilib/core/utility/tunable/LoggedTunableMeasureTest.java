@@ -7,11 +7,10 @@ import static org.mockito.Mockito.atLeastOnce;
 
 import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
+import java.util.Arrays;
 import org.junit.jupiter.api.*;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import org.mockito.MockedConstruction;
-
-import java.util.Arrays;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LoggedTunableMeasureTest {
@@ -108,7 +107,7 @@ public class LoggedTunableMeasureTest {
 
     // Second call: currentValue (5.0) == lastValue (5.0)
     assertFalse(
-            tunable.hasChanged(1), "Should return false if the value hasn't changed since last check");
+        tunable.hasChanged(1), "Should return false if the value hasn't changed since last check");
   }
 
   @Test
@@ -118,8 +117,9 @@ public class LoggedTunableMeasureTest {
 
     // We use a Mock to control what get() returns manually
     try (MockedConstruction<LoggedNetworkNumber> mocked =
-                 mockConstruction(LoggedNetworkNumber.class)) {
-      LoggedTunableMeasure<DistanceUnit> tunable = new LoggedTunableMeasure<>("Test", Meters.of(1.0));
+        mockConstruction(LoggedNetworkNumber.class)) {
+      LoggedTunableMeasure<DistanceUnit> tunable =
+          new LoggedTunableMeasure<>("Test", Meters.of(1.0));
       LoggedNetworkNumber mockNT = mocked.constructed().get(0);
 
       // Setup initial state
@@ -138,7 +138,8 @@ public class LoggedTunableMeasureTest {
   @Order(8)
   public void testHasChangedIdIsolation() {
     GompeiLib.init(null, false, 0.02);
-    LoggedTunableMeasure<DistanceUnit> tunable = new LoggedTunableMeasure<>("Test", Meters.of(10.0));
+    LoggedTunableMeasure<DistanceUnit> tunable =
+        new LoggedTunableMeasure<>("Test", Meters.of(10.0));
 
     // ID 1 checks the value
     assertTrue(tunable.hasChanged(1));
@@ -160,7 +161,13 @@ public class LoggedTunableMeasureTest {
     final double[][] capturedValues = new double[1][];
 
     // First call: Should trigger because they are new to this ID
-    LoggedTunableMeasure.ifChanged(id, (values) -> capturedValues[0] = Arrays.stream(values).mapToDouble((value) -> value.in(Meters)).toArray(), num1, num2);
+    LoggedTunableMeasure.ifChanged(
+        id,
+        (values) ->
+            capturedValues[0] =
+                Arrays.stream(values).mapToDouble((value) -> value.in(Meters)).toArray(),
+        num1,
+        num2);
 
     assertNotNull(capturedValues[0], "Action should have been called");
     assertEquals(1.0, capturedValues[0][0]);
@@ -193,9 +200,9 @@ public class LoggedTunableMeasureTest {
     int id = 999;
 
     try (MockedConstruction<LoggedNetworkNumber> mocked =
-                 mockConstruction(LoggedNetworkNumber.class)) {
-      LoggedTunableMeasure n1 = new LoggedTunableMeasure("n1", 1.0);
-      LoggedTunableMeasure n2 = new LoggedTunableMeasure("n2", 2.0);
+        mockConstruction(LoggedNetworkNumber.class)) {
+      LoggedTunableMeasure<DistanceUnit> n1 = new LoggedTunableMeasure<>("n1", Meters.of(1.0));
+      LoggedTunableMeasure<DistanceUnit> n2 = new LoggedTunableMeasure<>("n2", Meters.of(2.0));
       LoggedNetworkNumber mockNT1 = mocked.constructed().get(0);
       LoggedNetworkNumber mockNT2 = mocked.constructed().get(1);
 
@@ -210,14 +217,14 @@ public class LoggedTunableMeasureTest {
 
       final boolean[] ran = {false};
       LoggedTunableMeasure.ifChanged(
-              id,
-              (values) -> {
-                ran[0] = true;
-                assertEquals(5.0, values[0]);
-                assertEquals(2.0, values[1]);
-              },
-              n1,
-              n2);
+          id,
+          (values) -> {
+            ran[0] = true;
+            assertEquals(5.0, values[0].in(Meters));
+            assertEquals(2.0, values[1].in(Meters));
+          },
+          n1,
+          n2);
 
       assertTrue(ran[0], "Action should trigger if even one value changes");
     }
@@ -228,7 +235,7 @@ public class LoggedTunableMeasureTest {
   void testIfChangedRunnableOverloadCoverage() {
     // 1. Setup in non-tuning mode for simplicity
     GompeiLib.init(null, false, 0.02);
-    LoggedTunableMeasure num = new LoggedTunableMeasure("Coverage", 1.0);
+    LoggedTunableMeasure<DistanceUnit> num = new LoggedTunableMeasure<>("Coverage", Meters.of(1.0));
     int id = 10101;
 
     // We need a counter to verify the Runnable actually ran
@@ -245,5 +252,53 @@ public class LoggedTunableMeasureTest {
     // 4. Second call: Should NOT trigger (no change)
     LoggedTunableMeasure.ifChanged(id, mockAction, num);
     assertEquals(1, callCount[0], "The Runnable action should NOT have executed a second time");
+  }
+
+  @Test
+  @Order(13)
+  void testIfChangedSecondElementTriggers() {
+    GompeiLib.init(null, true, 0.02);
+    int id = 12345;
+
+    try (MockedConstruction<LoggedNetworkNumber> mocked =
+        mockConstruction(LoggedNetworkNumber.class)) {
+
+      LoggedTunableMeasure<DistanceUnit> n1 = new LoggedTunableMeasure<>("n1", Meters.of(1.0));
+      LoggedTunableMeasure<DistanceUnit> n2 = new LoggedTunableMeasure<>("n2", Meters.of(2.0));
+
+      LoggedNetworkNumber mockNT1 = mocked.constructed().get(0);
+      LoggedNetworkNumber mockNT2 = mocked.constructed().get(1);
+
+      // Initial values
+      when(mockNT1.get()).thenReturn(1.0);
+      when(mockNT2.get()).thenReturn(2.0);
+      n1.hasChanged(id);
+      n2.hasChanged(id);
+
+      // Only SECOND value changes
+      when(mockNT2.get()).thenReturn(5.0);
+
+      final boolean[] ran = {false};
+
+      LoggedTunableMeasure.ifChanged(id, values -> ran[0] = true, n1, n2);
+
+      assertTrue(ran[0], "Action should trigger when the second element changes");
+    }
+  }
+
+  @Test
+  @Order(14)
+  void testIfChangedWithNoTunables() {
+    GompeiLib.init(null, false, 0.02);
+    int id = 4242;
+
+    final boolean[] ran = {false};
+
+    LoggedTunableMeasure.ifChanged(
+        id, (values) -> ran[0] = true
+        // no tunable numbers
+        );
+
+    assertFalse(ran[0], "Action should not run when no tunables are provided");
   }
 }
