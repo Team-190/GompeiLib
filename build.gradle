@@ -46,6 +46,7 @@ dependencies {
 
     // CTRE
     compileOnly libs.phoenix6
+    testImplementation libs.phoenix6
 
     // Choreo
     compileOnly libs.choreo
