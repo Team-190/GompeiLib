@@ -1,9 +1,6 @@
 package edu.wpi.team190.gompeilib.core.utility;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 
 public class GeometryUtil {
   /**
@@ -47,12 +44,24 @@ public class GeometryUtil {
     return new Transform2d(pose.getTranslation(), pose.getRotation());
   }
 
+  /**
+   * Checks if a pose is (0, 0, 0)
+   *
+   * @param pose The pose to check
+   * @return Whether the pose is zero
+   */
   public static boolean isZero(Pose2d pose) {
     return pose.getX() == 0.0 && pose.getY() == 0.0 && pose.getRotation().getDegrees() == 0.0;
   }
 
-  public static boolean isZero(Pose2d[] pose) {
-    for (Pose2d p : pose) {
+  /**
+   * Checks if any poses are (0, 0, 0)
+   *
+   * @param poses The poses to check
+   * @return Whether any poses are zero
+   */
+  public static boolean isZero(Pose2d[] poses) {
+    for (Pose2d p : poses) {
       if (isZero(p)) {
         return true;
       }
@@ -60,26 +69,114 @@ public class GeometryUtil {
     return false;
   }
 
+  /**
+   * Checks if a translation is (0, 0)
+   *
+   * @param translation The translation to check
+   * @return Whether the translation is zero
+   */
   public static boolean isZero(Translation2d translation) {
     return translation.getX() == 0.0 && translation.getY() == 0.0;
   }
 
+  /**
+   * Checks if a rotation is zero
+   *
+   * @param rotation The rotation to check
+   * @return Whether the rotation is zero
+   */
   public static boolean isZero(Rotation2d rotation) {
     return rotation.getDegrees() == 0.0;
   }
 
+  /**
+   * Checks if a pose is NaN
+   *
+   * @param pose The pose to check
+   * @return Whether the pose is NaN
+   */
   public static boolean isNaN(Pose2d pose) {
     return Double.isNaN(pose.getX())
         || Double.isNaN(pose.getY())
         || Double.isNaN(pose.getRotation().getDegrees());
   }
 
-  public static boolean isNaN(Pose2d[] pose) {
-    for (Pose2d p : pose) {
+  /**
+   * Checks if any poses are NaN
+   *
+   * @param poses The poses to check
+   * @return Whether any poses are NaN
+   */
+  public static boolean isNaN(Pose2d[] poses) {
+    for (Pose2d p : poses) {
       if (isNaN(p)) {
         return true;
       }
     }
     return false;
+  }
+
+  /**
+   * @param rectangle2ds Array of rectangles to check if the pose is in
+   * @param pose The pose to check is contained by the rectangle
+   * @return Whether the pose is contained by the rectangle
+   */
+  public static boolean contains(Rectangle2d[] rectangle2ds, Pose2d pose) {
+    for (Rectangle2d rectangle : rectangle2ds) {
+      if (rectangle.contains(pose.getTranslation())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @param rectangle2ds Array of rectangles to check if the translation is in
+   * @param translation2d The translation to check is contained by the rectangle
+   * @return Whether the translation is contained by the rectangle
+   */
+  public static boolean contains(Rectangle2d[] rectangle2ds, Translation2d translation2d) {
+    for (Rectangle2d rectangle : rectangle2ds) {
+      if (rectangle.contains(translation2d)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Gets the center and corners of a rectangle2d
+   *
+   * @param rectangle2d The rectangle2d to get the center and corners of
+   * @return The poses from the rectangle2d
+   */
+  public static Pose2d[] rectanglePose2ds(Rectangle2d rectangle2d) {
+    Pose2d[] poses = new Pose2d[5];
+    poses[0] =
+        rectangle2d
+            .getCenter()
+            .transformBy(
+                new Transform2d(
+                    rectangle2d.getXWidth(), rectangle2d.getYWidth(), new Rotation2d()));
+    poses[1] =
+        rectangle2d
+            .getCenter()
+            .transformBy(
+                new Transform2d(
+                    -rectangle2d.getXWidth(), rectangle2d.getYWidth(), new Rotation2d()));
+    poses[2] =
+        rectangle2d
+            .getCenter()
+            .transformBy(
+                new Transform2d(
+                    -rectangle2d.getXWidth(), -rectangle2d.getYWidth(), new Rotation2d()));
+    poses[3] =
+        rectangle2d
+            .getCenter()
+            .transformBy(
+                new Transform2d(
+                    rectangle2d.getXWidth(), -rectangle2d.getYWidth(), new Rotation2d()));
+    poses[4] = rectangle2d.getCenter();
+    return poses;
   }
 }
