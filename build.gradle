@@ -5,7 +5,7 @@ plugins {
     id 'maven-publish'
     id "com.diffplug.spotless" version "6.25.0"
     id "io.freefair.lombok" version "8.4"
-    id "io.freefair.aspectj.post-compile-weaving" version "8.4"
+    id "io.freefair.aspectj.post-compile-weaving" version "8.6"
     id "jacoco"
 }
 
@@ -124,6 +124,19 @@ jacocoTestReport {
     reports {
         xml.required = true
         html.required = true
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                '**/*Aspect.class',
+                '**/*$AjcClosure*',
+                '**/ajc$*',
+                '**/*Tracer.class',
+                '**/*AutoLogged.class',
+                '**/*AutoLogged$*.class',
+                '**/*Tracing*'
+            ])
+        }))
     }
 }
 
