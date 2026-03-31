@@ -3,10 +3,7 @@ package edu.wpi.team190.gompeilib.core.utility;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -161,5 +158,70 @@ public class GeometryUtilTest {
   void testAnyPose2dsAreNotNAN() {
     Pose2d[] cases = new Pose2d[] {POSE2D_CASES[0], POSE2D_CASES[1], POSE2D_CASES[2]};
     assertFalse(GeometryUtil.isNaN(cases));
+  }
+
+  @Test
+  @Order(14)
+  void testRectangleDoesNotContainsPose() {
+    Rectangle2d[] rectangles = {
+      new Rectangle2d(new Pose2d(0, 0, Rotation2d.kZero), 1, 1),
+      new Rectangle2d(new Pose2d(0, 0, Rotation2d.kZero), 1, 1),
+      new Rectangle2d(new Pose2d(0, 0, Rotation2d.kZero), 2, 2)
+    };
+    Pose2d pose = new Pose2d(-5, -5, Rotation2d.kZero);
+    assertFalse(GeometryUtil.contains(rectangles, pose));
+  }
+
+  @Test
+  @Order(15)
+  void testRectangleContainsPose() {
+    Rectangle2d[] rectangles = {
+      new Rectangle2d(new Pose2d(0, 0, Rotation2d.kZero), 1, 1),
+      new Rectangle2d(new Pose2d(0, 0, Rotation2d.kZero), 2, 2),
+      new Rectangle2d(new Pose2d(0, 0, Rotation2d.kZero), 3, 3)
+    };
+    Pose2d pose = new Pose2d(1.5, 1.5, Rotation2d.kZero);
+    assertTrue(GeometryUtil.contains(rectangles, pose));
+  }
+
+  @Test
+  @Order(16)
+  void testRectangleDoesNotContainsTranslation() {
+    Rectangle2d[] rectangles = {
+      new Rectangle2d(new Pose2d(0, 0, Rotation2d.kZero), 1, 1),
+      new Rectangle2d(new Pose2d(0, 0, Rotation2d.kZero), 1, 1),
+      new Rectangle2d(new Pose2d(0, 0, Rotation2d.kZero), 2, 2)
+    };
+    Translation2d translation = new Translation2d(-5, -5);
+    assertFalse(GeometryUtil.contains(rectangles, translation));
+  }
+
+  @Test
+  @Order(17)
+  void testRectangleContainsTranslation() {
+    Rectangle2d[] rectangles = {
+      new Rectangle2d(new Pose2d(0, 0, Rotation2d.kZero), 1, 1),
+      new Rectangle2d(new Pose2d(0, 0, Rotation2d.kZero), 2, 2),
+      new Rectangle2d(new Pose2d(0, 0, Rotation2d.kZero), 3, 3)
+    };
+    Translation2d translation = new Translation2d(1.5, 1.5);
+    assertTrue(GeometryUtil.contains(rectangles, translation));
+  }
+
+  @Test
+  @Order(18)
+  void testRectanglePose2ds() {
+    Rectangle2d rectangle = new Rectangle2d(new Pose2d(0, 0, Rotation2d.kZero), 1, 1);
+    Pose2d[] poses = GeometryUtil.rectanglePose2ds(rectangle);
+    Pose2d[] correctPoses = {
+      new Pose2d(1.0, 1.0, Rotation2d.kZero),
+      new Pose2d(-1.0, 1.0, Rotation2d.kZero),
+      new Pose2d(-1.0, -1.0, Rotation2d.kZero),
+      new Pose2d(1.0, -1.0, Rotation2d.kZero),
+      new Pose2d(0, 0, Rotation2d.kZero),
+    };
+    for (int i = 0; i < 5; i++) {
+      assertEquals(poses[i], correctPoses[i]);
+    }
   }
 }
