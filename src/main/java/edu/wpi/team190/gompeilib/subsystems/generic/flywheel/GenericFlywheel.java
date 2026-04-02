@@ -3,7 +3,6 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.*;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
