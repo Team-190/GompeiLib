@@ -16,7 +16,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class GenericFlywheel {
   private final GenericFlywheelIO io;
-  private final GenericFlywheelIOInputsAutoLogged inputs;
+  @Getter private final GenericFlywheelIOInputsAutoLogged inputs;
 
   private final String aKitTopic;
   private final CustomSysIdRoutine<CurrentUnit> torqueCharacterizationRoutine;
