@@ -3,6 +3,7 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.*;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -110,14 +111,12 @@ public class GenericFlywheel {
     }
   }
 
-  public Command setVelocityGoal(double velocityGoalRadiansPerSecond) {
-    return Commands.runOnce(
-        () -> {
-          currentState = GenericFlywheelState.VELOCITY_VOLTAGE_CONTROL;
+  public GenericFlywheelIOInputsAutoLogged getInputs() {
+    return inputs;
+  }
 
-          this.velocityGoalRadiansPerSecond.setSetpoint(
-              RadiansPerSecond.of(velocityGoalRadiansPerSecond));
-        });
+  public double getFlywheelVelocity() {
+    return inputs.velocityRadiansPerSecond;
   }
 
   public Command setVelocityGoal(DoubleSupplier velocityGoalRadiansPerSecond) {
