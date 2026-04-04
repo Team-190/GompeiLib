@@ -8,7 +8,7 @@ import lombok.Getter;
 public class CameraIOLimelight implements CameraIO {
   @Getter private final String name;
 
-  public CameraIOLimelight(VisionConstants.LimelightConfig config) {
+  public CameraIOLimelight(VisionConstants.StaticLimelightConfig config) {
     this.name = "limelight-" + config.key();
   }
 
