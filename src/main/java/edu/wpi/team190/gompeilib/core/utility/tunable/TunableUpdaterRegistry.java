@@ -14,6 +14,9 @@ import java.util.function.Consumer;
  * and invoke the corresponding update callbacks.
  */
 public class TunableUpdaterRegistry {
+
+  private TunableUpdaterRegistry() {}
+
   /** Registered gain sets and their update callbacks. */
   private static final HashMap<Gains, Consumer<Gains>> GAINS_UPDATER = new HashMap<>();
 

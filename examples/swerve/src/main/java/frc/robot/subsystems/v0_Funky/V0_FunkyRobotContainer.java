@@ -15,7 +15,7 @@ import edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive.SwerveModuleI
 import edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive.SwerveModuleIOSim;
 import edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive.SwerveModuleIOTalonFX;
 import edu.wpi.team190.gompeilib.subsystems.vision.Vision;
-import edu.wpi.team190.gompeilib.subsystems.vision.camera.CameraLimelight;
+import edu.wpi.team190.gompeilib.subsystems.vision.camera.CameraStaticLimelight;
 import edu.wpi.team190.gompeilib.subsystems.vision.io.CameraIOLimelight;
 import frc.robot.Constants;
 import frc.robot.RobotConfig;
@@ -60,7 +60,7 @@ public class V0_FunkyRobotContainer implements RobotContainer {
           vision =
               new Vision(
                   () -> AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark),
-                  new CameraLimelight(
+                  new CameraStaticLimelight(
                       new CameraIOLimelight(V0_FunkyConstants.LIMELIGHT_CONFIG),
                       V0_FunkyConstants.LIMELIGHT_CONFIG,
                       V0_FunkyRobotState::getHeading,

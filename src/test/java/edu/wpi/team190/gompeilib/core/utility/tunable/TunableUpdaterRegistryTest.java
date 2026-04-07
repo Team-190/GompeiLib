@@ -21,13 +21,13 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
-  @Order(1)
+  @Order(2)
   void periodicWithNoRegistrationsDoesNothing() {
     assertDoesNotThrow(TunableUpdaterRegistry::periodic);
   }
 
   @Test
-  @Order(2)
+  @Order(3)
   void registerGainsInvokesConsumer() {
     Gains gains =
         Gains.fromDoubles()
@@ -51,7 +51,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
-  @Order(3)
+  @Order(4)
   void registerGainsDuplicateIgnored() {
     Gains gains =
         Gains.fromDoubles()
@@ -78,7 +78,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
-  @Order(4)
+  @Order(5)
   void registerConstraintsInvokesConsumer() {
     LinearConstraints constraints =
         LinearConstraints.fromMeasures()
@@ -98,7 +98,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
-  @Order(5)
+  @Order(6)
   void registerConstraintsDuplicateIgnored() {
     LinearConstraints constraints =
         LinearConstraints.fromMeasures()
@@ -121,7 +121,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
-  @Order(6)
+  @Order(7)
   void registerNumberAcceptsArray() {
     LoggedTunableNumber[] nums = new LoggedTunableNumber[0];
 
@@ -129,7 +129,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
-  @Order(7)
+  @Order(8)
   void registerNumberDuplicateIgnored() {
     LoggedTunableNumber[] nums = new LoggedTunableNumber[1];
     nums[0] = new LoggedTunableNumber("test/testnumber1");
@@ -152,7 +152,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
-  @Order(8)
+  @Order(9)
   void registerMeasureAcceptsArray() {
     LoggedTunableMeasure<?>[] measures = new LoggedTunableMeasure<?>[0];
 
@@ -160,7 +160,7 @@ class TunableUpdaterRegistryTest {
   }
 
   @Test
-  @Order(9)
+  @Order(10)
   void registerMeasureDuplicateIgnored() {
     LoggedTunableMeasure<?>[] measures = new LoggedTunableMeasure<?>[1];
 

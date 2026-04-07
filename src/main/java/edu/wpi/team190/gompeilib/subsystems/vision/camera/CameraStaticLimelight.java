@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.team190.gompeilib.core.utility.LimelightHelpers;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants;
-import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants.LimelightConfig;
+import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants.StaticLimelightConfig;
 import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionPoseObservation;
 import edu.wpi.team190.gompeilib.subsystems.vision.data.VisionSingleTxTyObservation;
 import edu.wpi.team190.gompeilib.subsystems.vision.io.CameraIO;
@@ -26,11 +26,11 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
-public class CameraLimelight extends Camera {
+public class CameraStaticLimelight extends Camera {
   private final LimelightIOInputsAutoLogged inputs;
   private final CameraIOLimelight io;
 
-  private final LimelightConfig config;
+  private final StaticLimelightConfig config;
   @Getter private final String name;
 
   private final Supplier<Rotation2d> headingSupplier;
@@ -43,9 +43,9 @@ public class CameraLimelight extends Camera {
   private boolean wasEnabled;
   private double enabledTimestamp;
 
-  public CameraLimelight(
+  public CameraStaticLimelight(
       CameraIOLimelight io,
-      LimelightConfig config,
+      StaticLimelightConfig config,
       Supplier<Rotation2d> headingSupplier,
       Supplier<ChassisSpeeds> chassisSpeedsSupplier,
       LongSupplier timestampSupplier,
