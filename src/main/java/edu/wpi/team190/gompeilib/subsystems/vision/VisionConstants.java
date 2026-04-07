@@ -15,7 +15,7 @@ public class VisionConstants {
   public static final double XY_STDEV_TAG_COUNT_EXPONENT = 2.0;
 
   @Builder
-  public record LimelightConfig(
+  public record StaticLimelightConfig(
       String key,
       CameraType cameraType,
       double horizontalFOV,
@@ -24,6 +24,19 @@ public class VisionConstants {
       double metatagThetaStdev,
       double megatag2XYStdev,
       Transform3d robotToCameraTransform,
+      Boolean enableRewind) {}
+
+  @Builder
+  public record MovingLimelightConfig(
+      String key,
+      CameraType cameraType,
+      double horizontalFOV,
+      double verticalFOV,
+      double megatagXYStdev,
+      double metatagThetaStdev,
+      double megatag2XYStdev,
+      Transform3d robotToRotationAxisTransform,
+      Transform3d rotationAxisToLensTransform,
       Boolean enableRewind) {}
 
   @Builder

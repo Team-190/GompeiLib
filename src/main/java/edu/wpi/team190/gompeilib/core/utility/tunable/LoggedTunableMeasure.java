@@ -66,11 +66,7 @@ public class LoggedTunableMeasure<U extends Unit> implements Supplier<Measure<U>
   }
 
   public double getRawValue() {
-    if (!hasDefault) {
-      return 0;
-    } else {
-      return GompeiLib.isTuning() ? dashboardNumber.get() : defaultValue.in(unit);
-    }
+    return GompeiLib.isTuning() ? dashboardNumber.get() : defaultValue.in(unit);
   }
 
   /** Checks whether the measure has changed since our last check */

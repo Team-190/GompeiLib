@@ -20,7 +20,7 @@ public abstract class Camera {
   @Getter List<VisionMultiTxTyObservation> multiTxTyObservationList;
   @Getter List<VisionSingleTxTyObservation> singleTxTyObservationList;
 
-  protected Pose3d currentCameraPose;
+  @Getter protected Pose3d currentCameraPose;
 
   public Camera(
       String name,

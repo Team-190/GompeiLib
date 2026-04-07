@@ -12,7 +12,7 @@ import edu.wpi.team190.gompeilib.core.utility.control.constraints.LinearConstrai
 import edu.wpi.team190.gompeilib.core.utility.tunable.LoggedTunableMeasure;
 import edu.wpi.team190.gompeilib.core.utility.tunable.LoggedTunableNumber;
 import edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive.SwerveDriveConstants;
-import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants.LimelightConfig;
+import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants.StaticLimelightConfig;
 import edu.wpi.team190.gompeilib.subsystems.vision.camera.CameraType;
 
 public class V0_FunkyConstants {
@@ -148,8 +148,8 @@ public class V0_FunkyConstants {
           .withOperatorDeadband(OPERATOR_DEADBAND)
           .build();
 
-  public static final LimelightConfig LIMELIGHT_CONFIG =
-      LimelightConfig.builder()
+  public static final StaticLimelightConfig LIMELIGHT_CONFIG =
+      StaticLimelightConfig.builder()
           .key("limelight")
           .cameraType(CameraType.LIMELIGHT_4)
           .horizontalFOV(82.0)
