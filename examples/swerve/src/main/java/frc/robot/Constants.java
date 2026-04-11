@@ -7,8 +7,6 @@ public final class Constants {
   public static final boolean TUNING_MODE = true;
   public static final double LOOP_PERIOD_SECONDS = 0.02;
 
-  
-
   public static RobotMode getMode() {
     switch (RobotConfig.ROBOT) {
       case V0_FUNKY, V1_DOOMSPIRAL:
