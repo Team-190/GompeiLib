@@ -26,6 +26,7 @@ import edu.wpi.team190.gompeilib.core.io.components.inertial.GyroIOPigeon2;
 import edu.wpi.team190.gompeilib.core.logging.Trace;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.PhoenixOdometryThread;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
@@ -261,13 +262,16 @@ public class SwerveDrive extends SubsystemBase {
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
-      Vector<N2> wheelDirection =
-          VecBuilder.fill(setpointStates[i].angle.getCos(), setpointStates[i].angle.getSin());
-      setpointTorques[i] =
-          new SwerveModuleState(
-              forces.get(i).dot(wheelDirection)
-                  * driveConstants.driveConfig.frontLeft().DriveMotorGearRatio,
-              setpointStates[i].angle);
+      double motorTorque =
+          forces
+                  .get(i)
+                  .dot(
+                      VecBuilder.fill(
+                          setpointStates[i].angle.getCos(), setpointStates[i].angle.getSin()))
+              * driveConstants.driveConfig.wheelRadiusMeters()
+              / driveConstants.driveConfig.frontLeft().DriveMotorGearRatio;
+
+      setpointTorques[i] = new SwerveModuleState(motorTorque, setpointStates[i].angle);
 
       setpointStates[i].optimize(modules[i].getAngle());
       setpointTorques[i].optimize(modules[i].getAngle());
@@ -303,6 +307,21 @@ public class SwerveDrive extends SubsystemBase {
     Rotation2d[] headings = new Rotation2d[4];
     for (int i = 0; i < 4; i++) {
       headings[i] = driveConstants.driveConfig.getModuleTranslations()[i].getAngle();
+    }
+    kinematics.resetHeadings(headings);
+    stop();
+  }
+
+  /** Stops the drive and turns the modules to an O arrangement to resist movement. */
+  public void stopWithO() {
+    Rotation2d[] headings = new Rotation2d[4];
+    for (int i = 0; i < 4; i++) {
+      headings[i] =
+          driveConstants
+              .driveConfig
+              .getModuleTranslations()[i]
+              .getAngle()
+              .plus(Rotation2d.kCW_90deg);
     }
     kinematics.resetHeadings(headings);
     stop();
@@ -414,7 +433,16 @@ public class SwerveDrive extends SubsystemBase {
             rotationFF + rotationFeedback,
             Rotation2d.fromRadians(sample.heading));
 
-    runVelocity(velocity);
+    List<Vector<N2>> moduleTorques = new ArrayList<>(4);
+
+    for (int i = 0; i < 4; i++) {
+      moduleTorques.add(
+          new Translation2d(sample.moduleForcesX()[i], sample.moduleForcesY()[i])
+              .rotateBy(Rotation2d.fromRadians(-sample.heading))
+              .toVector());
+    }
+
+    runVelocityTorque(velocity, moduleTorques);
     Logger.recordOutput("Auto/Setpoint", sample.getPose());
   }
 
