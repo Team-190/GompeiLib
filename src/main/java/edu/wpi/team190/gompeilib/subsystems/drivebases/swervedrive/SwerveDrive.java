@@ -3,6 +3,10 @@ package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
@@ -61,6 +65,8 @@ public class SwerveDrive extends SubsystemBase {
 
   private final Optional<Queue<Double>> yawTimestampQueue;
   private final Optional<Queue<Double>> yawPositionQueue;
+
+  private RobotConfig config;
 
   public SwerveDrive(
       SwerveDriveConstants driveConstants,
@@ -138,6 +144,29 @@ public class SwerveDrive extends SubsystemBase {
     autoHeadingController.setTolerance(Units.degreesToRadians(1.0));
 
     measuredChassisSpeeds = new ChassisSpeeds();
+
+    try {
+      config = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      System.err.println("Error occurred while loading robot config: " + e.getMessage());
+    }
+
+    AutoBuilder.configure(
+        this.robotPoseSupplier,
+        resetPoseConsumer, // resetPose
+        () -> getChassisSpeeds(), // get robotRelativeSpeeds
+        (speeds, feedfowards) -> runVelocity(speeds),
+        new PPHolonomicDriveController(
+            new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+        config,
+        () -> {
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        this);
   }
 
   @Trace

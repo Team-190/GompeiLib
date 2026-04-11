@@ -32,6 +32,7 @@ repositories {
     maven { url = uri("https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release") }
     maven { url = uri("https://maven.ctr-electronics.com/release/") }
     maven { url = uri("https://frcmaven.wpi.edu/artifactory/sleipnirgroup-mvn-release/") }
+    maven { url = uri("https://3015rangerrobotics.github.io/pathplannerlib/repo") }
 }
 
 apply from: "gradle/native-utils.gradle"
@@ -43,6 +44,8 @@ dependencies {
     // AspectJ
     compileOnly libs.aspectj.rt
     runtimeOnly libs.aspectj.tools
+
+    implementation 'com.pathplanner.lib:PathplannerLib-java:2026.1.2'
 
     // CTRE
     compileOnly libs.phoenix6
@@ -91,8 +94,6 @@ publishing {
                 }
             }
         }
-        // NOTE: DO NOT add mavenLocal() here
-        // Gradle already provides publishToMavenLocal automatically
     }
 }
 
