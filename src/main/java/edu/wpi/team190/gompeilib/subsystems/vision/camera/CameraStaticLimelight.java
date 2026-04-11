@@ -78,7 +78,7 @@ public class CameraStaticLimelight extends Camera {
     LimelightHelpers.setCameraPose_RobotSpace(
         name,
         currentCameraPose.getX(),
-        currentCameraPose.getY(),
+        -currentCameraPose.getY(),
         currentCameraPose.getZ(),
         currentCameraPose.getRotation().getMeasureX().in(Degrees),
         currentCameraPose.getRotation().getMeasureY().in(Degrees),
