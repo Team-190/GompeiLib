@@ -6,6 +6,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -113,14 +114,6 @@ public class CameraMovingLimelight extends Camera {
                 currentCameraPose.getTranslation(), new Rotation3d(rotationAxisSupplier.get()))
             .transformBy(config.rotationAxisToLensTransform());
 
-    LimelightHelpers.setCameraPose_RobotSpace(
-        name,
-        currentCameraPose.getX(),
-        -currentCameraPose.getY(),
-        currentCameraPose.getZ(),
-        currentCameraPose.getRotation().getMeasureX().in(Degrees),
-        currentCameraPose.getRotation().getMeasureY().in(Degrees),
-        currentCameraPose.getRotation().getMeasureZ().in(Degrees));
 
     if (DriverStation.isEnabled()) {
       if (!wasEnabled) {
@@ -148,7 +141,7 @@ public class CameraMovingLimelight extends Camera {
     }
 
     headingPublisher.set(
-        new double[] {headingSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0},
+        new double[] {rotationAxisSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0},
         timestampSupplier.getAsLong());
 
     io.updateInputs(inputs);
@@ -206,7 +199,7 @@ public class CameraMovingLimelight extends Camera {
 
       poseObservationList.add(
           new VisionPoseObservation(
-              inputs.mt2PoseEstimate.pose(),
+              inputs.mt2PoseEstimate.pose().rotateBy(rotationAxisSupplier.get().plus(headingSupplier.get())).transformBy(new Transform2d(currentCameraPose.toPose2d().getTranslation(), rotationAxisSupplier.get())), //pass in turret angle relative to robot, get back mt2 pose (assume camera is at turret center), subtract camera offset from center of turret, subtract turret angle minus robot angle from overall pose rotation
               Arrays.stream(inputs.mt2PoseEstimate.rawFiducials())
                   .map(CameraIO.RawFiducial::id)
                   .collect(Collectors.toSet()),
