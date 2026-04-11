@@ -58,7 +58,12 @@ public class SwerveDriveConstants {
       @NonNull SwerveModuleConstants.ClosedLoopOutputType driveClosedLoopOutputType,
       @NonNull SwerveModuleConstants.ClosedLoopOutputType steerClosedLoopOutputType,
       @NonNull Double bumperWidth,
-      @NonNull Double bumperLength) {
+      @NonNull Double bumperLength,
+      @NonNull Double robotMassKilograms,
+      @NonNull Double wheelCOF,
+      @NonNull Double trackWidth,
+      @NonNull Double robotMOI,
+      @NonNull Double moduleCurrentLimit) {
     public Double driveBaseRadius() {
       return Math.hypot(
           (Math.abs(frontLeft.LocationX) + Math.abs(frontRight.LocationX)) / 2.0,

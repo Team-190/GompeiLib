@@ -4,6 +4,7 @@ package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -20,7 +21,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.MassUnit;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
@@ -37,6 +41,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.units.MassUnit;
 
 public class SwerveDrive extends SubsystemBase {
   private final SwerveDriveConstants driveConstants;
@@ -146,7 +151,8 @@ public class SwerveDrive extends SubsystemBase {
     measuredChassisSpeeds = new ChassisSpeeds();
 
     try {
-      config = RobotConfig.fromGUISettings();
+      config = new RobotConfig(driveConstants.driveConfig.robotMassKilograms(), driveConstants.driveConfig.robotMOI(), new ModuleConfig(
+        driveConstants.driveConfig.wheelRadiusMeters(), driveConstants.driveConfig.trackWidth(), driveConstants.driveConfig.moduleCurrentLimit(), DCMotor.getKrakenX60(1), 60.0, 1), driveConstants.driveConfig.trackWidth());
     } catch (Exception e) {
       System.err.println("Error occurred while loading robot config: " + e.getMessage());
     }
