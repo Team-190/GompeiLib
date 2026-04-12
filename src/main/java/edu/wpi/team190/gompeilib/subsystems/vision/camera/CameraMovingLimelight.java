@@ -185,7 +185,8 @@ public class CameraMovingLimelight extends Camera {
                       VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT)
               : Double.POSITIVE_INFINITY;
       Pose2d tagPose = inputs.mt1PoseEstimate.pose();
-      tagPose = tagPose.rotateBy(rotationAxisSupplier.get().unaryMinus());
+      tagPose =
+          tagPose.rotateAround(tagPose.getTranslation(), rotationAxisSupplier.get().unaryMinus());
       Pose2d correctedRobotPose =
           tagPose.transformBy(
               new Transform2d(
