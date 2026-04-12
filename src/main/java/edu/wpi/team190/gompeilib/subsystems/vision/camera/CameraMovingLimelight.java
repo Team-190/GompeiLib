@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -78,9 +79,7 @@ public class CameraMovingLimelight extends Camera {
 
     allTagPoses = new ArrayList<>();
 
-    currentCameraPose =
-        Pose3d.kZero
-            .transformBy(config.robotToRotationAxisTransform());
+    currentCameraPose = Pose3d.kZero.transformBy(config.robotToRotationAxisTransform());
 
     LimelightHelpers.setCameraPose_RobotSpace(
         name,
@@ -141,9 +140,9 @@ public class CameraMovingLimelight extends Camera {
 
     headingPublisher.set(
         new double[] {
-          edu.wpi.first.math.util.Units.radiansToDegrees(
-                  config.robotToRotationAxisTransform().getRotation().getZ())
-              + rotationAxisSupplier.get().getDegrees(),
+          -Units.radiansToDegrees(config.robotToRotationAxisTransform().getRotation().getZ())
+              + rotationAxisSupplier.get().getDegrees()
+              + headingSupplier.get().getDegrees(),
           0.0,
           0.0,
           0.0,
@@ -186,18 +185,16 @@ public class CameraMovingLimelight extends Camera {
                       VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT)
               : Double.POSITIVE_INFINITY;
       Pose2d tagPose = inputs.mt1PoseEstimate.pose();
-      Pose2d cameraPose = currentCameraPose.toPose2d();
-
-      // Step 1: translate by camera offset
-      Pose2d translated =
-          tagPose.transformBy(new Transform2d(cameraPose.getTranslation(), new Rotation2d()));
-
-      // Step 2: rotate 90° around turret center (camera position)
-      Pose2d result =
-          translated.rotateAround(cameraPose.getTranslation(), Rotation2d.fromDegrees(90));
+      tagPose = tagPose.rotateBy(rotationAxisSupplier.get().unaryMinus());
+      Pose2d correctedRobotPose =
+          tagPose.transformBy(
+              new Transform2d(
+                  config.rotationAxisToLensTransform().getTranslation().toTranslation2d(),
+                  new Rotation2d()));
+      Logger.recordOutput("Vision/Cameras/" + this.name + "/MT1Pose", correctedRobotPose);
       poseObservationList.add(
           new VisionPoseObservation(
-              result,
+              correctedRobotPose,
               Arrays.stream(inputs.mt1PoseEstimate.rawFiducials())
                   .map(CameraIO.RawFiducial::id)
                   .collect(Collectors.toSet()),
@@ -214,18 +211,15 @@ public class CameraMovingLimelight extends Camera {
                   inputs.mt2PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
       thetaStdev = Double.POSITIVE_INFINITY;
       Pose2d tagPose = inputs.mt2PoseEstimate.pose();
-      Pose2d cameraPose = currentCameraPose.toPose2d();
-
-      // Step 1: translate by camera offset
-      Pose2d translated =
-          tagPose.transformBy(new Transform2d(cameraPose.getTranslation(), new Rotation2d()));
-
-      // Step 2: rotate 90° around turret center (camera position)
-      Pose2d result =
-          translated.rotateAround(cameraPose.getTranslation(), Rotation2d.fromDegrees(90));
+      Pose2d limelightBelievedCameraPose =
+          new Pose3d().transformBy(config.robotToRotationAxisTransform()).toPose2d();
+      Pose2d trueCameraPose = currentCameraPose.toPose2d();
+      Transform2d correction = new Transform2d(limelightBelievedCameraPose, trueCameraPose);
+      Pose2d correctedRobotPose = tagPose.transformBy(correction.inverse());
+      Logger.recordOutput("Vision/" + name + "/MT2Pose", correctedRobotPose);
       poseObservationList.add(
           new VisionPoseObservation(
-              result,
+              correctedRobotPose,
               Arrays.stream(inputs.mt2PoseEstimate.rawFiducials())
                   .map(CameraIO.RawFiducial::id)
                   .collect(Collectors.toSet()),
