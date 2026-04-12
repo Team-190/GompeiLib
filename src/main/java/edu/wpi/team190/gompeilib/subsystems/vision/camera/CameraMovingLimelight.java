@@ -3,6 +3,7 @@ package edu.wpi.team190.gompeilib.subsystems.vision.camera;
 import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -196,10 +197,22 @@ public class CameraMovingLimelight extends Camera {
               / Math.pow(
                   inputs.mt2PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
       thetaStdev = Double.POSITIVE_INFINITY;
+      Pose2d tagPose = inputs.mt2PoseEstimate.pose();
+      Pose2d cameraPose = currentCameraPose.toPose2d();
 
+      // Step 1: translate by camera offset
+      Pose2d translated = tagPose.transformBy(
+          new Transform2d(cameraPose.getTranslation(), new Rotation2d())
+      );
+
+      // Step 2: rotate 90° around turret center (camera position)
+      Pose2d result = translated.rotateAround(
+          cameraPose.getTranslation(),
+          Rotation2d.fromDegrees(90)
+);
       poseObservationList.add(
           new VisionPoseObservation(
-              inputs.mt2PoseEstimate.pose().rotateBy(rotationAxisSupplier.get().plus(headingSupplier.get())).transformBy(new Transform2d(currentCameraPose.toPose2d().getTranslation(), rotationAxisSupplier.get())), //pass in turret angle relative to robot, get back mt2 pose (assume camera is at turret center), subtract camera offset from center of turret, subtract turret angle minus robot angle from overall pose rotation
+              result,
               Arrays.stream(inputs.mt2PoseEstimate.rawFiducials())
                   .map(CameraIO.RawFiducial::id)
                   .collect(Collectors.toSet()),
