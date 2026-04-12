@@ -45,7 +45,8 @@ dependencies {
     compileOnly libs.aspectj.rt
     runtimeOnly libs.aspectj.tools
 
-    implementation libs.pathplanner
+    // PathPlanner
+    compileOnly libs.pathplanner
 
     // CTRE
     compileOnly libs.phoenix6

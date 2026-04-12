@@ -157,7 +157,7 @@ public class SwerveDrive extends SubsystemBase {
                   driveConstants.driveConfig.trackWidth(),
                   driveConstants.driveConfig.moduleCurrentLimit(),
                   DCMotor.getKrakenX60(1),
-                  60.0,
+                  driveConstants.driveConfig.moduleCurrentLimit(),
                   1),
               driveConstants.driveConfig.trackWidth());
     } catch (Exception e) {
@@ -170,7 +170,14 @@ public class SwerveDrive extends SubsystemBase {
         () -> getChassisSpeeds(), // get robotRelativeSpeeds
         (speeds, feedfowards) -> runVelocity(speeds),
         new PPHolonomicDriveController(
-            new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+            new PIDConstants(
+                driveConstants.autoTranslationGains.kP().getAsDouble(),
+                driveConstants.autoTranslationGains.kI().getAsDouble(),
+                driveConstants.autoTranslationGains.kD().getAsDouble()),
+            new PIDConstants(
+                driveConstants.autoRotationGains.kP().getAsDouble(),
+                driveConstants.autoRotationGains.kI().getAsDouble(),
+                driveConstants.autoRotationGains.kD().getAsDouble())),
         config,
         () -> {
           var alliance = DriverStation.getAlliance();
