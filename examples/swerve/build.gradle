@@ -7,6 +7,10 @@ plugins {
     id "io.freefair.aspectj.post-compile-weaving" version "8.6"
 }
 
+repositories {
+    maven { url = uri("https://3015rangerrobotics.github.io/pathplannerlib/repo") }
+}
+
 ext {
     deploySrcDir = "src/main/deploy"
     deployRobotDir = "/home/lvuser/deploy"
@@ -264,6 +268,8 @@ dependencies {
     implementation wpi.java.vendor.java()
     implementation 'org.jgrapht:jgrapht-core:1.5.1'
     implementation 'org.jgrapht:jgrapht-io:1.5.1'
+
+    implementation 'com.pathplanner.lib:PathplannerLib-java:2026.1.2'
 
 
     implementation project(":")  // <- root project (GompeiLib library)
