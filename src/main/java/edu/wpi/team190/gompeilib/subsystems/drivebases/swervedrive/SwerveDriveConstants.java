@@ -60,7 +60,6 @@ public class SwerveDriveConstants {
       @NonNull Double bumperWidth,
       @NonNull Double bumperLength,
       @NonNull Double robotMassKilograms,
-      @NonNull Double wheelCOF,
       @NonNull Double trackWidth,
       @NonNull Double robotMOI,
       @NonNull Double moduleCurrentLimit) {

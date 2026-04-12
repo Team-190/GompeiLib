@@ -159,7 +159,7 @@ public class SwerveDrive extends SubsystemBase {
                   DCMotor.getKrakenX60(1),
                   driveConstants.driveConfig.moduleCurrentLimit(),
                   1),
-              driveConstants.driveConfig.trackWidth());
+              driveConstants.driveConfig.getModuleTranslations());
     } catch (Exception e) {
       System.err.println("Error occurred while loading robot config: " + e.getMessage());
     }
