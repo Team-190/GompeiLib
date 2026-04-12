@@ -80,8 +80,7 @@ public class CameraMovingLimelight extends Camera {
 
     currentCameraPose =
         Pose3d.kZero
-            .transformBy(config.robotToRotationAxisTransform())
-            .transformBy(config.rotationAxisToLensTransform());
+            .transformBy(config.robotToRotationAxisTransform());
 
     LimelightHelpers.setCameraPose_RobotSpace(
         name,
@@ -115,7 +114,6 @@ public class CameraMovingLimelight extends Camera {
                 currentCameraPose.getTranslation(), new Rotation3d(rotationAxisSupplier.get()))
             .transformBy(config.rotationAxisToLensTransform());
 
-
     if (DriverStation.isEnabled()) {
       if (!wasEnabled) {
         enabledTimestamp = Timer.getFPGATimestamp();
@@ -142,7 +140,16 @@ public class CameraMovingLimelight extends Camera {
     }
 
     headingPublisher.set(
-        new double[] {rotationAxisSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0},
+        new double[] {
+          edu.wpi.first.math.util.Units.radiansToDegrees(
+                  config.robotToRotationAxisTransform().getRotation().getZ())
+              + rotationAxisSupplier.get().getDegrees(),
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        },
         timestampSupplier.getAsLong());
 
     io.updateInputs(inputs);
@@ -178,10 +185,19 @@ public class CameraMovingLimelight extends Camera {
                       inputs.mt1PoseEstimate.tagCount(),
                       VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT)
               : Double.POSITIVE_INFINITY;
+      Pose2d tagPose = inputs.mt1PoseEstimate.pose();
+      Pose2d cameraPose = currentCameraPose.toPose2d();
 
+      // Step 1: translate by camera offset
+      Pose2d translated =
+          tagPose.transformBy(new Transform2d(cameraPose.getTranslation(), new Rotation2d()));
+
+      // Step 2: rotate 90° around turret center (camera position)
+      Pose2d result =
+          translated.rotateAround(cameraPose.getTranslation(), Rotation2d.fromDegrees(90));
       poseObservationList.add(
           new VisionPoseObservation(
-              inputs.mt1PoseEstimate.pose(),
+              result,
               Arrays.stream(inputs.mt1PoseEstimate.rawFiducials())
                   .map(CameraIO.RawFiducial::id)
                   .collect(Collectors.toSet()),
@@ -201,15 +217,12 @@ public class CameraMovingLimelight extends Camera {
       Pose2d cameraPose = currentCameraPose.toPose2d();
 
       // Step 1: translate by camera offset
-      Pose2d translated = tagPose.transformBy(
-          new Transform2d(cameraPose.getTranslation(), new Rotation2d())
-      );
+      Pose2d translated =
+          tagPose.transformBy(new Transform2d(cameraPose.getTranslation(), new Rotation2d()));
 
       // Step 2: rotate 90° around turret center (camera position)
-      Pose2d result = translated.rotateAround(
-          cameraPose.getTranslation(),
-          Rotation2d.fromDegrees(90)
-);
+      Pose2d result =
+          translated.rotateAround(cameraPose.getTranslation(), Rotation2d.fromDegrees(90));
       poseObservationList.add(
           new VisionPoseObservation(
               result,
