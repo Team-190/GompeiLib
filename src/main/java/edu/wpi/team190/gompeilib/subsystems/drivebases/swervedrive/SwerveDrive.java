@@ -433,16 +433,7 @@ public class SwerveDrive extends SubsystemBase {
             rotationFF + rotationFeedback,
             Rotation2d.fromRadians(sample.heading));
 
-    List<Vector<N2>> moduleTorques = new ArrayList<>(4);
-
-    for (int i = 0; i < 4; i++) {
-      moduleTorques.add(
-          new Translation2d(sample.moduleForcesX()[i], sample.moduleForcesY()[i])
-              .rotateBy(Rotation2d.fromRadians(-sample.heading))
-              .toVector());
-    }
-
-    runVelocityTorque(velocity, moduleTorques);
+    runVelocity(velocity);
     Logger.recordOutput("Auto/Setpoint", sample.getPose());
   }
 
