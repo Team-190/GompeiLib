@@ -310,16 +310,13 @@ public class SwerveDrive extends SubsystemBase {
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
-      double motorTorque =
-          forces
-                  .get(i)
-                  .dot(
-                      VecBuilder.fill(
-                          setpointStates[i].angle.getCos(), setpointStates[i].angle.getSin()))
-              * driveConstants.driveConfig.wheelRadiusMeters()
-              / driveConstants.driveConfig.frontLeft().DriveMotorGearRatio;
-
-      setpointTorques[i] = new SwerveModuleState(motorTorque, setpointStates[i].angle);
+      Vector<N2> wheelDirection =
+          VecBuilder.fill(setpointStates[i].angle.getCos(), setpointStates[i].angle.getSin());
+      setpointTorques[i] =
+          new SwerveModuleState(
+              forces.get(i).dot(wheelDirection)
+                  * driveConstants.driveConfig.frontLeft().DriveMotorGearRatio,
+              setpointStates[i].angle);
 
       setpointStates[i].optimize(modules[i].getAngle());
       setpointTorques[i].optimize(modules[i].getAngle());
@@ -355,21 +352,6 @@ public class SwerveDrive extends SubsystemBase {
     Rotation2d[] headings = new Rotation2d[4];
     for (int i = 0; i < 4; i++) {
       headings[i] = driveConstants.driveConfig.getModuleTranslations()[i].getAngle();
-    }
-    kinematics.resetHeadings(headings);
-    stop();
-  }
-
-  /** Stops the drive and turns the modules to an O arrangement to resist movement. */
-  public void stopWithO() {
-    Rotation2d[] headings = new Rotation2d[4];
-    for (int i = 0; i < 4; i++) {
-      headings[i] =
-          driveConstants
-              .driveConfig
-              .getModuleTranslations()[i]
-              .getAngle()
-              .plus(Rotation2d.kCW_90deg);
     }
     kinematics.resetHeadings(headings);
     stop();
