@@ -154,8 +154,8 @@ public class SwerveDrive extends SubsystemBase {
               driveConstants.driveConfig.robotMOI(),
               new ModuleConfig(
                   driveConstants.driveConfig.wheelRadiusMeters(),
-                  driveConstants.driveConfig.trackWidth(),
-                  driveConstants.driveConfig.moduleCurrentLimit(),
+                  driveConstants.driveConfig.maxLinearVelocityMetersPerSecond(),
+                  2.0,
                   DCMotor.getKrakenX60(1),
                   driveConstants.driveConfig.moduleCurrentLimit(),
                   1),
