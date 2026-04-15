@@ -3,6 +3,11 @@ package edu.wpi.team190.gompeilib.subsystems.drivebases.swervedrive;
 
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
@@ -16,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -61,6 +67,8 @@ public class SwerveDrive extends SubsystemBase {
 
   private final Optional<Queue<Double>> yawTimestampQueue;
   private final Optional<Queue<Double>> yawPositionQueue;
+
+  private RobotConfig config;
 
   public SwerveDrive(
       SwerveDriveConstants driveConstants,
@@ -138,6 +146,47 @@ public class SwerveDrive extends SubsystemBase {
     autoHeadingController.setTolerance(Units.degreesToRadians(1.0));
 
     measuredChassisSpeeds = new ChassisSpeeds();
+
+    try {
+      config =
+          new RobotConfig(
+              driveConstants.driveConfig.robotMassKilograms(),
+              driveConstants.driveConfig.robotMOI(),
+              new ModuleConfig(
+                  driveConstants.driveConfig.wheelRadiusMeters(),
+                  driveConstants.driveConfig.maxLinearVelocityMetersPerSecond(),
+                  2.0,
+                  DCMotor.getKrakenX60(1),
+                  driveConstants.driveConfig.moduleCurrentLimit(),
+                  1),
+              driveConstants.driveConfig.getModuleTranslations());
+    } catch (Exception e) {
+      System.err.println("Error occurred while loading robot config: " + e.getMessage());
+    }
+
+    AutoBuilder.configure(
+        this.robotPoseSupplier,
+        resetPoseConsumer, // resetPose
+        () -> getChassisSpeeds(), // get robotRelativeSpeeds
+        (speeds, feedfowards) -> runVelocity(speeds),
+        new PPHolonomicDriveController(
+            new PIDConstants(
+                driveConstants.autoTranslationGains.kP().getAsDouble(),
+                driveConstants.autoTranslationGains.kI().getAsDouble(),
+                driveConstants.autoTranslationGains.kD().getAsDouble()),
+            new PIDConstants(
+                driveConstants.autoRotationGains.kP().getAsDouble(),
+                driveConstants.autoRotationGains.kI().getAsDouble(),
+                driveConstants.autoRotationGains.kD().getAsDouble())),
+        config,
+        () -> {
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        this);
   }
 
   @Trace

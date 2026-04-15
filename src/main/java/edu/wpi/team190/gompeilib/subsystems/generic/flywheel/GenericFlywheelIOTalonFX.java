@@ -41,7 +41,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
   private final VoltageOut voltageControlRequest;
   private final TorqueCurrentFOC torqueCurrentFOCRequest;
   private final VelocityVoltage velocityControlRequest;
-  private final MotionMagicVelocityTorqueCurrentFOC velocityTorqueCurrentRequest;
+  private final VelocityTorqueCurrentFOC velocityTorqueCurrentRequest;
 
   protected GenericFlywheelConstants constants;
 
@@ -167,7 +167,7 @@ public class GenericFlywheelIOTalonFX implements GenericFlywheelIO {
     torqueCurrentFOCRequest = new TorqueCurrentFOC(0.0);
 
     velocityControlRequest = new VelocityVoltage(0).withSlot(0);
-    velocityTorqueCurrentRequest = new MotionMagicVelocityTorqueCurrentFOC(0.0).withSlot(1);
+    velocityTorqueCurrentRequest = new VelocityTorqueCurrentFOC(0.0).withSlot(1);
 
     this.constants = constants;
   }
