@@ -131,6 +131,52 @@ public class GeometryUtil {
   }
 
   /**
+   * @param rectangle2ds Array of rectangles to check against
+   * @param pose Center of the target rectangle
+   * @param x Full width of the target rectangle
+   * @param y Full height of the target rectangle
+   * @return Whether ANY part of the target rectangle is inside any rectangle
+   */
+  public static boolean intersects(Rectangle2d[] rectangle2ds, Pose2d pose, double x, double y) {
+    Rectangle2d target = new Rectangle2d(pose, x, y);
+
+    double hx = x / 2.0;
+    double hy = y / 2.0;
+
+    // Target corners (correctly rotated)
+    Translation2d[] corners =
+        new Translation2d[] {
+          new Translation2d(hx, hy),
+          new Translation2d(-hx, hy),
+          new Translation2d(-hx, -hy),
+          new Translation2d(hx, -hy)
+        };
+
+    Translation2d center = pose.getTranslation();
+    Rotation2d rot = pose.getRotation();
+
+    for (Rectangle2d rectangle : rectangle2ds) {
+
+      for (Translation2d corner : corners) {
+        Translation2d worldCorner = center.plus(corner.rotateBy(rot));
+        if (rectangle.contains(worldCorner)) {
+          return true;
+        }
+      }
+
+      if (rectangle.contains(center)) {
+        return true;
+      }
+
+      if (target.contains(rectangle.getCenter().getTranslation())) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * @param rectangle2ds Array of rectangles to check if the translation is in
    * @param translation2d The translation to check is contained by the rectangle
    * @return Whether the translation is contained by the rectangle

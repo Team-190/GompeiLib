@@ -3,10 +3,13 @@ package edu.wpi.team190.gompeilib.subsystems.vision.camera;
 import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -76,15 +79,12 @@ public class CameraMovingLimelight extends Camera {
 
     allTagPoses = new ArrayList<>();
 
-    currentCameraPose =
-        Pose3d.kZero
-            .transformBy(config.robotToRotationAxisTransform())
-            .transformBy(config.rotationAxisToLensTransform());
+    currentCameraPose = Pose3d.kZero.transformBy(config.robotToRotationAxisTransform());
 
     LimelightHelpers.setCameraPose_RobotSpace(
         name,
         currentCameraPose.getX(),
-        currentCameraPose.getY(),
+        -currentCameraPose.getY(),
         currentCameraPose.getZ(),
         currentCameraPose.getRotation().getMeasureX().in(Degrees),
         currentCameraPose.getRotation().getMeasureY().in(Degrees),
@@ -113,15 +113,6 @@ public class CameraMovingLimelight extends Camera {
                 currentCameraPose.getTranslation(), new Rotation3d(rotationAxisSupplier.get()))
             .transformBy(config.rotationAxisToLensTransform());
 
-    LimelightHelpers.setCameraPose_RobotSpace(
-        name,
-        currentCameraPose.getX(),
-        currentCameraPose.getY(),
-        currentCameraPose.getZ(),
-        currentCameraPose.getRotation().getMeasureX().in(Degrees),
-        currentCameraPose.getRotation().getMeasureY().in(Degrees),
-        currentCameraPose.getRotation().getMeasureZ().in(Degrees));
-
     if (DriverStation.isEnabled()) {
       if (!wasEnabled) {
         enabledTimestamp = Timer.getFPGATimestamp();
@@ -148,7 +139,16 @@ public class CameraMovingLimelight extends Camera {
     }
 
     headingPublisher.set(
-        new double[] {headingSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0},
+        new double[] {
+          -Units.radiansToDegrees(config.robotToRotationAxisTransform().getRotation().getZ())
+              + rotationAxisSupplier.get().getDegrees()
+              + headingSupplier.get().getDegrees(),
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        },
         timestampSupplier.getAsLong());
 
     io.updateInputs(inputs);
@@ -184,10 +184,18 @@ public class CameraMovingLimelight extends Camera {
                       inputs.mt1PoseEstimate.tagCount(),
                       VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT)
               : Double.POSITIVE_INFINITY;
-
+      Pose2d tagPose = inputs.mt1PoseEstimate.pose();
+      tagPose =
+          tagPose.rotateAround(tagPose.getTranslation(), rotationAxisSupplier.get().unaryMinus());
+      Pose2d correctedRobotPose =
+          tagPose.transformBy(
+              new Transform2d(
+                  config.rotationAxisToLensTransform().getTranslation().toTranslation2d(),
+                  new Rotation2d()));
+      Logger.recordOutput("Vision/Cameras/" + this.name + "/MT1Pose", correctedRobotPose);
       poseObservationList.add(
           new VisionPoseObservation(
-              inputs.mt1PoseEstimate.pose(),
+              correctedRobotPose,
               Arrays.stream(inputs.mt1PoseEstimate.rawFiducials())
                   .map(CameraIO.RawFiducial::id)
                   .collect(Collectors.toSet()),
@@ -203,10 +211,16 @@ public class CameraMovingLimelight extends Camera {
               / Math.pow(
                   inputs.mt2PoseEstimate.tagCount(), VisionConstants.XY_STDEV_TAG_COUNT_EXPONENT);
       thetaStdev = Double.POSITIVE_INFINITY;
-
+      Pose2d tagPose = inputs.mt2PoseEstimate.pose();
+      Pose2d limelightBelievedCameraPose =
+          new Pose3d().transformBy(config.robotToRotationAxisTransform()).toPose2d();
+      Pose2d trueCameraPose = currentCameraPose.toPose2d();
+      Transform2d correction = new Transform2d(limelightBelievedCameraPose, trueCameraPose);
+      Pose2d correctedRobotPose = tagPose.transformBy(correction.inverse());
+      Logger.recordOutput("Vision/" + name + "/MT2Pose", correctedRobotPose);
       poseObservationList.add(
           new VisionPoseObservation(
-              inputs.mt2PoseEstimate.pose(),
+              correctedRobotPose,
               Arrays.stream(inputs.mt2PoseEstimate.rawFiducials())
                   .map(CameraIO.RawFiducial::id)
                   .collect(Collectors.toSet()),

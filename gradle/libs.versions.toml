@@ -8,6 +8,7 @@ aspectj = "1.9.21"
 advantagekit = "26.0.2"
 quickbuf = "1.4"
 jackson = "2.17.2"
+pathplanner = "2026.1.2"
 
 [libraries]
 # WPILib Core
@@ -33,6 +34,9 @@ phoenix6 = { group = "com.ctre.phoenix6", name = "wpiapi-java", version.ref = "p
 
 # Choreo
 choreo = { group = "choreo", name = "ChoreoLib-java", version.ref = "choreo" }
+
+# PathplannerLib
+pathplanner = { group = "com.pathplanner.lib", name = "PathplannerLib-java", version.ref = "pathplanner" }
 
 # AspectJ
 aspectj-rt = { group = "org.aspectj", name = "aspectjrt", version.ref = "aspectj" }

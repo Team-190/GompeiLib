@@ -12,6 +12,10 @@ public class CameraIOLimelight implements CameraIO {
     this.name = "limelight-" + config.key();
   }
 
+  public CameraIOLimelight(VisionConstants.MovingLimelightConfig config) {
+    this.name = "limelight-" + config.key();
+  }
+
   @Override
   public void updateInputs(LimelightIOInputs inputs) {
     inputs.mt1PoseEstimate = new PoseEstimate(LimelightHelpers.getBotPoseEstimate_wpiBlue(name));

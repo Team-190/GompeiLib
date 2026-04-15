@@ -2,6 +2,7 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -144,6 +145,10 @@ public class GenericFlywheel {
 
   public AngularVelocity getFlywheelVelocity() {
     return inputs.velocity;
+  }
+
+  public Rotation2d getFlywheelPosition() {
+    return inputs.position;
   }
 
   public void setVoltageGoal(Voltage voltageGoal) {
