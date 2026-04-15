@@ -62,7 +62,8 @@ public class SwerveDriveConstants {
       @NonNull Double robotMassKilograms,
       @NonNull Double trackWidth,
       @NonNull Double robotMOI,
-      @NonNull Double moduleCurrentLimit) {
+      @NonNull Double moduleCurrentLimit,
+      @NonNull Double wheelCOF) {
     public Double driveBaseRadius() {
       return Math.hypot(
           (Math.abs(frontLeft.LocationX) + Math.abs(frontRight.LocationX)) / 2.0,
