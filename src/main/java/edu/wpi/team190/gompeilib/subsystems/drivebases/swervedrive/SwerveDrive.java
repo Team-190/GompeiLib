@@ -191,7 +191,7 @@ public class SwerveDrive extends SubsystemBase {
                   driveConstants.autoRotationGains.kP().getAsDouble(),
                   driveConstants.autoRotationGains.kI().getAsDouble(),
                   driveConstants.autoRotationGains.kD().getAsDouble())),
-          config,
+          com.pathplanner.lib.config.RobotConfig.fromGUISettings(),
           () -> {
             var alliance = DriverStation.getAlliance();
             if (alliance.isPresent()) {
