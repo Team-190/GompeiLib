@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.utility.LimelightHelpers;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants;
 import edu.wpi.team190.gompeilib.subsystems.vision.VisionConstants.StaticLimelightConfig;
@@ -121,7 +122,11 @@ public class CameraStaticLimelight extends Camera {
         }
         wasEnabled = false;
         LimelightHelpers.SetIMUMode(name, 1);
-        LimelightHelpers.SetThrottle(name, 190);
+        if (GompeiLib.isTuning()) {
+          LimelightHelpers.SetThrottle(name, 190);
+        } else {
+          LimelightHelpers.SetIMUMode(name, 0);
+        }
       }
     }
 
