@@ -67,4 +67,8 @@ public class GenericRoller {
   public void setVoltageGoal(Setpoint<VoltageUnit> voltage) {
     voltageGoal = voltage;
   }
+
+  public double[] getTorqueCurrent() {
+    return inputs.torqueCurrentAmps;
+  }
 }
