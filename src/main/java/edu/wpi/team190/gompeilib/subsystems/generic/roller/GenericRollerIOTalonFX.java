@@ -43,6 +43,7 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
     talonFXConfiguration = new TalonFXConfiguration();
 
     talonFXConfiguration.MotorOutput.withInverted(constants.leaderInvertedValue);
+    talonFXConfiguration.MotorOutput.NeutralMode = constants.neutralMode;
 
     talonFXConfiguration
         .CurrentLimits

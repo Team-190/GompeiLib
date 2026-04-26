@@ -238,12 +238,16 @@ public class GenericFlywheel {
   public Command sysIdRoutineVoltage() {
     return Commands.sequence(
         Commands.runOnce(() -> currentState = GenericFlywheelState.IDLE),
-        voltageCharacterizationRoutine.dynamic(CustomSysIdRoutine.Direction.kForward),
-        Commands.waitSeconds(1.0),
-        voltageCharacterizationRoutine.dynamic(CustomSysIdRoutine.Direction.kReverse),
-        Commands.waitSeconds(1.0),
+        voltageCharacterizationRoutine
+            .dynamic(CustomSysIdRoutine.Direction.kForward)
+            .withTimeout(10),
+        Commands.waitSeconds(6.0),
+        voltageCharacterizationRoutine
+            .dynamic(CustomSysIdRoutine.Direction.kReverse)
+            .withTimeout(10),
+        Commands.waitSeconds(6.0),
         voltageCharacterizationRoutine.quasistatic(CustomSysIdRoutine.Direction.kForward),
-        Commands.waitSeconds(1.0),
+        Commands.waitSeconds(6.0),
         voltageCharacterizationRoutine.quasistatic(CustomSysIdRoutine.Direction.kReverse));
   }
 
@@ -251,11 +255,11 @@ public class GenericFlywheel {
     return Commands.sequence(
         Commands.runOnce(() -> currentState = GenericFlywheelState.IDLE),
         torqueCharacterizationRoutine.dynamic(CustomSysIdRoutine.Direction.kForward),
-        Commands.waitSeconds(1.0),
+        Commands.waitSeconds(5.0),
         torqueCharacterizationRoutine.dynamic(CustomSysIdRoutine.Direction.kReverse),
-        Commands.waitSeconds(1.0),
+        Commands.waitSeconds(5.0),
         torqueCharacterizationRoutine.quasistatic(CustomSysIdRoutine.Direction.kForward),
-        Commands.waitSeconds(1.0),
+        Commands.waitSeconds(5.0),
         torqueCharacterizationRoutine.quasistatic(CustomSysIdRoutine.Direction.kReverse));
   }
 }
