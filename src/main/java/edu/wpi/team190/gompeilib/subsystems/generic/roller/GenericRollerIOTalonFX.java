@@ -51,6 +51,7 @@ public class GenericRollerIOTalonFX implements GenericRollerIO {
         .withSupplyCurrentLimitEnable(true)
         .withStatorCurrentLimit(constants.currentLimits.statorCurrentLimit())
         .withStatorCurrentLimitEnable(true);
+    talonFXConfiguration.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.25;
 
     talonFXConfiguration.Feedback.SensorToMechanismRatio = constants.rollerMotorGearRatio;
 
