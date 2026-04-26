@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
@@ -151,29 +152,44 @@ public class SwerveDrive extends SubsystemBase {
       System.err.println("Error occurred while loading robot config: " + e.getMessage());
     }
 
-    AutoBuilder.configure(
-        this.robotPoseSupplier,
-        resetPoseConsumer, // resetPose
-        () -> getChassisSpeeds(), // get robotRelativeSpeeds
-        (speeds, feedfowards) -> runVelocity(speeds),
-        new PPHolonomicDriveController(
-            new PIDConstants(
-                driveConstants.autoTranslationGains.kP().getAsDouble(),
-                driveConstants.autoTranslationGains.kI().getAsDouble(),
-                driveConstants.autoTranslationGains.kD().getAsDouble()),
-            new PIDConstants(
-                driveConstants.autoRotationGains.kP().getAsDouble(),
-                driveConstants.autoRotationGains.kI().getAsDouble(),
-                driveConstants.autoRotationGains.kD().getAsDouble())),
-        config,
-        () -> {
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        },
-        this);
+    try {
+      AutoBuilder.configure(
+          this.robotPoseSupplier,
+          resetPoseConsumer, // resetPose
+          () -> getChassisSpeeds(), // get robotRelativeSpeeds
+          (speeds, feedforwards) -> {
+            List<Vector<N2>> forces =
+                IntStream.range(0, 4)
+                    .mapToObj(
+                        i ->
+                            VecBuilder.fill(
+                                feedforwards.robotRelativeForcesXNewtons()[i],
+                                feedforwards.robotRelativeForcesYNewtons()[i]))
+                    .toList();
+
+            runVelocity(speeds);
+          },
+          new PPHolonomicDriveController(
+              new PIDConstants(
+                  driveConstants.autoTranslationGains.kP().getAsDouble(),
+                  driveConstants.autoTranslationGains.kI().getAsDouble(),
+                  driveConstants.autoTranslationGains.kD().getAsDouble()),
+              new PIDConstants(
+                  driveConstants.autoRotationGains.kP().getAsDouble(),
+                  driveConstants.autoRotationGains.kI().getAsDouble(),
+                  driveConstants.autoRotationGains.kD().getAsDouble())),
+          com.pathplanner.lib.config.RobotConfig.fromGUISettings(),
+          () -> {
+            var alliance = DriverStation.getAlliance();
+            if (alliance.isPresent()) {
+              return alliance.get() == DriverStation.Alliance.Red;
+            }
+            return false;
+          },
+          this);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to load PathPlanner robot config", e);
+    }
   }
 
   @Trace
