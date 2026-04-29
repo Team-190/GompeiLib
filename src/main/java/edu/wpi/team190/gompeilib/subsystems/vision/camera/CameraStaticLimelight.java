@@ -89,7 +89,11 @@ public class CameraStaticLimelight extends Camera {
     LimelightHelpers.setRewindEnabled(name, config.enableRewind());
 
     LimelightHelpers.SetIMUMode(name, 1);
-    LimelightHelpers.SetThrottle(name, 190);
+    if (GompeiLib.isTuning()) {
+      LimelightHelpers.SetThrottle(name, 190);
+    } else {
+      LimelightHelpers.SetIMUMode(name, 0);
+    }
 
     wasEnabled = false;
     enabledTimestamp = Timer.getFPGATimestamp();
