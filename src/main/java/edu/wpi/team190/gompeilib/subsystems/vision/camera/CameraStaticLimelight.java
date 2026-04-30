@@ -90,9 +90,9 @@ public class CameraStaticLimelight extends Camera {
 
     LimelightHelpers.SetIMUMode(name, 1);
     if (GompeiLib.isTuning()) {
-      LimelightHelpers.SetThrottle(name, 190);
+      LimelightHelpers.SetThrottle(name, 0);
     } else {
-      LimelightHelpers.SetIMUMode(name, 0);
+      LimelightHelpers.SetIMUMode(name, 190);
     }
 
     wasEnabled = false;
@@ -127,9 +127,9 @@ public class CameraStaticLimelight extends Camera {
         wasEnabled = false;
         LimelightHelpers.SetIMUMode(name, 1);
         if (GompeiLib.isTuning()) {
-          LimelightHelpers.SetThrottle(name, 190);
+          LimelightHelpers.SetThrottle(name, 0);
         } else {
-          LimelightHelpers.SetIMUMode(name, 0);
+          LimelightHelpers.SetIMUMode(name, 190);
         }
       }
     }
