@@ -11,9 +11,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.robot.RobotMode;
 import edu.wpi.team190.gompeilib.core.utility.control.CurrentLimits;
@@ -24,13 +21,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
+import org.wpilib.math.system.DCMotor;
+import org.wpilib.units.Units;
+import org.wpilib.units.measure.*;
 
 public class GenericFlywheelIOTalonFXTest {
   private GenericFlywheelConstants constants;
 
   @BeforeEach
   public void setUp() {
-    edu.wpi.first.hal.HAL.initialize(500, 0);
+    org.wpilib.hardware.hal.HAL.initialize(500, 0);
     try {
       GompeiLib.deinit();
     } catch (Exception e) {
@@ -104,7 +104,7 @@ public class GenericFlywheelIOTalonFXTest {
     StatusSignal<Double> velocityErrorRotationsPerSecond = mock(StatusSignal.class);
     StatusSignal<Integer> closedLoopSlot = mock(StatusSignal.class);
 
-    when(positionRotations.getValueAsDouble()).thenReturn(10.0);
+    when(positionRotations.getValue()).thenReturn(Units.Rotations.of(10));
     when(velocityRotationsPerSecond.getValue()).thenReturn(Units.RotationsPerSecond.of(5.0));
     when(velocityRotationsPerSecond.getValueAsDouble()).thenReturn(5.0);
     when(velocityRotationsPerSecond.isNear(any(), any())).thenReturn(true);
@@ -159,7 +159,7 @@ public class GenericFlywheelIOTalonFXTest {
 
       // Verify the allocated inputs length matches leader + 2 followers
       assertEquals(3, inputs.appliedVolts.length);
-      assertEquals(10.0, inputs.position.getRotations(), 0.01);
+      assertEquals(10.0, inputs.position.in(Units.Rotations), 0.01);
       assertEquals(5.0, inputs.velocity.in(Units.RotationsPerSecond), 0.01);
       assertEquals(6.0, inputs.appliedVolts[0], 0.01);
       assertEquals(15.0, inputs.supplyCurrentAmps[0], 0.01);
