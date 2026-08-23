@@ -91,6 +91,9 @@ dependencies {
     compileOnly(libs.bundles.advantagekit)
     annotationProcessor libs.advantagekit.autolog
 
+    // XRP
+    compileOnly(libs.xrp)
+
     // Tests
     testImplementation platform('org.junit:junit-bom:5.11.0')
     // mockito-inline was discontinued at 5.2.0 and its ByteBuddy predates Java 25 support
@@ -107,6 +110,7 @@ dependencies {
     testImplementation libs.pathplanner
     // testImplementation libs.choreo
     testImplementation "org.ejml:ejml-simple:0.44.0"
+    testImplementation libs.xrp
 
     testRuntimeOnly libs.bundles.wpilib
     testRuntimeOnly libs.bundles.aspectj
@@ -114,6 +118,7 @@ dependencies {
     testRuntimeOnly libs.phoenix6
     testRuntimeOnly libs.pathplanner
     // testRuntimeOnly libs.choreo
+    testRuntimeOnly libs.xrp
 }
 
 publishing {
