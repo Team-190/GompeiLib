@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.InvertedValue;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.Units;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.robot.RobotMode;
 import edu.wpi.team190.gompeilib.core.utility.control.CurrentLimits;
@@ -14,13 +12,15 @@ import edu.wpi.team190.gompeilib.core.utility.control.constraints.AngularVelocit
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.system.DCMotor;
+import org.wpilib.units.Units;
 
 public class GenericFlywheelIOSimTest {
   private GenericFlywheelConstants constants;
 
   @BeforeEach
   public void setUp() {
-    edu.wpi.first.hal.HAL.initialize(500, 0);
+    org.wpilib.hardware.hal.HAL.initialize(500, 0);
     try {
       GompeiLib.deinit();
     } catch (Exception e) {
@@ -85,7 +85,7 @@ public class GenericFlywheelIOSimTest {
 
     // Initial check
     sim.updateInputs(inputs);
-    assertEquals(0.0, inputs.position.getRadians(), 1e-6);
+    assertEquals(0.0, inputs.position.in(Units.Radians), 1e-6);
     assertEquals(0.0, inputs.velocity.in(Units.RadiansPerSecond), 1e-6);
     assertEquals(3, inputs.appliedVolts.length);
 

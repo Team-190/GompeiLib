@@ -13,9 +13,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.*;
 import edu.wpi.team190.gompeilib.core.GompeiLib;
 import edu.wpi.team190.gompeilib.core.robot.RobotMode;
 import edu.wpi.team190.gompeilib.core.utility.control.CurrentLimits;
@@ -23,13 +20,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
+import org.wpilib.math.system.DCMotor;
+import org.wpilib.units.Units;
+import org.wpilib.units.measure.*;
 
 public class GenericRollerIOTalonFXSimTest {
   private GenericRollerConstants constants;
 
   @BeforeEach
   public void setUp() {
-    edu.wpi.first.hal.HAL.initialize(500, 0);
+    org.wpilib.hardware.hal.HAL.initialize(500, 0);
     try {
       GompeiLib.deinit();
     } catch (Exception e) {
@@ -69,7 +69,7 @@ public class GenericRollerIOTalonFXSimTest {
     StatusSignal<Current> torqueCurrentAmps = mock(StatusSignal.class);
     StatusSignal<Temperature> temperatureCelsius = mock(StatusSignal.class);
 
-    when(positionRotations.getValueAsDouble()).thenReturn(10.0);
+    when(positionRotations.getValue()).thenReturn(Units.Rotations.of(10));
     when(velocityRotationsPerSecond.getValue()).thenReturn(Units.RotationsPerSecond.of(5.0));
     when(velocityRotationsPerSecond.getValueAsDouble()).thenReturn(5.0);
     when(appliedVolts.getValueAsDouble()).thenReturn(6.0);
@@ -110,7 +110,7 @@ public class GenericRollerIOTalonFXSimTest {
 
       sim.updateInputs(inputs);
 
-      assertEquals(10.0, inputs.position.getRotations(), 0.01);
+      assertEquals(10.0, inputs.position.in(Units.Rotations), 0.01);
       assertEquals(5.0, inputs.velocity.in(Units.RotationsPerSecond), 0.01);
 
       verify(simState).setSupplyVoltage(anyDouble());

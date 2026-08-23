@@ -2,11 +2,11 @@ package edu.wpi.team190.gompeilib.subsystems.generic.flywheel;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import edu.wpi.first.units.Units;
 import edu.wpi.team190.gompeilib.core.utility.control.Gains;
 import edu.wpi.team190.gompeilib.core.utility.control.constraints.AngularVelocityConstraints;
 import edu.wpi.team190.gompeilib.core.utility.phoenix.GainSlot;
 import org.junit.jupiter.api.Test;
+import org.wpilib.units.Units;
 
 public class GenericFlywheelIOTest {
   @Test
@@ -35,7 +35,7 @@ public class GenericFlywheelIOTest {
             .build());
 
     // Inputs defaults
-    assertEquals(0.0, inputs.position.getDegrees());
+    assertEquals(0.0, inputs.position.in(Units.Radians));
     assertEquals(0.0, inputs.velocity.in(Units.RadiansPerSecond));
     assertEquals(0, inputs.appliedVolts.length);
     assertEquals(0, inputs.supplyCurrentAmps.length);
